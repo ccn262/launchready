@@ -70,3 +70,15 @@
 - Validate like-for-like cover only: same station, same asset, same operational role, current currency, in-date qualifications, available for the window, and no conflicting rota assignment.
 - Audit log all cover request and acceptance actions, and notify the requester, the accepting crew member, and the relevant admin or DLA.
 - Keep WhatsApp awareness-only and never the sole cover notification path.
+
+## Future Phase: Readiness Engine
+
+- Add a future readiness engine only after availability, rota, and crew capability foundations are stable.
+- Support safe-crewing rules by asset type and operation type using effective-date aware reference data.
+- Model operation types including service, exercise, passage, boat_movement, and assurance_activity.
+- Track minimum crew, maximum crew, darkness minimum crew where applicable, source reference, notes, and effective date ranges.
+- Check required roles separately from crew count, with hard-stop, required, and preferred role levels.
+- Support launch/recovery capability separately from operating boat crew.
+- Capture launch method context where needed, including afloat_alongside, afloat_mooring, floating_dock, hydraulic_lift, ilb_davit, alb_carriage, slipway, tractor, winch, davit, and remote_site.
+- Show service-ready, exercise-only, delayed-launch, and off-service states without authorising launches.
+- Require dynamic risk assessment, approving authority, reason, notes, and service-return logging for exceptions, while never overriding hard-stop role requirements.

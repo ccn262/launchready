@@ -7,6 +7,7 @@
 - Admins and LOMs only manage their own organisation and station scope.
 - DLA users only manage launch alerts for their own station.
 - Operational audit logging is required for important changes.
+- The readiness engine must not authorise launches; it can only describe readiness states and exceptional-review requirements.
 
 ## Data Classes
 
@@ -39,6 +40,7 @@
 - Audit rows for create, update, delete, alert, and role-scope changes.
 - No reliance on WhatsApp as the sole critical alert route.
 - `.env.local` is local-only and must never be committed.
+- Future safe-crewing and launch-exception reference data is restricted internal project material and must not be exposed publicly as official RNLI guidance.
 
 ## Phase 2 RLS Baseline
 
@@ -70,3 +72,4 @@
 - `/admin/stations`, `/admin/locations`, and `/admin/assets` are station-scoped CRUD routes for admin and LOM memberships, or super admins globally.
 - `/admin/asset-types` is visible to authenticated admin users but only editable by super admins.
 - `/admin/crew`, `/admin/roles`, and `/admin/qualifications` are management routes for station admins and LOMs, with operational data still protected by RLS at the table level.
+- Future readiness-engine views should distinguish service-ready, exercise-only, delayed-launch, and off-service states without claiming launch authorisation.

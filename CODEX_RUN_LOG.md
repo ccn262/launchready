@@ -104,6 +104,15 @@
 - Tests run: none, documentation-only update.
 - Next recommended step: leave these items in backlog until the availability engine and rota foundation are in place.
 
+## 2026-05-07 14:33 BST
+
+- Branch: `feature/crew-management-asset-roles`
+- Files changed: `BUILD_PLAN.md`, `DATABASE_SCHEMA.md`, `SECURITY_MODEL.md`, `PROJECT_HANDOFF.md`, `CHANGELOG.md`, and supporting run log references.
+- Purpose: record restricted internal readiness-engine guidance for safe crewing, minimum role complements, launch/recovery separation, and dynamic risk assessment boundaries.
+- Errors: none.
+- Tests run: none, documentation-only update.
+- Next recommended step: defer readiness-engine implementation until availability, rota, and crew capability foundations are stable.
+
 ## 2026-05-07 14:04 BST
 
 - Branch: `feature/crew-management-asset-roles`

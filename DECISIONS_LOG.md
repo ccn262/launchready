@@ -20,3 +20,5 @@
 - Chosen future rota model: weekend duty rota work is deferred until the availability engine exists, and it will cover Friday 19:00 through Monday 07:00 with explicit coverage slices for Friday night, Saturday day/night, and Sunday day/night into Monday morning.
 - Chosen capability badge model: reusable crew capability badge formatting will be shared across dashboards, admin pages, rotas, launch response screens, reports, and message summaries instead of being hardcoded per page.
 - Chosen cover-request model: cover swap requests will be like-for-like only, station-scoped, and validated against the required asset, role, currency, qualification, availability, and rota constraints before acceptance.
+- Chosen readiness-engine model: safe-crewing and required-role rules will be effective-dated, asset-type scoped, and operation-type aware, but the system will never authorise launches.
+- Chosen internal-reference rule: restricted SAR crewing guidance is treated as internal project reference only and must not be surfaced as public-facing RNLI approval or endorsement.

@@ -85,3 +85,9 @@
 - Added backlog notes for weekend duty rota management after the availability engine exists.
 - Added backlog notes for reusable crew capability badge rendering across dashboards, rotas, and communication summaries.
 - Added backlog notes for like-for-like cover and swap requests with audit logging and eligibility validation.
+
+## 0.5.2 - 2026-05-07
+
+- Added future readiness-engine backlog notes for safe-crewing rules by asset type and operation type.
+- Added future readiness-engine backlog notes for minimum role complements, launch/recovery separation, and effective-dated rule sets.
+- Clarified that safe-crewing reference material is restricted internal guidance and not public-facing RNLI approval.
