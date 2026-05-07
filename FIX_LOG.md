@@ -69,3 +69,12 @@
 - Reworked `middleware.ts` to be fully Edge-safe and fail closed when Supabase config or session refresh fails.
 - Added defensive redirects for missing config and session refresh errors instead of letting the Edge runtime throw a 500.
 - Tightened the middleware matcher so static assets and public files are excluded from invocation.
+
+
+## 2026-05-07 Phase 6 Availability and Rota Foundation
+
+- Added the crew and admin availability/rota foundation routes.
+- Fixed the crew availability write guard so crew users can save their own availability without requiring admin-only station permissions.
+- Fixed loader tuple typing in the Phase 6 helper so array-returning helpers are destructured correctly.
+- Fixed build-time nullability issues in the Phase 6 actions by narrowing profile and datetime values before payload assembly.
+- Confirmed `npm run lint` and `npm run build` pass after the Phase 6 fixes.

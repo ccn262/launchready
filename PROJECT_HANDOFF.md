@@ -2,7 +2,7 @@
 
 ## Status
 
-Launch Ready now has the initial Next.js App Router foundation, strict TypeScript, Tailwind, a dark operational design system, placeholder dashboards, Supabase client scaffolding, a manually validated Phase 2 Supabase schema/RLS foundation, the Phase 3 auth/session foundation, the Phase 4 admin CRUD foundation for stations, locations, asset types, and assets, and the Phase 5 crew/roles/qualification foundation in progress.
+Launch Ready now has the initial Next.js App Router foundation, strict TypeScript, Tailwind, a dark operational design system, placeholder dashboards, Supabase client scaffolding, a manually validated Phase 2 Supabase schema/RLS foundation, the Phase 3 auth/session foundation, the Phase 4 admin CRUD foundation for stations, locations, asset types, and assets, the Phase 5 crew/roles/qualification foundation, and the Phase 6 availability/night-cover/weekend-rota foundation.
 
 ## What Exists
 
@@ -10,6 +10,8 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - `src/app/page.tsx`, `src/app/crew/page.tsx`, `src/app/dla/page.tsx`, and `src/app/admin/page.tsx` provide the initial shell and section entry points.
 - `src/app/admin/stations/page.tsx`, `src/app/admin/locations/page.tsx`, `src/app/admin/asset-types/page.tsx`, and `src/app/admin/assets/page.tsx` now provide the first real admin CRUD surfaces.
 - `src/app/admin/crew/page.tsx`, `src/app/admin/roles/page.tsx`, and `src/app/admin/qualifications/page.tsx` now provide the crew membership, operational role, and qualification management surfaces.
+- `src/app/crew/availability/page.tsx`, `src/app/crew/rota/page.tsx`, `src/app/admin/availability/page.tsx`, and `src/app/admin/duty-rota/page.tsx` now provide the first availability, weeknight cover, and weekend duty rota foundation surfaces.
+- `src/components/crew-capability-badges.tsx` and `src/lib/capability-badges.ts` provide reusable asset/role badge rendering for the current and future rota views.
 - `src/components/app-shell.tsx` implements the responsive sidebar and mobile drawer.
 - `src/lib/supabase/browser.ts` and `src/lib/supabase/server.ts` provide lazy Supabase client factories.
 - The required governance documents now exist in the repository root.
@@ -35,12 +37,13 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 3. Continue Phase 3 route and session hardening.
 4. Complete Phase 4 CRUD smoke testing for stations, locations, asset types, and assets.
 5. Validate Phase 5 crew, role, and qualification management in the browser.
-6. Replace the remaining placeholders with alert, readiness, and rota data models.
-7. Add audit logging write paths into the app.
-8. Keep RNLI public station reference/import in the future backlog until the CRUD and readiness engine are stable.
-9. Keep weekend duty rota, crew capability badges, and cover/swap request work in the backlog until the availability engine and rota foundation are ready.
-10. Keep the future readiness engine aligned to safe-crewing reference rules, minimum role complements, launch/recovery checks, and dynamic risk assessment boundaries.
-11. Verify the Vercel preview redeploy for the middleware fix, then merge the published branches in order once review is complete.
+6. Complete browser smoke testing for the Phase 6 availability and rota foundation routes.
+7. Replace the remaining placeholders with alert, readiness, and rota data models.
+8. Add audit logging write paths into the app.
+9. Keep RNLI public station reference/import in the future backlog until the CRUD and readiness engine are stable.
+10. Keep weekend duty rota, crew capability badges, and cover/swap request work in the backlog until the availability engine and rota foundation are ready.
+11. Keep the future readiness engine aligned to safe-crewing reference rules, minimum role complements, launch/recovery checks, and dynamic risk assessment boundaries.
+12. Verify the Vercel preview redeploy for the middleware fix, then merge the published branches in order once review is complete.
 
 ## Verification
 
@@ -63,6 +66,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Phase 5 adds station crew management plus asset-specific role and qualification assignment using the existing `station_memberships` and `crew_qualifications` tables.
 - Weekend duty rota management is deferred until the availability engine is ready, and it must cover Friday 19:00 through Monday 07:00.
 - Crew capability badges must be reused everywhere instead of being reimplemented per page.
+- The Phase 6 foundation uses the existing `availability_slots` and `duty_periods` tables with `starts_at`, `ends_at`, and `created_by_profile_id` support to keep the rota work lightweight and reviewable.
 - Cover and swap requests must remain like-for-like only and audit logged when they are introduced.
 - The future readiness engine must support effective-dated safe-crewing rules, required-role complements, launch method checks, and non-authorising risk assessment states.
 

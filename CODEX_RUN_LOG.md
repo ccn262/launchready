@@ -122,3 +122,14 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: let Vercel redeploy the preview, then continue Phase 5 browser smoke testing if the preview is green.
+
+
+## 2026-05-07 14:39 BST
+
+- Branch: `feature/availability-night-weekend-rota`
+- Files changed: Phase 6 availability/rota routes, shared capability badge helpers, Phase 6 server actions, Phase 6 loaders, migration, and supporting project docs.
+- Errors: crew availability initially used the admin-only station guard; Phase 6 helpers also had tuple typing and nullability issues during `next build`.
+- Fixes attempted: added a crew-scoped station access guard for availability writes, tightened helper return types, normalized loader destructuring, and narrowed action payload values before insertion/update.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: run the browser smoke test for `/crew/availability`, `/crew/rota`, `/admin/availability`, and `/admin/duty-rota`, then merge Phase 6 if the review pass is clean.

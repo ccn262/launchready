@@ -91,3 +91,11 @@
 - Added future readiness-engine backlog notes for safe-crewing rules by asset type and operation type.
 - Added future readiness-engine backlog notes for minimum role complements, launch/recovery separation, and effective-dated rule sets.
 - Clarified that safe-crewing reference material is restricted internal guidance and not public-facing RNLI approval.
+
+
+## 0.6.0 - 2026-05-07
+
+- Added the Phase 6 availability and rota foundation routes for crew and station admins.
+- Added reusable crew capability badge rendering for asset-specific roles and currency states.
+- Added weekend-unavailable availability support and weekend duty rota foundation fields.
+- Kept auto-rota generation, cover/swap requests, and the full readiness engine in backlog.

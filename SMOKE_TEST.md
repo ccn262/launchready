@@ -34,7 +34,12 @@
 22. Confirm `/admin/crew` lists station crew and allows editing a membership.
 23. Confirm `/admin/roles` allows assigning D Class and B Class roles with different currency states to the same crew member.
 24. Confirm `/admin/qualifications` allows setting Casualty Care expiry and clearly flags expired or near-expiry records.
-25. Confirm DLA access still follows the agreed security model and does not grant management access to the admin pages.
+25. Confirm `/crew/availability` allows crew to create full-day, partial-day, and night-cover availability windows.
+26. Confirm `/crew/availability` allows marking weekend unavailability and shows capability badges.
+27. Confirm `/crew/rota` shows assigned rota periods and capability badges for the selected station.
+28. Confirm `/admin/availability` shows station-wide availability and allows station-scoped edits.
+29. Confirm `/admin/duty-rota` allows manually assigning weekend cover and DLA day/night duty periods.
+30. Confirm DLA access still follows the agreed security model and does not grant management access to the admin pages.
 
 ## Pass Criteria
 
@@ -48,4 +53,5 @@
 - The browser smoke test covers `/login`, `/`, `/crew`, `/dla`, `/admin`, `/unauthorized`, and logout.
 - The browser smoke test also covers `/admin/stations`, `/admin/locations`, `/admin/asset-types`, and `/admin/assets`.
 - The browser smoke test also covers `/admin/crew`, `/admin/roles`, and `/admin/qualifications`.
+- The browser smoke test also covers `/crew/availability`, `/crew/rota`, `/admin/availability`, and `/admin/duty-rota`.
 - Server-side route helpers block inactive profiles and insufficient role memberships even if middleware only refreshes the session.

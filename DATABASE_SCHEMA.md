@@ -61,7 +61,10 @@
 ## Availability Model
 
 - Availability blocks store start time, end time, cover type, location scope, and the asset or role they support.
-- Night cover, full-day cover, and split-day cover must all be representable.
+- Availability rows now also support `starts_at`, `ends_at`, and `created_by_profile_id` so the UI can work with full datetime windows directly.
+- `availability_slots.slot_kind` includes `full_day`, `partial_day`, `night_cover`, `unavailable`, and `weekend_unavailable`.
+- `duty_periods.period_kind` includes `day_cover`, `night_cover`, `launch_alert`, `incident_cover`, `training`, `weekend_cover`, `dla_day`, and `dla_night`.
+- Night cover, full-day cover, split-day cover, and weekend unavailability must all be representable.
 - Monday to Thursday rota logic must be representable.
 - Weekend rota and readiness-engine coverage should be added later as separate future phases rather than merged into Phase 2 or Phase 5.
 
@@ -74,3 +77,4 @@
 5. Alerts, deliveries, and audit logging.
 6. RLS policies on every table.
 7. Station and asset CRUD notes fields where needed.
+8. Availability and rota foundation datetime columns plus extended slot and period kinds.
