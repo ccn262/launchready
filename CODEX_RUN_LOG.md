@@ -176,3 +176,10 @@
 - Notes captured: training stages, pass-out and currency model, task-based competence, periodic requalification exceptions, safe-crewing crew-number baselines, minimum role complement, Head Launcher constraints, and dynamic risk assessment boundaries.
 - Tests run: not yet run in this patch set.
 - Next recommended step: run `npm run lint` and `npm run build`, then commit the reference-note docs.
+
+## 2026-05-07 Restricted Reference Validation
+
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Working tree: clean after commit `6ef3a5e`.
+- Next recommended step: no code changes required; keep the reference notes as internal-only guidance for future readiness work.
