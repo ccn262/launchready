@@ -21,6 +21,15 @@ export default async function LoginPage({
 }>) {
   const context = await getCurrentUserContext();
 
+  if (context.user && !context.isAuthenticated) {
+    redirect(
+      "/unauthorized?reason=" +
+        encodeURIComponent(
+          "Your account profile is inactive. Please contact a station admin or LOM.",
+        ),
+    );
+  }
+
   if (context.isAuthenticated) {
     redirect("/");
   }

@@ -59,3 +59,9 @@
 - Published the completed branches to GitHub.
 - Opened draft pull requests for the schema/RLS and auth/session branches.
 - Noted that `feature/initial-foundation` is already the same commit as `develop`, so GitHub does not create a PR for that branch.
+
+## 0.3.4 - 2026-05-07
+
+- Fixed the Vercel Edge middleware compatibility issue by removing imports of server-only auth helpers from middleware.
+- Moved detailed route authorization into server-rendered route helpers for the protected pages.
+- Kept middleware focused on session refresh and login redirects only.

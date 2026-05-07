@@ -3,8 +3,11 @@ import { OperationalCard } from "@/components/operational-card";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
+import { requireRouteAccess } from "@/lib/auth";
 
-export default function DlaPage() {
+export default async function DlaPage() {
+  await requireRouteAccess("/dla");
+
   return (
     <AppShell>
       <div className="space-y-6">

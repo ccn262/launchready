@@ -34,3 +34,4 @@
 - Phase 2 manual Supabase validation confirms the seed data and RLS baseline are correct.
 - Auth/session redirect behaviour works in the browser.
 - The browser smoke test covers `/login`, `/`, `/crew`, `/dla`, `/admin`, `/unauthorized`, and logout.
+- Server-side route helpers block inactive profiles and insufficient role memberships even if middleware only refreshes the session.

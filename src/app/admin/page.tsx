@@ -4,6 +4,7 @@ import { SectionShell } from "@/components/section-shell";
 import Link from "next/link";
 import { ArrowUpRight, Building2, MapPinned, Anchor, Users, BadgeCheck, Scale, ClipboardList, CalendarDays, Radio } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
+import { requireRouteAccess } from "@/lib/auth";
 
 const adminSections = [
   {
@@ -62,7 +63,9 @@ const adminSections = [
   },
 ];
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  await requireRouteAccess("/admin");
+
   return (
     <AppShell>
       <div className="space-y-6">

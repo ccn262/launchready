@@ -23,7 +23,7 @@
 - Add login and logout flows.
 - Add route protection and role-aware navigation.
 - Add current user/profile loading and unauthorised handling.
-- Status: started on `feature/auth-session-foundation`; branch is published and draft PRs are open.
+- Status: auth/session foundation is on `develop`; route checks are split so Edge middleware handles session routing and server pages enforce detailed access control.
 
 ## Phase 4
 

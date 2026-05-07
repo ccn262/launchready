@@ -43,3 +43,4 @@
 - Configure production environment variables.
 - Prepare preview and production secrets separately.
 - Ensure deployment checks require lint and build success.
+- Edge middleware should only handle session refresh and login redirects; detailed route authorization remains on the server.

@@ -64,3 +64,13 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: merge the published branches in dependency order, with `feature/supabase-schema-rls-foundation` before `feature/auth-session-foundation`.
+
+## 2026-05-07 13:03 BST
+
+- Branch: `fix/vercel-edge-middleware-auth`
+- Files changed: `middleware.ts`, protected page route guards, `src/lib/auth.ts`, and the project guard-rail docs.
+- Error: Vercel Edge middleware rejected imports of `@/lib/auth` and `@/lib/supabase/middleware` because they pull server-side code into the Edge bundle.
+- Fixes attempted: inlined the minimal Supabase session refresh logic in middleware, removed all server-only imports from the Edge file, and moved detailed role checks into server-rendered route helpers.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: commit, push, and open a PR from `fix/vercel-edge-middleware-auth` into `develop`.

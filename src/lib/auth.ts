@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { User } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type StationMembership = {
@@ -240,4 +241,28 @@ export function getUnauthorizedReason(pathname: string) {
   }
 
   return "You are not authorised to view this page.";
+}
+
+export async function requireRouteAccess(pathname: string) {
+  const context = await getCurrentUserContext();
+
+  if (!context.user) {
+    redirect(`/login?redirectTo=${encodeURIComponent(pathname)}`);
+  }
+
+  if (!context.isAuthenticated) {
+    redirect(
+      `/unauthorized?reason=${encodeURIComponent(
+        "Your account profile is inactive. Please contact a station admin or LOM.",
+      )}`,
+    );
+  }
+
+  if (!canAccessPath(pathname, context)) {
+    redirect(
+      `/unauthorized?reason=${encodeURIComponent(getUnauthorizedReason(pathname))}`,
+    );
+  }
+
+  return context;
 }
