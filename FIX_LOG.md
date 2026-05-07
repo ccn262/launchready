@@ -50,3 +50,9 @@
 - Removed `@/lib/auth` and `@/lib/supabase/middleware` imports from `middleware.ts` so the Edge bundle only uses edge-safe code.
 - Inlined the minimal Supabase session refresh logic in middleware.
 - Moved detailed role checks into server-rendered page guards for `/`, `/crew`, `/dla`, and `/admin`.
+
+## 2026-05-07 Phase 4 CRUD Foundation
+
+- Added the first real admin CRUD pages for stations, locations, asset types, and assets.
+- Added a corrective migration for `station_locations.notes` and `assets.notes` so operational notes can be captured without changing the core schema again.
+- Added cancel/reset handling to the new admin forms for a clearer mobile-first workflow.

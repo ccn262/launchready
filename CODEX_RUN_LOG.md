@@ -74,3 +74,13 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: commit, push, and open a PR from `fix/vercel-edge-middleware-auth` into `develop`.
+
+## 2026-05-07 13:26 BST
+
+- Branch: `feature/admin-station-location-asset-crud`
+- Files changed: `src/app/admin/stations/page.tsx`, `src/app/admin/locations/page.tsx`, `src/app/admin/asset-types/page.tsx`, `src/app/admin/assets/page.tsx`, `src/app/admin/page.tsx`, `src/app/admin/loading.tsx`, `src/app/admin/actions.ts`, `src/lib/admin-crud.ts`, `src/app/admin/assets/page.tsx`, `supabase/migrations/20260508000000_phase4_admin_notes.sql`, and supporting project logs/docs.
+- Error: TypeScript relation normalisation failed during `next build` because station/location/asset relation shapes were being normalised through the wrong helper type.
+- Fixes attempted: replaced the constrained relation helper with a generic `getFirstRecord()` helper, then re-ran lint and build successfully.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: commit the Phase 4 CRUD branch, push it, and open a PR into `develop` for review and manual browser smoke testing.

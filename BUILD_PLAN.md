@@ -27,9 +27,13 @@
 
 ## Phase 4
 
-- Add operational reporting and readiness calculations.
-- Add push, SMS placeholder, and WhatsApp awareness orchestration.
-- Prepare PWA support.
+- Build admin CRUD for stations, locations, asset types, and assets.
+- Keep access station-scoped for admins and LOMs, with super admin reference-data control.
+- Preserve duplicate asset names across different locations with unique station asset codes.
+- Add only the required operational notes fields for locations and assets.
 - Future backlog item: RNLI public station reference/import for admin pre-population only, with manual confirmation/editing and no operational overwrite.
 - Check RNLI website terms before any scraping or automated import work.
+- Add operational reporting and readiness calculations after CRUD stabilises.
+- Add push, SMS placeholder, and WhatsApp awareness orchestration later.
+- Prepare PWA support after the core admin workflow is complete.
 - Hardening, testing, and release preparation.

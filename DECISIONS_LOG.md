@@ -13,3 +13,5 @@
 - Chosen scope model: station admins and LOMs manage their own station or organisation; DLAs manage incidents and alerts only for their own station.
 - Chosen reference-data model: RNLI public station pages may be considered later as read-only reference data for admin pre-population only, never as operational truth, and never as an automatic overwrite source.
 - Chosen import rule: any future RNLI reference/import work must check site terms first, store source URL and last checked date, and require manual admin confirmation before using imported names/classes.
+- Chosen admin CRUD scope: stations, locations, and assets are station-scoped operational records, while asset types remain super-admin-only reference data.
+- Chosen notes model: `station_locations.notes` and `assets.notes` are the only new Phase 4 schema additions needed for operational notes.
