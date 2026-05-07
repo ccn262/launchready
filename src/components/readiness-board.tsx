@@ -202,9 +202,18 @@ function AssetReadinessCard({ asset }: Readonly<{ asset: ReadinessAssetSummary }
         <StatusPill tone={summaryTone(asset.status)}>{getStatusCopy(asset.status)}</StatusPill>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Crew count</p>
+          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Qualified crew</p>
+          <p className="mt-2 text-2xl font-semibold text-card-foreground">
+            {formatCount(asset.qualifiedCrewCount)}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Current green qualifications relevant to this asset
+          </p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Available crew</p>
           <p className="mt-2 text-2xl font-semibold text-card-foreground">
             {formatCount(asset.availableCrewCount)}
           </p>
@@ -213,7 +222,16 @@ function AssetReadinessCard({ asset }: Readonly<{ asset: ReadinessAssetSummary }
             {asset.maximumCrew !== null ? ` · Max ${formatCount(asset.maximumCrew)}` : ""}
           </p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-3 sm:col-span-2">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Suggested crew</p>
+          <p className="mt-2 text-2xl font-semibold text-card-foreground">
+            {formatCount(asset.allocatedCrewCount)}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Advisory boat, launch/recovery, shore support, and Head Launcher allocation
+          </p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-3 xl:col-span-1 sm:col-span-2">
           <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Crew capability badges</p>
           <div className="mt-2">
             <CrewCapabilityBadges items={asset.capabilityBadges} emptyLabel="No current green capability badges" />

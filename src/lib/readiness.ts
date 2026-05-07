@@ -139,7 +139,9 @@ export type ReadinessAssetSummary = Readonly<{
   rule: SafeCrewingRuleRecord | null;
   status: ReadinessStatus;
   statusLabel: string;
+  qualifiedCrewCount: number;
   availableCrewCount: number;
+  allocatedCrewCount: number;
   minimumCrew: number;
   maximumCrew: number | null;
   currentCrew: CrewCandidate[];
@@ -570,6 +572,10 @@ function isQualificationCurrentGreenForAsset(qualification: CrewQualificationRec
   return isQualificationCurrent(qualification, windowStart) && qualification.currency_state === "green" && isQualificationRelevantToAsset(qualification, asset);
 }
 
+function isCrewQualifiedForAsset(candidate: CrewCandidate, asset: AssetRecord, windowStart: Date) {
+  return candidate.qualifications.some((qualification) => isQualificationCurrentGreenForAsset(qualification, asset, windowStart));
+}
+
 function isRoleEligibleForRequirement(role: OperationalRoleRecord, requirementRoleCode: string | null, bucket: AllocationBucket) {
   if (requirementRoleCode && role.code === requirementRoleCode) {
     return true;
@@ -936,7 +942,9 @@ function aggregateAssetStatus(params: {
       rule,
       status: "off_service" as ReadinessStatus,
       statusLabel: "Off service",
+      qualifiedCrewCount: 0,
       availableCrewCount: 0,
+      allocatedCrewCount: 0,
       minimumCrew: rule?.minimum_crew ?? 0,
       maximumCrew: rule?.maximum_crew ?? null,
       missingRoles: [] as RequirementGap[],
@@ -962,7 +970,9 @@ function aggregateAssetStatus(params: {
       rule: null,
       status: "unknown" as ReadinessStatus,
       statusLabel: "No readiness rule configured",
+      qualifiedCrewCount: 0,
       availableCrewCount: 0,
+      allocatedCrewCount: 0,
       minimumCrew: 0,
       maximumCrew: null,
       missingRoles: [] as RequirementGap[],
@@ -984,6 +994,7 @@ function aggregateAssetStatus(params: {
   }
 
   const currentCrew = getAssetCandidatesForCrew(candidates, asset, windowStart, windowEnd);
+  const qualifiedCrewCount = candidates.filter((candidate) => isCrewQualifiedForAsset(candidate, asset, windowStart)).length;
   const matchingRoleRequirements = roleRequirements.filter((requirement) => requirement.asset_type_id === asset.asset_type_id);
   const matchingLaunchRecovery = launchRecoveryRequirements.filter((requirement) => requirement.asset_id === asset.id);
   const allocation = buildAllocationSummary({
@@ -1029,6 +1040,11 @@ function aggregateAssetStatus(params: {
     ),
   );
 
+  const allocatedCrewCount =
+    allocation.likelyBoatCrew.length +
+    allocation.likelyLaunchRecoveryCrew.length +
+    allocation.likelyShoreSupportCrew.length +
+    allocation.headLauncher.crew.length;
   const availableCrewCount = currentCrew.length;
   const hasHardStopGaps = missingHardStopRoles.length > 0 || launchRecoveryGaps.some((gap) => gap.severity === "hard_stop");
   const hasRequiredGaps = missingRequiredRoles.length > 0 || launchRecoveryGaps.some((gap) => gap.severity === "required");
@@ -1054,7 +1070,9 @@ function aggregateAssetStatus(params: {
     rule,
     status,
     statusLabel,
+    qualifiedCrewCount,
     availableCrewCount,
+    allocatedCrewCount,
     minimumCrew: rule.minimum_crew,
     maximumCrew: rule.maximum_crew,
     missingRoles,

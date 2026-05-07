@@ -95,3 +95,8 @@
 
 - Fixed the readiness allocation helper so advisory crew allocation compiles cleanly and can surface likely boat crew, likely launch/recovery crew, role conflicts, and Head Launcher status.
 - Removed the stale legacy matcher after the advisory allocation path replaced it.
+
+## 2026-05-07 Advisory Crew-State Split Fix
+
+- Updated the readiness summary to surface qualified crew, available crew, and suggested allocation separately on each asset card.
+- Preserved advisory-only behavior and Head Launcher conflict handling.

@@ -121,3 +121,8 @@
 - Added restricted internal reference summaries for `TP-OCF-02` pages 10-40 and `GU1007` to guide future readiness, training, currency, and safe-crewing work.
 - Added `docs/reference/LIFEBOAT_TRAINING_STANDARDS_NOTES.md` and `docs/reference/SAFE_CREWING_REFERENCE_NOTES.md` as internal-only project notes.
 - Confirmed the reference PDFs remain in repo root and are not being surfaced as public app assets or public-facing approval claims.
+
+## 0.7.4 - 2026-05-07
+
+- Made advisory readiness allocation more explicit by separating qualified crew, available crew, and suggested crew counts in the readiness board.
+- Kept Head Launcher handling advisory-only and separate from launch authorisation.

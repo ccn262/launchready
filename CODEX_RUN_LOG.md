@@ -183,3 +183,12 @@
 - Test result: both passed.
 - Working tree: clean after commit `6ef3a5e`.
 - Next recommended step: no code changes required; keep the reference notes as internal-only guidance for future readiness work.
+
+## 2026-05-07 Advisory Crew-State Split
+
+- Branch: `feature/readiness-engine`
+- Files changed: `src/lib/readiness.ts`, `src/components/readiness-board.tsx`, `BUILD_PLAN.md`, `PROJECT_HANDOFF.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `CODEX_RUN_LOG.md`, and `FIX_LOG.md`.
+- Change: readiness assets now expose separate qualified crew, available crew, and allocated/suggested crew counts so the advisory allocation is clearer.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed.
+- Next recommended step: browser smoke-test `/`, `/dla`, and `/admin/readiness` to confirm the new crew-state split renders correctly.

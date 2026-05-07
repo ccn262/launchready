@@ -80,3 +80,5 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Readiness gate: lint, build, and smoke tests must pass before merge
 
 - Restricted internal reference summaries now live under `docs/reference/` for `TP-OCF-02` and `GU1007`; they are internal project notes only and must not be surfaced as public-facing RNLI approval.
+
+- Readiness asset summaries now expose qualified crew, available crew, and suggested allocation counts separately, while still keeping launch decisions advisory only.
