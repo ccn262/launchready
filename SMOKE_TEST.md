@@ -55,3 +55,5 @@
 - The browser smoke test also covers `/admin/crew`, `/admin/roles`, and `/admin/qualifications`.
 - The browser smoke test also covers `/crew/availability`, `/crew/rota`, `/admin/availability`, and `/admin/duty-rota`.
 - Server-side route helpers block inactive profiles and insufficient role memberships even if middleware only refreshes the session.
+
+- Browser smoke testing should confirm that protected routes redirect cleanly to `/login` when no likely Supabase auth cookie is present and that `/login` remains public.

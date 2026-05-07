@@ -99,3 +99,13 @@
 - Added reusable crew capability badge rendering for asset-specific roles and currency states.
 - Added weekend-unavailable availability support and weekend duty rota foundation fields.
 - Kept auto-rota generation, cover/swap requests, and the full readiness engine in backlog.
+
+## 0.7.6 - 2026-05-07
+
+- Simplified Edge middleware to avoid Supabase session refresh in middleware and use a lightweight cookie-presence gate instead.
+- Kept detailed session validation and role checks on the server side so Vercel Edge can fail closed without hard-crashing.
+
+## 0.7.7 - 2026-05-07
+
+- Hardened Vercel Edge middleware so it cannot hard-crash during runtime auth handling.
+- Simplified middleware to a cookie-presence gate and kept full session validation and role checks on server-side helpers.
