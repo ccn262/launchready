@@ -79,6 +79,33 @@
 - Fixed build-time nullability issues in the Phase 6 actions by narrowing profile and datetime values before payload assembly.
 - Confirmed `npm run lint` and `npm run build` pass after the Phase 6 fixes.
 
+## 2026-05-07 Phase 7 Readiness Engine
+
+- Fixed `src/lib/readiness.ts` to import shared asset and asset type records from the modules that actually export them.
+- Added the missing `rule` field to every readiness asset summary branch so the summary type stays stable.
+- Changed safe-crewing rule selection so `boat_movement` and `assurance_activity` can fall back to service baselines when no exact row exists.
+- Corrected the safe-crewing seed join order for launch/recovery requirements so the SQL remains valid and idempotent.
+
+## 2026-05-07 Phase 7 Seed Syntax Fix
+
+- Fixed the launch/recovery seed block in `supabase/seed.sql` by converting the inline `VALUES` list to a `CROSS JOIN`.
+- Kept the `WHERE` filters before `ON CONFLICT` so the statement remains valid and idempotent in Supabase SQL Editor.
+
+## 2026-05-07 Phase 7 Advisory Allocation Fix
+
+- Fixed the readiness allocation helper so advisory crew allocation compiles cleanly and can surface likely boat crew, likely launch/recovery crew, role conflicts, and Head Launcher status.
+- Removed the stale legacy matcher after the advisory allocation path replaced it.
+
+## 2026-05-07 Advisory Crew-State Split Fix
+
+- Updated the readiness summary to surface qualified crew, available crew, and suggested allocation separately on each asset card.
+- Preserved advisory-only behavior and Head Launcher conflict handling.
+
+## 2026-05-07 Readiness Key Fix
+
+- Fixed duplicate React keys in the readiness board by using a stable composite key for requirement rows.
+- Added defensive deduplication for readiness gap arrays in the loader so repeated rows do not render twice.
+
 ## 2026-05-07 Middleware Runtime Failure Fix
 
 - Branch: `fix/vercel-middleware-runtime-failure`

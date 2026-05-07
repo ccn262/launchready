@@ -91,3 +91,15 @@
 - Capture launch method context where needed, including afloat_alongside, afloat_mooring, floating_dock, hydraulic_lift, ilb_davit, alb_carriage, slipway, tractor, winch, davit, and remote_site.
 - Show service-ready, exercise-only, delayed-launch, and off-service states without authorising launches.
 - Require dynamic risk assessment, approving authority, reason, notes, and service-return logging for exceptions, while never overriding hard-stop role requirements.
+
+## Phase 7
+
+- Status: readiness engine foundation is now built on `feature/readiness-engine`.
+- Calculate station, location, and asset readiness using availability, rota, qualifications, asset-specific roles, and safe-crewing roadmap data.
+- Surface missing hard-stop roles, required roles, preferred gaps, launch/recovery gaps, and current DLA context.
+- Add an admin readiness console so calculated readiness can be reviewed without authorising launches.
+- Add advisory likely crew composition so the readiness view can suggest likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and explicit Head Launcher status without authorising launches.
+
+- Restricted internal reference notes have been created for `TP-OCF-02` and `GU1007` to inform future readiness, currency, and safe-crewing work without exposing long copied text or public-facing approval claims.
+
+- The readiness board now distinguishes qualified crew, available crew, and suggested allocation for each asset so advisory allocation is explicit instead of implied.

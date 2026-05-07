@@ -100,6 +100,38 @@
 - Added weekend-unavailable availability support and weekend duty rota foundation fields.
 - Kept auto-rota generation, cover/swap requests, and the full readiness engine in backlog.
 
+## 0.7.0 - 2026-05-07
+
+- Added the first readiness engine foundation with effective-dated safe-crewing rules.
+- Added a reusable readiness board for the dashboard, DLA, and admin readiness console.
+- Added readiness calculations for station, location, and asset status using crew availability, duty periods, qualifications, and asset-specific roles.
+- Seeded conservative safe-crewing baseline rules and launch/recovery requirements for the Southend reference station.
+
+## 0.7.1 - 2026-05-07
+
+- Fixed the Phase 7 seed SQL syntax error in the launch/recovery requirements block.
+- Kept the Phase 7 seed idempotent while preserving duplicate asset names across locations.
+
+## 0.7.2 - 2026-05-07
+
+- Added advisory readiness allocation output for likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and Head Launcher status on the readiness board.
+
+## 0.7.3 - 2026-05-07
+
+- Added restricted internal reference summaries for `TP-OCF-02` pages 10-40 and `GU1007` to guide future readiness, training, currency, and safe-crewing work.
+- Added `docs/reference/LIFEBOAT_TRAINING_STANDARDS_NOTES.md` and `docs/reference/SAFE_CREWING_REFERENCE_NOTES.md` as internal-only project notes.
+- Confirmed the reference PDFs remain in repo root and are not being surfaced as public app assets or public-facing approval claims.
+
+## 0.7.4 - 2026-05-07
+
+- Made advisory readiness allocation more explicit by separating qualified crew, available crew, and suggested crew counts in the readiness board.
+- Kept Head Launcher handling advisory-only and separate from launch authorisation.
+
+## 0.7.5 - 2026-05-07
+
+- Fixed duplicate React key warnings on the readiness board by switching requirement rows to composite keys.
+- Added defensive deduplication for readiness gap arrays in the readiness loader.
+
 ## 0.7.6 - 2026-05-07
 
 - Simplified Edge middleware to avoid Supabase session refresh in middleware and use a lightweight cookie-presence gate instead.

@@ -37,6 +37,13 @@
 - Future launch/recovery rules should be modelled separately from boat-crew capability so launch methods can be evaluated without conflating the two.
 - Future exception handling should record reason, approving authority or role, notes, and service-return status.
 
+## Phase 7 Readiness Tables
+
+- `safe_crewing_rules` stores effective-dated minimum and maximum crew baselines by asset type and operation type.
+- `safe_crewing_role_requirements` stores effective-dated required-role complements by asset type, operation type, and requirement level.
+- `asset_launch_recovery_requirements` stores launch/recovery role requirements per asset.
+- The readiness engine combines these tables with availability slots, duty periods, crew qualifications, station memberships, assets, and locations.
+
 ## Initial Relationships
 
 - One organisation has many stations.
@@ -78,3 +85,4 @@
 6. RLS policies on every table.
 7. Station and asset CRUD notes fields where needed.
 8. Availability and rota foundation datetime columns plus extended slot and period kinds.
+9. Readiness engine outputs are computed server-side and now include advisory allocation fields for likely boat crew, likely launch/recovery crew, role conflicts, readiness-restoration candidates, and Head Launcher status. No new database columns were added for those computed outputs.

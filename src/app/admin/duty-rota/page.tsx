@@ -4,6 +4,7 @@ import { OperationalCard } from "@/components/operational-card";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
+import Link from "next/link";
 import { saveDutyPeriodAction } from "@/app/phase6-actions";
 import { buildRedirectUrl } from "@/lib/admin-crud";
 import { buildCapabilityBadges } from "@/lib/capability-badges";
@@ -115,6 +116,18 @@ export default async function AdminDutyRotaPage({
             ]}
           />
         </div>
+
+        <SectionShell
+          title="Readiness console"
+          description="Readiness calculations use the same station context, so rota managers can compare assignments against launch readiness in one place."
+        >
+          <Link
+            href="/admin/readiness"
+            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+          >
+            Open readiness console
+          </Link>
+        </SectionShell>
 
         <SectionShell title="Station context" description="Pick the station you want to manage.">
           <form method="get" className="flex flex-wrap items-end gap-3">

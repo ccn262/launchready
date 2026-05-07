@@ -134,6 +134,75 @@
 - Test result: both passed.
 - Next recommended step: run the browser smoke test for `/crew/availability`, `/crew/rota`, `/admin/availability`, and `/admin/duty-rota`, then merge Phase 6 if the review pass is clean.
 
+## 2026-05-07 15:08 BST
+
+- Branch: `feature/readiness-engine`
+- Files changed: readiness engine helper, readiness board component, dashboard and DLA readiness views, admin readiness page, admin availability and duty rota handoff links, safe-crewing seed data, build plan, project handoff, database schema, security model, smoke test, changelog, fix log, decisions log, and this run log.
+- Errors: initial TypeScript validation failed because `AssetRecord` and `AssetTypeRecord` were imported from the wrong helper module, and the asset summary type was missing its `rule` field in early-return branches.
+- Fixes attempted: moved shared record types to `src/lib/admin-crud.ts`, added `rule` to every readiness asset return path, broadened the safe-crewing rule picker to fall back to service baselines, and corrected the safe-crewing seed join order for launch/recovery inserts.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: run the browser smoke test for `/`, `/dla`, and `/admin/readiness`, then decide whether to merge the readiness branch into `develop`.
+
+## 2026-05-07 15:20 BST
+
+- Branch: `feature/readiness-engine`
+- Files changed: `supabase/seed.sql`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, `CHANGELOG.md`, and `PROJECT_HANDOFF.md`.
+- Error: Phase 7 seed SQL failed in Supabase SQL Editor because the launch/recovery seed block used `JOIN (...)` without a valid join condition before the `WHERE` clause.
+- Fixes attempted: converted the inline `VALUES` table to a `CROSS JOIN`, kept the `WHERE` filters before `ON CONFLICT`, and preserved idempotent upserts.
+- Verification SQL to run in Supabase:
+  select asset_type_id, operation_type, minimum_crew, maximum_crew, darkness_minimum_crew, effective_from from safe_crewing_rules order by asset_type_id, operation_type, effective_from;
+  select asset_type_id, operation_type, operational_role_id, required_count, requirement_level, effective_from from safe_crewing_role_requirements order by asset_type_id, operation_type, effective_from;
+  select asset_id, operational_role_id, required_count, requirement_level from asset_launch_recovery_requirements order by asset_id, operational_role_id;
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: rerun `supabase/seed.sql` in Supabase SQL Editor, then continue Phase 7 browser smoke testing.
+
+## 2026-05-07 15:46 BST
+
+- Branch: `feature/readiness-engine`
+- Files changed: `src/lib/readiness.ts`, `src/components/readiness-board.tsx`, `BUILD_PLAN.md`, `PROJECT_HANDOFF.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, `DECISIONS_LOG.md`, and this run log.
+- Error: initial advisory allocation implementation triggered lint/build failures from an unused matcher and readonly Head Launcher assignment in the readiness helper.
+- Fixes attempted: removed the stale matcher, simplified the candidate matching helpers, added empty allocation fallbacks, and switched Head Launcher selection to local mutable state before constructing the readonly summary.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: run the browser smoke test for `/`, `/dla`, and `/admin/readiness` to confirm the advisory allocation summaries and Head Launcher states render correctly.
+
+## 2026-05-07 Restricted Reference Summary Task
+
+- Branch: `feature/readiness-engine`
+- Files changed: `docs/reference/LIFEBOAT_TRAINING_STANDARDS_NOTES.md`, `docs/reference/SAFE_CREWING_REFERENCE_NOTES.md`, `BUILD_PLAN.md`, `PROJECT_HANDOFF.md`, `SECURITY_MODEL.md`, `DECISIONS_LOG.md`, `CHANGELOG.md`, and this run log.
+- Pages reviewed: `Lifeboat Training Standards Handbook TP-OCF-02.pdf` pages 10-40; `Safe Crewing for Maritime SAR Operations Guidance - GU1007.pdf` pages 1-5.
+- Notes captured: training stages, pass-out and currency model, task-based competence, periodic requalification exceptions, safe-crewing crew-number baselines, minimum role complement, Head Launcher constraints, and dynamic risk assessment boundaries.
+- Tests run: not yet run in this patch set.
+- Next recommended step: run `npm run lint` and `npm run build`, then commit the reference-note docs.
+
+## 2026-05-07 Restricted Reference Validation
+
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Working tree: clean after commit `6ef3a5e`.
+- Next recommended step: no code changes required; keep the reference notes as internal-only guidance for future readiness work.
+
+## 2026-05-07 Advisory Crew-State Split
+
+- Branch: `feature/readiness-engine`
+- Files changed: `src/lib/readiness.ts`, `src/components/readiness-board.tsx`, `BUILD_PLAN.md`, `PROJECT_HANDOFF.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `CODEX_RUN_LOG.md`, and `FIX_LOG.md`.
+- Change: readiness assets now expose separate qualified crew, available crew, and allocated/suggested crew counts so the advisory allocation is clearer.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed.
+- Next recommended step: browser smoke-test `/`, `/dla`, and `/admin/readiness` to confirm the new crew-state split renders correctly.
+
+## 2026-05-07 Readiness Key Fix
+
+- Branch: `feature/readiness-engine`
+- Files changed: `src/components/readiness-board.tsx`, `src/lib/readiness.ts`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, and `CHANGELOG.md`.
+- Root cause: `RequirementList` used `item.id` as the React key, which was not strong enough when duplicate requirement rows surfaced in the rendered arrays.
+- Fix: switched to a composite key in the component and added defensive deduplication for readiness gap arrays in the loader.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed.
+- Next recommended step: browser retest `/admin/readiness`.
+
 ## 2026-05-07 Middleware Runtime Failure Fix
 
 - Branch: `fix/vercel-middleware-runtime-failure`
@@ -147,7 +216,7 @@
 
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed after moving the pathname read inside the top-level try/catch.
-- Final middleware behavior: protected routes use a lightweight cookie-presence gate, `/login` redirects authenticated users to `/`, and any unexpected Edge error falls back to a redirect for protected routes instead of throwing.
+- Final middleware behavior: protected routes use a lightweight cookie-presence gate, `/login` stays public in middleware, and any unexpected Edge error falls back to a redirect for protected routes instead of throwing.
 - Next recommended step: push the branch and open the PR into `develop` for Vercel redeploy.
 
 ## 2026-05-07 Middleware Redirect-Loop Fix

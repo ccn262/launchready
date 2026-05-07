@@ -69,6 +69,9 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - The Phase 6 foundation uses the existing `availability_slots` and `duty_periods` tables with `starts_at`, `ends_at`, and `created_by_profile_id` support to keep the rota work lightweight and reviewable.
 - Cover and swap requests must remain like-for-like only and audit logged when they are introduced.
 - The future readiness engine must support effective-dated safe-crewing rules, required-role complements, launch method checks, and non-authorising risk assessment states.
+- Phase 7 now adds a dedicated readiness console plus dashboard and DLA readiness views on `feature/readiness-engine`; it still needs browser smoke testing before merge.
+- The Phase 7 seed file now runs cleanly in Supabase SQL Editor after fixing the launch/recovery join ordering issue.
+- The readiness engine now includes advisory allocation output for likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and explicit Head Launcher status. This is advisory only and does not authorise launches.
 
 ## Run Notes
 
@@ -76,4 +79,6 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Delivery target: Vercel + Supabase
 - Readiness gate: lint, build, and smoke tests must pass before merge
 
+- Restricted internal reference summaries now live under `docs/reference/` for `TP-OCF-02` and `GU1007`; they are internal project notes only and must not be surfaced as public-facing RNLI approval.
+- Readiness asset summaries now expose qualified crew, available crew, and suggested allocation counts separately, while still keeping launch decisions advisory only.
 - Vercel middleware now fails closed with a cookie-presence gate only, redirecting protected routes to login on uncertainty while leaving full session validation and role checks to server-side helpers.

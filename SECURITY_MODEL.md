@@ -54,6 +54,12 @@
 - Audit logs are append-only.
 - No table is publicly readable without an authenticated policy.
 
+## Phase 7 Access Boundaries
+
+- `safe_crewing_rules` and `safe_crewing_role_requirements` are readable by authenticated users and writable by super admins only.
+- `asset_launch_recovery_requirements` remain station-scoped through RLS and writable only within permitted station scope.
+- The readiness console is advisory only and continues to rely on RLS plus server-side route checks.
+
 ## Phase 2 Validation
 
 - Phase 2 was manually validated in Supabase project `yhddbkkjpyeetihrlxrw`.
@@ -78,6 +84,6 @@
 - `/admin/availability` and `/admin/duty-rota` are management routes for station admins and LOMs, with super admins retaining global access.
 - Future readiness-engine views should distinguish service-ready, exercise-only, delayed-launch, and off-service states without claiming launch authorisation.
 
+- Restricted PDF notes under `docs/reference/` are internal-only project artefacts; they must not be exposed in public routes, assets, or marketing copy, and they must not be presented as official RNLI approval.
 - Middleware is deliberately lightweight on Vercel Edge and now uses cookie presence only as a temporary fail-closed gate for protected routes; detailed session and role checks remain server-side.
-
 - Middleware no longer redirects `/login` based on cookie presence; the login page handles authenticated-user redirects with real server-side session validation.

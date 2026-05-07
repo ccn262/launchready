@@ -56,6 +56,19 @@
 - The browser smoke test also covers `/crew/availability`, `/crew/rota`, `/admin/availability`, and `/admin/duty-rota`.
 - Server-side route helpers block inactive profiles and insufficient role memberships even if middleware only refreshes the session.
 
-- Browser smoke testing should confirm that protected routes redirect cleanly to `/login` when no likely Supabase auth cookie is present and that `/login` remains public.
+## Phase 7 Smoke Test
 
+- Dashboard loads readiness cards at `/`.
+- Southend Inshore and Southend Offshore / Pier assets display readiness and missing roles.
+- Crew with green asset roles count toward readiness.
+- Crew with amber or red asset roles do not count as launch-ready.
+- Unavailable crew do not count.
+- Expired qualifications do not count where required.
+- Launch/recovery gaps display separately from boat crew gaps.
+- DLA and admin users can open `/dla` and `/admin/readiness`.
+- Non-members cannot access station readiness.
+- The readiness board shows advisory-only likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and Head Launcher status.
+- Head Launcher renders as missing until the role exists in data, then it should show available or conflict states as appropriate.
+- Readiness UI now shows qualified crew, available crew, and suggested allocation as separate operational indicators for each asset card.
+- Browser smoke testing should confirm that protected routes redirect cleanly to `/login` when no likely Supabase auth cookie is present and that `/login` remains public.
 - Browser smoke testing should confirm `/login` stays public, authenticated users are redirected by the login page itself, and stale cookies no longer create a `/login` ↔ `/` loop.
