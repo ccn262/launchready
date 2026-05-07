@@ -15,18 +15,21 @@
 - Create organisations, stations, locations, assets, and crew tables.
 - Implement RLS policies for all user-scoped data.
 - Add audit logging for operational actions.
-- Status: schema and RLS foundation added; local Supabase validation blocked until Docker Desktop is available.
+- Status: schema, seed, and RLS foundation added; manually validated in Supabase and safe to merge into `develop`.
 
 ## Phase 3
 
-- Build crew availability and qualification workflows.
-- Build DLA launch-alert and night rota workflows.
-- Add realtime dashboards and alert delivery.
-- Add email integration through Resend.
+- Build auth/session foundation.
+- Add login and logout flows.
+- Add route protection and role-aware navigation.
+- Add current user/profile loading and unauthorised handling.
+- Status: started on `feature/auth-session-foundation`; branch is published and draft PRs are open.
 
 ## Phase 4
 
 - Add operational reporting and readiness calculations.
 - Add push, SMS placeholder, and WhatsApp awareness orchestration.
 - Prepare PWA support.
+- Future backlog item: RNLI public station reference/import for admin pre-population only, with manual confirmation/editing and no operational overwrite.
+- Check RNLI website terms before any scraping or automated import work.
 - Hardening, testing, and release preparation.

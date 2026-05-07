@@ -25,3 +25,22 @@
 - Added the missing asset seed block to `supabase/seed.sql`.
 - Switched asset inserts to deterministic `asset_code` values so the seed is idempotent across repeated runs.
 - Kept duplicate asset names valid across different station locations by using `station_id + asset_code` as the conflict target.
+
+## 2026-05-07 Validation Complete
+
+- Confirmed the Phase 2 seed and schema work manually in Supabase project `yhddbkkjpyeetihrlxrw`.
+- Verified the full Southend asset set now exists in `assets`.
+- Marked Phase 2 as safe to merge into `develop`.
+
+## 2026-05-07 Auth Foundation
+
+- Added middleware-based protection for `/`, `/crew`, `/dla`, and `/admin`.
+- Added login and unauthorized pages plus server-side sign-in/sign-out actions.
+- Refactored the sidebar shell so it can render role-aware navigation from the current Supabase profile and memberships.
+
+## 2026-05-07 Auth Hardening
+
+- Blocked inactive profiles from satisfying route access checks.
+- Kept inactive memberships out of the access decision set.
+- Removed the redirect-away behavior from `/unauthorized` so blocked sessions can reach the access-denied page.
+- Restored the missing `.env.example` template after the working tree delete.

@@ -20,6 +20,10 @@
 - Station admins can manage assets, locations, and station crew only within their station.
 - DLA users can create and manage launch alerts only within their station.
 - Service-role access is reserved for trusted backend workflows and should be tightly constrained.
+- Route access is based on `profiles.system_role = super_admin` and `station_memberships.membership_role` values of `admin`, `lom`, `dla`, and `crew`.
+- Inactive profiles are blocked before station membership checks are evaluated.
+- Inactive station memberships are excluded from access decisions.
+- `SUPABASE_SERVICE_ROLE_KEY` must never be exposed to browser or client bundles.
 
 ## Required Controls
 
@@ -27,6 +31,7 @@
 - Server-side session handling via Supabase Auth.
 - Audit rows for create, update, delete, alert, and role-scope changes.
 - No reliance on WhatsApp as the sole critical alert route.
+- `.env.local` is local-only and must never be committed.
 
 ## Phase 2 RLS Baseline
 
@@ -38,3 +43,19 @@
 - DLA access is station-scoped and limited to incidents, availability visibility, and operational alerting.
 - Audit logs are append-only.
 - No table is publicly readable without an authenticated policy.
+
+## Phase 2 Validation
+
+- Phase 2 was manually validated in Supabase project `yhddbkkjpyeetihrlxrw`.
+- The Southend demo data and RLS baseline are considered ready for integration into `develop`.
+
+## Phase 3 Auth Baseline
+
+- Supabase Auth is the source of truth for session state.
+- The browser never receives a service role key.
+- Middleware protects the authenticated routes and handles redirects for unauthorised access.
+- Login and logout are server-action driven.
+- Current user/profile loading happens on the server before rendering the shell.
+- `admin` access accepts super admin, admin, and LOM memberships.
+- `dla` access accepts super admin, DLA, admin, and LOM memberships.
+- `crew` access accepts any active station membership.
