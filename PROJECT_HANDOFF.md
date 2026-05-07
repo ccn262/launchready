@@ -2,13 +2,14 @@
 
 ## Status
 
-Launch Ready now has the initial Next.js App Router foundation, strict TypeScript, Tailwind, a dark operational design system, placeholder dashboards, Supabase client scaffolding, a manually validated Phase 2 Supabase schema/RLS foundation, the Phase 3 auth/session foundation, and the Phase 4 admin CRUD foundation for stations, locations, asset types, and assets.
+Launch Ready now has the initial Next.js App Router foundation, strict TypeScript, Tailwind, a dark operational design system, placeholder dashboards, Supabase client scaffolding, a manually validated Phase 2 Supabase schema/RLS foundation, the Phase 3 auth/session foundation, the Phase 4 admin CRUD foundation for stations, locations, asset types, and assets, and the Phase 5 crew/roles/qualification foundation in progress.
 
 ## What Exists
 
 - `src/app/layout.tsx` sets global metadata and fonts.
 - `src/app/page.tsx`, `src/app/crew/page.tsx`, `src/app/dla/page.tsx`, and `src/app/admin/page.tsx` provide the initial shell and section entry points.
 - `src/app/admin/stations/page.tsx`, `src/app/admin/locations/page.tsx`, `src/app/admin/asset-types/page.tsx`, and `src/app/admin/assets/page.tsx` now provide the first real admin CRUD surfaces.
+- `src/app/admin/crew/page.tsx`, `src/app/admin/roles/page.tsx`, and `src/app/admin/qualifications/page.tsx` now provide the crew membership, operational role, and qualification management surfaces.
 - `src/components/app-shell.tsx` implements the responsive sidebar and mobile drawer.
 - `src/lib/supabase/browser.ts` and `src/lib/supabase/server.ts` provide lazy Supabase client factories.
 - The required governance documents now exist in the repository root.
@@ -21,6 +22,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Inactive profiles and inactive memberships are blocked before route access is granted.
 - Edge middleware only refreshes the session and handles login redirects; server-side route helpers enforce detailed access control.
 - Admin CRUD access is station-scoped for admin and LOM memberships, while asset types remain super-admin reference data.
+- Crew management, asset-specific role assignment, and qualification tracking are station-scoped for admins and LOMs, with DLA visibility remaining database-scoped rather than management-scoped.
 - WhatsApp is awareness-only and cannot be the only critical alert path.
 - `.env.local` is local-only and must never be committed.
 
@@ -29,11 +31,12 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 1. Complete manual Supabase Auth setup.
 2. Verify sign-in, sign-out, and redirect handling in the browser.
 3. Continue Phase 3 route and session hardening.
-4. Complete Phase 4 CRUD polish and smoke testing for stations, locations, asset types, and assets.
-5. Replace the remaining placeholders with crew, station, and alert data models.
-6. Add audit logging write paths into the app.
-7. Keep RNLI public station reference/import in the future backlog until the CRUD and readiness engine are stable.
-8. Merge the published branches in order once review is complete.
+4. Complete Phase 4 CRUD smoke testing for stations, locations, asset types, and assets.
+5. Validate Phase 5 crew, role, and qualification management in the browser.
+6. Replace the remaining placeholders with alert, readiness, and rota data models.
+7. Add audit logging write paths into the app.
+8. Keep RNLI public station reference/import in the future backlog until the CRUD and readiness engine are stable.
+9. Merge the published branches in order once review is complete.
 
 ## Verification
 
@@ -52,6 +55,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - GitHub branches are now published and draft PRs exist for schema/RLS and auth/session work.
 - Phase 4 adds real admin CRUD pages for stations, locations, asset types, and assets.
 - `station_locations.notes` and `assets.notes` were added so admins can capture operational notes without reworking the base schema.
+- Phase 5 adds station crew management plus asset-specific role and qualification assignment using the existing `station_memberships` and `crew_qualifications` tables.
 
 ## Run Notes
 

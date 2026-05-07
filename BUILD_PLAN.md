@@ -37,3 +37,12 @@
 - Add push, SMS placeholder, and WhatsApp awareness orchestration later.
 - Prepare PWA support after the core admin workflow is complete.
 - Hardening, testing, and release preparation.
+
+## Phase 5
+
+- Build crew management for station memberships and active status.
+- Build asset-specific role and currency assignment per crew member.
+- Build qualification management with expiry-aware casualty care tracking.
+- Keep role and qualification management station-scoped for admins and LOMs.
+- Keep operational role reference data and qualification reference data aligned with the existing schema.
+- Manual browser smoke testing and hardening.

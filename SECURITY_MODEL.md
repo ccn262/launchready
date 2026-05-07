@@ -21,6 +21,7 @@
 - Station admins and LOMs can manage stations, locations, and assets only within their own station scope.
 - Super admins can manage station records and global reference data such as asset types across all stations.
 - Asset type CRUD remains super-admin only because it is shared reference data.
+- Station admins and LOMs can manage crew memberships, operational role assignments, and qualifications only within their station scope.
 - DLA users can create and manage launch alerts only within their station.
 - Service-role access is reserved for trusted backend workflows and should be tightly constrained.
 - Route access is based on `profiles.system_role = super_admin` and `station_memberships.membership_role` values of `admin`, `lom`, `dla`, and `crew`.
@@ -66,3 +67,4 @@
 - `crew` access accepts any active station membership.
 - `/admin/stations`, `/admin/locations`, and `/admin/assets` are station-scoped CRUD routes for admin and LOM memberships, or super admins globally.
 - `/admin/asset-types` is visible to authenticated admin users but only editable by super admins.
+- `/admin/crew`, `/admin/roles`, and `/admin/qualifications` are management routes for station admins and LOMs, with operational data still protected by RLS at the table level.

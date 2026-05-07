@@ -15,3 +15,5 @@
 - Chosen import rule: any future RNLI reference/import work must check site terms first, store source URL and last checked date, and require manual admin confirmation before using imported names/classes.
 - Chosen admin CRUD scope: stations, locations, and assets are station-scoped operational records, while asset types remain super-admin-only reference data.
 - Chosen notes model: `station_locations.notes` and `assets.notes` are the only new Phase 4 schema additions needed for operational notes.
+- Chosen Phase 5 assignment model: `station_memberships` manages crew membership and `crew_qualifications` stores asset-specific role/currency assignments and qualification records.
+- Chosen Phase 5 currency model: green, amber, and red states are shared by role assignments and qualifications so status reads consistently across the UI.

@@ -84,3 +84,13 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: commit the Phase 4 CRUD branch, push it, and open a PR into `develop` for review and manual browser smoke testing.
+
+## 2026-05-07 14:05 BST
+
+- Branch: `feature/crew-management-asset-roles`
+- Files changed: `src/app/admin/crew/page.tsx`, `src/app/admin/roles/page.tsx`, `src/app/admin/qualifications/page.tsx`, `src/app/admin/phase5-actions.ts`, `src/lib/admin-phase5.ts`, and supporting project logs/docs.
+- Errors: initial TypeScript validation failed because the qualification relation helper carried fields that the query did not actually return, and the primary-membership flow could clear the newly created primary record.
+- Fixes attempted: trimmed the qualification record shape to the actual query result, rewired the primary-membership update logic to clear old primaries before insert/update, and reran the checks.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: do a browser smoke test for crew membership edits, asset-specific role assignment, and qualification expiry handling, then merge once the review pass is clean.

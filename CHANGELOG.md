@@ -72,3 +72,10 @@
 - Added station-scoped station, location, and asset management with super-admin-only asset type editing.
 - Added optional operational notes fields for station locations and assets via a corrective schema migration.
 - Updated the admin landing page, smoke tests, and security documentation to reflect the new CRUD routes.
+
+## 0.5.0 - 2026-05-07
+
+- Added station crew management for memberships, crew type, membership role, and active status.
+- Added asset-specific role assignment with currency states per crew member and per asset.
+- Added qualification management with expiry-aware casualty care tracking.
+- Reused the existing `station_memberships` and `crew_qualifications` tables for the Phase 5 admin surfaces.

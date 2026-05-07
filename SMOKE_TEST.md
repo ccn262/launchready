@@ -29,6 +29,10 @@
 17. Confirm `/admin/assets` lists Southend assets, allows create/edit, and preserves duplicate asset names across different locations.
 18. Confirm duplicate `D Class` assets can exist at both Southend locations when `asset_code` remains unique per station.
 19. Confirm non-admin users cannot access the admin CRUD pages.
+20. Confirm `/admin/crew` lists station crew and allows editing a membership.
+21. Confirm `/admin/roles` allows assigning D Class and B Class roles with different currency states to the same crew member.
+22. Confirm `/admin/qualifications` allows setting Casualty Care expiry and clearly flags expired or near-expiry records.
+23. Confirm DLA access still follows the agreed security model and does not grant management access to the admin pages.
 
 ## Pass Criteria
 
@@ -41,4 +45,5 @@
 - Auth/session redirect behaviour works in the browser.
 - The browser smoke test covers `/login`, `/`, `/crew`, `/dla`, `/admin`, `/unauthorized`, and logout.
 - The browser smoke test also covers `/admin/stations`, `/admin/locations`, `/admin/asset-types`, and `/admin/assets`.
+- The browser smoke test also covers `/admin/crew`, `/admin/roles`, and `/admin/qualifications`.
 - Server-side route helpers block inactive profiles and insufficient role memberships even if middleware only refreshes the session.
