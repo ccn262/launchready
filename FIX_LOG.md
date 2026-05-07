@@ -85,3 +85,8 @@
 - Added the missing `rule` field to every readiness asset summary branch so the summary type stays stable.
 - Changed safe-crewing rule selection so `boat_movement` and `assurance_activity` can fall back to service baselines when no exact row exists.
 - Corrected the safe-crewing seed join order for launch/recovery requirements so the SQL remains valid and idempotent.
+
+## 2026-05-07 Phase 7 Seed Syntax Fix
+
+- Fixed the launch/recovery seed block in `supabase/seed.sql` by converting the inline `VALUES` list to a `CROSS JOIN`.
+- Kept the `WHERE` filters before `ON CONFLICT` so the statement remains valid and idempotent in Supabase SQL Editor.
