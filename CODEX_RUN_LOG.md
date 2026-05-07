@@ -133,3 +133,26 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: run the browser smoke test for `/crew/availability`, `/crew/rota`, `/admin/availability`, and `/admin/duty-rota`, then merge Phase 6 if the review pass is clean.
+
+## 2026-05-07 Middleware Runtime Failure Fix
+
+- Branch: `fix/vercel-middleware-runtime-failure`
+- Files changed: `middleware.ts`, `SECURITY_MODEL.md`, `PROJECT_HANDOFF.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`.
+- Root cause: the Vercel Edge middleware could still fail during Supabase session handling before route-level auth helpers ran.
+- Fix: the middleware now only checks for likely Supabase auth cookies inside a top-level try/catch and redirects protected routes to `/login?error=middleware_fallback` if anything unexpected occurs.
+- Tests run: not yet run in this patch set.
+- Next recommended step: run `npm run lint` and `npm run build`, then open the PR into `develop`.
+
+## 2026-05-07 Middleware Runtime Failure Validation
+
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed after moving the pathname read inside the top-level try/catch.
+- Final middleware behavior: protected routes use a lightweight cookie-presence gate, `/login` redirects authenticated users to `/`, and any unexpected Edge error falls back to a redirect for protected routes instead of throwing.
+- Next recommended step: push the branch and open the PR into `develop` for Vercel redeploy.
+
+## 2026-05-07 Middleware Redirect-Loop Fix
+
+- Branch: `fix/vercel-middleware-runtime-failure`
+- Files changed: `middleware.ts`, `SECURITY_MODEL.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`.
+- Change: middleware now leaves `/login` public and only cookie-gates protected routes, which removes the stale-cookie redirect loop risk.
+- Next recommended step: rerun lint/build, then update the PR into `develop`.

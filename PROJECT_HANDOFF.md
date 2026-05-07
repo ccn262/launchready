@@ -75,3 +75,5 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Branch: `feature/initial-foundation`
 - Delivery target: Vercel + Supabase
 - Readiness gate: lint, build, and smoke tests must pass before merge
+
+- Vercel middleware now fails closed with a cookie-presence gate only, redirecting protected routes to login on uncertainty while leaving full session validation and role checks to server-side helpers.

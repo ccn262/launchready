@@ -1,4 +1,3 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
 const PROTECTED_PATHS = ["/", "/crew", "/dla", "/admin"];
@@ -9,7 +8,11 @@ function isProtectedPath(pathname: string) {
   );
 }
 
-function createRedirect(request: NextRequest, pathname: string, params?: Record<string, string>) {
+function createRedirect(
+  request: NextRequest,
+  pathname: string,
+  params?: Record<string, string>,
+) {
   const url = request.nextUrl.clone();
   url.pathname = pathname;
   url.search = "";
@@ -21,93 +24,49 @@ function createRedirect(request: NextRequest, pathname: string, params?: Record<
   return NextResponse.redirect(url);
 }
 
-function getSupabaseConfig() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return null;
-  }
-
-  return { supabaseUrl, supabaseAnonKey };
+function hasLikelySupabaseAuthCookie(request: NextRequest) {
+  return request.cookies
+    .getAll()
+    .some(({ name }) => name.startsWith("sb-") || name.includes("auth-token"));
 }
 
-export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  const isLoginRoute = pathname === "/login";
-  const isUnauthorizedRoute = pathname === "/unauthorized";
-  const config = getSupabaseConfig();
-
-  if (!config) {
-    if (isProtectedPath(pathname)) {
-      return createRedirect(request, "/login", { error: "missing_config", redirectTo: pathname });
-    }
-
-    return NextResponse.next();
-  }
-
-  const response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+export function middleware(request: NextRequest) {
+  let pathname = "/";
 
   try {
-    const supabase = createServerClient(config.supabaseUrl, config.supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    });
+    pathname = request.nextUrl.pathname;
+    const isLoginRoute = pathname === "/login";
+    const isUnauthorizedRoute = pathname === "/unauthorized";
+    const hasAuthCookie = hasLikelySupabaseAuthCookie(request);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      if (isProtectedPath(pathname)) {
-        return createRedirect(request, "/login", { redirectTo: pathname });
-      }
-
-      return response;
+    if (isLoginRoute || isUnauthorizedRoute) {
+      return NextResponse.next();
     }
 
-    if (isLoginRoute) {
-      return createRedirect(request, "/");
-    }
-
-    if (isUnauthorizedRoute) {
-      return response;
-    }
-
-    return response;
-  } catch {
-    if (isProtectedPath(pathname)) {
+    if (isProtectedPath(pathname) && !hasAuthCookie) {
       return createRedirect(request, "/login", {
-        error: "session_unavailable",
+        error: "middleware_fallback",
         redirectTo: pathname,
       });
     }
 
-    if (isLoginRoute) {
-      return response;
+    return NextResponse.next();
+  } catch {
+    if (pathname === "/login" || pathname === "/unauthorized") {
+      return NextResponse.next();
     }
 
-    if (isUnauthorizedRoute) {
-      return response;
+    if (isProtectedPath(pathname)) {
+      return createRedirect(request, "/login", {
+        error: "middleware_fallback",
+        redirectTo: pathname,
+      });
     }
 
-    return response;
+    return NextResponse.next();
   }
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)"],
 };

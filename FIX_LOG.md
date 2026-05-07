@@ -78,3 +78,25 @@
 - Fixed loader tuple typing in the Phase 6 helper so array-returning helpers are destructured correctly.
 - Fixed build-time nullability issues in the Phase 6 actions by narrowing profile and datetime values before payload assembly.
 - Confirmed `npm run lint` and `npm run build` pass after the Phase 6 fixes.
+
+## 2026-05-07 Middleware Runtime Failure Fix
+
+- Branch: `fix/vercel-middleware-runtime-failure`
+- Root cause: Edge middleware was still attempting Supabase session handling on Vercel, which could fail before the app-level route helpers had a chance to recover.
+- Fix: removed Supabase client creation from middleware, wrapped the entire middleware body in a single try/catch, and switched to a lightweight cookie-presence gate for protected routes.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed.
+- Next recommended step: verify the Vercel `develop` deployment no longer shows `MIDDLEWARE_INVOCATION_FAILED`.
+
+## 2026-05-07 Middleware Runtime Failure Validation
+
+- Confirmed the Edge middleware now fails closed via a top-level try/catch and no longer creates a Supabase client in middleware.
+- Protected routes redirect to `/login?error=middleware_fallback` on unexpected middleware failure, while public routes remain accessible.
+
+## 2026-05-07 Middleware Redirect-Loop Fix
+
+- Branch: `fix/vercel-middleware-runtime-failure`
+- Root cause: middleware was still redirecting `/login` to `/` based on cookie presence alone, which could loop when stale cookies were present.
+- Fix: let `/login` remain public in middleware and keep authenticated-user redirect logic in `src/app/login/page.tsx`, where real server-side session validation already exists.
+- Tests run: not yet run in this patch set.
+- Next recommended step: run `npm run lint` and `npm run build`, then update the PR.
