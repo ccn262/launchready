@@ -41,3 +41,5 @@
 
 - Chosen allocation model: keep likely crew composition advisory only, and surface the output as suggested boat crew, launch/recovery crew, role conflicts, and readiness-restoration candidates.
 - Chosen Head Launcher fallback: treat Head Launcher as missing until the role exists in the operational role data, rather than adding a schema dependency during Phase 7.
+
+- Chosen documentation model: keep `TP-OCF-02` and `GU1007` as restricted internal reference summaries only, stored under `docs/reference/` and excluded from any public-facing wording or feature claims.

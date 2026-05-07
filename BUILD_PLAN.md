@@ -99,3 +99,5 @@
 - Surface missing hard-stop roles, required roles, preferred gaps, launch/recovery gaps, and current DLA context.
 - Add an admin readiness console so calculated readiness can be reviewed without authorising launches.
 - Add advisory likely crew composition so the readiness view can suggest likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and explicit Head Launcher status without authorising launches.
+
+- Restricted internal reference notes have been created for `TP-OCF-02` and `GU1007` to inform future readiness, currency, and safe-crewing work without exposing long copied text or public-facing approval claims.

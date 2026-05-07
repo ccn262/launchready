@@ -167,3 +167,12 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: run the browser smoke test for `/`, `/dla`, and `/admin/readiness` to confirm the advisory allocation summaries and Head Launcher states render correctly.
+
+## 2026-05-07 Restricted Reference Summary Task
+
+- Branch: `feature/readiness-engine`
+- Files changed: `docs/reference/LIFEBOAT_TRAINING_STANDARDS_NOTES.md`, `docs/reference/SAFE_CREWING_REFERENCE_NOTES.md`, `BUILD_PLAN.md`, `PROJECT_HANDOFF.md`, `SECURITY_MODEL.md`, `DECISIONS_LOG.md`, `CHANGELOG.md`, and this run log.
+- Pages reviewed: `Lifeboat Training Standards Handbook TP-OCF-02.pdf` pages 10-40; `Safe Crewing for Maritime SAR Operations Guidance - GU1007.pdf` pages 1-5.
+- Notes captured: training stages, pass-out and currency model, task-based competence, periodic requalification exceptions, safe-crewing crew-number baselines, minimum role complement, Head Launcher constraints, and dynamic risk assessment boundaries.
+- Tests run: not yet run in this patch set.
+- Next recommended step: run `npm run lint` and `npm run build`, then commit the reference-note docs.

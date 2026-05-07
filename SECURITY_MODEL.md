@@ -83,3 +83,5 @@
 - `/crew/rota` lets authenticated crew read their assigned rota periods only.
 - `/admin/availability` and `/admin/duty-rota` are management routes for station admins and LOMs, with super admins retaining global access.
 - Future readiness-engine views should distinguish service-ready, exercise-only, delayed-launch, and off-service states without claiming launch authorisation.
+
+- Restricted PDF notes under `docs/reference/` are internal-only project artefacts; they must not be exposed in public routes, assets, or marketing copy, and they must not be presented as official RNLI approval.
