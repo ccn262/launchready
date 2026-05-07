@@ -82,3 +82,10 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Restricted internal reference summaries now live under `docs/reference/` for `TP-OCF-02` and `GU1007`; they are internal project notes only and must not be surfaced as public-facing RNLI approval.
 - Readiness asset summaries now expose qualified crew, available crew, and suggested allocation counts separately, while still keeping launch decisions advisory only.
 - Vercel middleware now fails closed with a cookie-presence gate only, redirecting protected routes to login on uncertainty while leaving full session validation and role checks to server-side helpers.
+
+## Phase 8
+
+- Cover / swap request foundation now exists on `feature/cover-swap-requests`.
+- `cover_requests` and `cover_request_responses` are station-scoped, RLS-protected, and audit logged.
+- Notifications are placeholders only; no real WhatsApp, SMS, or email sending is enabled.
+- Cover eligibility is advisory only and must not be treated as launch authorisation.

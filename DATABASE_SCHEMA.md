@@ -44,6 +44,17 @@
 - `asset_launch_recovery_requirements` stores launch/recovery role requirements per asset.
 - The readiness engine combines these tables with availability slots, duty periods, crew qualifications, station memberships, assets, and locations.
 
+## Phase 8 Cover Request Tables
+
+- `cover_requests` stores cover requests by station, asset, role, duty period, period type, urgency, and status.
+- `cover_request_responses` stores crew offers, acceptances, withdrawals, rejection states, and eligibility notes for each cover request.
+- `cover_request_cover_type` captures `weekend`, `day`, `night`, and `custom` cover periods.
+- `cover_request_status` captures `open`, `accepted`, `cancelled`, and `expired` states.
+- `cover_request_urgency` captures `normal` and `urgent` requests.
+- `cover_request_response_status` captures `offered`, `accepted`, `withdrawn`, and `rejected` responses.
+- `cover_request_eligibility_status` captures `eligible`, `ineligible`, and `needs_admin_review`.
+- Notification rows for cover-request placeholders are written without sending real messages.
+
 ## Initial Relationships
 
 - One organisation has many stations.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0 - 2026-05-07
+
+- Added the Phase 8 cover / swap request foundation on `feature/cover-swap-requests`.
+- Added station-scoped cover request and response tables with RLS, audit logging, and notification placeholders.
+- Added crew and admin cover pages plus station readiness/dashboard awareness of open cover requests.
+- Added a reusable cover eligibility helper for like-for-like validation without real message sending.
+
 ## 0.1.0 - 2026-05-07
 
 - Created the initial Launch Ready foundation.

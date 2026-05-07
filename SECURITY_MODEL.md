@@ -43,6 +43,15 @@
 - `.env.local` is local-only and must never be committed.
 - Future safe-crewing and launch-exception reference data is restricted internal project material and must not be exposed publicly as official RNLI guidance.
 
+## Phase 8 Access Boundaries
+
+- `cover_requests` and `cover_request_responses` are station-scoped and protected by RLS.
+- Crew can create and view their own station cover requests; they cannot accept their own request.
+- Admin and LOM users can manage cover requests only within their station scope; super admins can manage all.
+- DLA users can view cover request awareness for their station but should not manage requests unless they also hold an admin or LOM membership.
+- Notification rows created for cover-request placeholders remain internal operational records and do not send email, SMS, or WhatsApp messages.
+- Cover eligibility stays advisory only; middleware and route access must never treat cover acceptance as launch authorisation.
+
 ## Phase 2 RLS Baseline
 
 - `profiles` is auto-created from an auth.users trigger and remains private by default.

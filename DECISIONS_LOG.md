@@ -43,3 +43,9 @@
 - Chosen Head Launcher fallback: treat Head Launcher as missing until the role exists in the operational role data, rather than adding a schema dependency during Phase 7.
 
 - Chosen documentation model: keep `TP-OCF-02` and `GU1007` as restricted internal reference summaries only, stored under `docs/reference/` and excluded from any public-facing wording or feature claims.
+
+## 2026-05-07 Phase 8 Decisions
+
+- Chosen cover-request model: keep cover / swap requests station-scoped, like-for-like, and advisory only, with acceptance validated against active membership, availability, currency, and qualification state.
+- Chosen notification model: write placeholder notification records only for cover request lifecycle events; do not send real WhatsApp, SMS, or email messages in Phase 8.
+- Chosen audit model: log create, response, accept, confirm, and cancel actions for cover requests and responses so operational changes remain traceable.

@@ -1,5 +1,15 @@
 # Codex Run Log
 
+## 2026-05-07 17:13 +01:00
+
+- Branch: `feature/cover-swap-requests`
+- Files changed: `supabase/migrations/20260512000000_phase8_cover_requests.sql`, `src/lib/cover-requests.ts`, `src/app/cover-actions.ts`, `src/app/crew/cover/page.tsx`, `src/app/admin/cover/page.tsx`, `src/app/page.tsx`, `src/app/dla/page.tsx`, `src/app/crew/page.tsx`, `src/app/admin/page.tsx`, `BUILD_PLAN.md`, `PROJECT_HANDOFF.md`, `DATABASE_SCHEMA.md`, `SECURITY_MODEL.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, and `CODEX_RUN_LOG.md`.
+- Root cause: Phase 8 needed a cover-request schema, loaders, actions, and summary pages that remained station-scoped, RLS-protected, and advisory only.
+- Fixes attempted: added `cover_requests` and `cover_request_responses` tables with enums, RLS policies, notification placeholders, audit logging, eligibility helpers, crew and admin cover pages, and readiness/dashboard awareness sections; then resolved strict TypeScript narrowing issues in the actions and cover overview loader.
+- Errors: initial build failures in `src/app/cover-actions.ts` from nullable query results and missing record shape fields; one summary-shape mismatch in `src/lib/cover-requests.ts`.
+- Tests run: `npm run lint`, `npm run build`.
+- Next recommended step: browser smoke-test `/crew/cover`, `/admin/cover`, `/`, and `/dla`, then decide whether to merge `feature/cover-swap-requests` into `develop`.
+
 ## 2026-05-07 11:11 BST
 
 - Branch: `feature/supabase-schema-rls-foundation`

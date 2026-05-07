@@ -1,5 +1,12 @@
 # Fix Log
 
+## 2026-05-07 Phase 8 Cover Request Foundation
+
+- Added the Phase 8 `cover_requests` and `cover_request_responses` schema, RLS, notification placeholders, eligibility helper, and cover management pages.
+- Fixed strict TypeScript errors in `src/app/cover-actions.ts` by aligning query shapes with the existing membership record types and narrowing nullable query results before use.
+- Fixed the cover overview loader so `ownRequests` returns summary items instead of raw request rows.
+- Added the admin cover page `ownMembership` field back into the returned data shape so the admin view compiles cleanly.
+
 ## 2026-05-07
 
 - Replaced the default Next.js starter page with a Launch Ready operational dashboard shell.
