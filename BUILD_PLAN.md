@@ -23,7 +23,7 @@
 - Add login and logout flows.
 - Add route protection and role-aware navigation.
 - Add current user/profile loading and unauthorised handling.
-- Status: started on `feature/auth-session-foundation`.
+- Status: started on `feature/auth-session-foundation`; branch is published and draft PRs are open.
 
 ## Phase 4
 

@@ -53,3 +53,9 @@
 - Added a deferred backlog note for RNLI public station reference/import.
 - Clarified that RNLI public station data is reference-only for future admin pre-population and must not overwrite operational data automatically.
 - Noted that any future RNLI import work must review site terms first and capture source URL and last checked date.
+
+## 0.3.3 - 2026-05-07
+
+- Published the completed branches to GitHub.
+- Opened draft pull requests for the schema/RLS and auth/session branches.
+- Noted that `feature/initial-foundation` is already the same commit as `develop`, so GitHub does not create a PR for that branch.

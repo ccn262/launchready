@@ -29,6 +29,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 4. Replace placeholders with crew, station, and alert data models.
 5. Add audit logging write paths into the app.
 6. Keep RNLI public station reference/import in the future backlog until the CRUD and readiness engine are stable.
+7. Merge the published branches in order once review is complete.
 
 ## Verification
 
@@ -43,6 +44,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Phase 3 access checks now rely on `profiles.display_name`, `profiles.system_role`, `station_memberships.profile_id`, and `station_memberships.membership_role`.
 - `/unauthorized` is the blocked-access landing page and should not bounce users back into a redirect loop.
 - RNLI public station pages are a future reference source only, with manual admin confirmation required and no operational overwrite.
+- GitHub branches are now published and draft PRs exist for schema/RLS and auth/session work.
 
 ## Run Notes
 
