@@ -4,25 +4,37 @@
 
 - `organisations`
 - `stations`
-- `locations`
+- `station_locations`
+- `asset_types`
 - `assets`
-- `crew_profiles`
+- `profiles`
+- `station_memberships`
+- `crew_types`
+- `operational_roles`
+- `asset_role_qualifications`
+- `asset_minimum_crewing`
+- `qualification_types`
 - `crew_qualifications`
-- `crew_availability_blocks`
-- `station_rotas`
-- `launch_alerts`
-- `alert_deliveries`
-- `audit_log_entries`
+- `availability_slots`
+- `duty_periods`
+- `incidents`
+- `incident_assets`
+- `incident_responses`
+- `notifications`
+- `notification_delivery_attempts`
+- `audit_log`
+- `system_settings`
 
 ## Initial Relationships
 
 - One organisation has many stations.
 - One station has many locations.
 - One location has many assets.
-- One crew profile belongs to one organisation and may be linked to one or more station scopes.
+- One profile belongs to one organisation and may hold many station memberships.
 - One crew profile has many qualifications and many availability blocks.
-- One station has many rota entries and many launch alerts.
-- One launch alert may produce many delivery attempts.
+- One station has many rota entries and many incidents.
+- One incident may produce many asset links, responses, and notifications.
+- One notification may produce many delivery attempts.
 - One audit log entry belongs to one actor and one target entity.
 
 ## Qualification Model
@@ -30,6 +42,7 @@
 - Qualifications are per asset, not global.
 - Qualification state must support green, amber, and red currency.
 - Qualifications can carry expiry dates and operational notes.
+- Casualty care is tracked as a qualification type with its own expiry support.
 
 ## Availability Model
 

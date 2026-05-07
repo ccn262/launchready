@@ -27,3 +27,14 @@
 - Server-side session handling via Supabase Auth.
 - Audit rows for create, update, delete, alert, and role-scope changes.
 - No reliance on WhatsApp as the sole critical alert route.
+
+## Phase 2 RLS Baseline
+
+- `profiles` is auto-created from an auth.users trigger and remains private by default.
+- Crew can only update their own profile unless a station admin or LOM role is explicitly granted access.
+- Station access is derived from `station_memberships`.
+- `can_manage_station` covers station admins and LOMs.
+- `can_manage_organisation` covers organisation-scoped admins and LOMs.
+- DLA access is station-scoped and limited to incidents, availability visibility, and operational alerting.
+- Audit logs are append-only.
+- No table is publicly readable without an authenticated policy.

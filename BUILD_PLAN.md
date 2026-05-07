@@ -15,6 +15,7 @@
 - Create organisations, stations, locations, assets, and crew tables.
 - Implement RLS policies for all user-scoped data.
 - Add audit logging for operational actions.
+- Status: schema and RLS foundation added; local Supabase validation blocked until Docker Desktop is available.
 
 ## Phase 3
 

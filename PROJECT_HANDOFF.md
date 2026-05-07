@@ -21,16 +21,20 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 
 ## Immediate Next Work
 
-1. Define the Postgres schema and RLS policies as migrations.
-2. Add Supabase auth flows and session handling.
-3. Replace placeholders with crew, station, and alert data models.
-4. Add audit logging tables and write paths.
+1. Add Supabase auth flows and session handling.
+2. Replace placeholders with crew, station, and alert data models.
+3. Add audit logging write paths into the app.
+4. Validate the migration locally once Docker Desktop is available.
 
 ## Verification
 
 - `npm install` completed successfully after dependency additions.
 - `npm run lint` passed.
 - `npm run build` passed.
+- `supabase db lint --local --fail-on error` was attempted but could not connect because the local Supabase database is not running.
+- `supabase start` was attempted but Docker Desktop is not installed/running in this environment.
+- The Phase 2 migration file was corrected so table-dependent helpers follow the table definitions.
+- The seed file now contains the missing asset insert block and uses deterministic asset codes for idempotency.
 
 ## Run Notes
 
