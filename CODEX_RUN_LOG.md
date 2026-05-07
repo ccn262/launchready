@@ -94,3 +94,12 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: do a browser smoke test for crew membership edits, asset-specific role assignment, and qualification expiry handling, then merge once the review pass is clean.
+
+## 2026-05-07 14:20 BST
+
+- Branch: `feature/crew-management-asset-roles`
+- Files changed: `BUILD_PLAN.md`, `DECISIONS_LOG.md`, `PROJECT_HANDOFF.md`, and `CHANGELOG.md`.
+- Purpose: record future roadmap items for weekend duty rota management, reusable crew capability badges, and like-for-like cover/swap requests.
+- Errors: none.
+- Tests run: none, documentation-only update.
+- Next recommended step: leave these items in backlog until the availability engine and rota foundation are in place.

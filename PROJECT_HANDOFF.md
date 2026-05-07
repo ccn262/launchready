@@ -36,7 +36,8 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 6. Replace the remaining placeholders with alert, readiness, and rota data models.
 7. Add audit logging write paths into the app.
 8. Keep RNLI public station reference/import in the future backlog until the CRUD and readiness engine are stable.
-9. Merge the published branches in order once review is complete.
+9. Keep weekend duty rota, crew capability badges, and cover/swap request work in the backlog until the availability engine and rota foundation are ready.
+10. Merge the published branches in order once review is complete.
 
 ## Verification
 
@@ -56,6 +57,9 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Phase 4 adds real admin CRUD pages for stations, locations, asset types, and assets.
 - `station_locations.notes` and `assets.notes` were added so admins can capture operational notes without reworking the base schema.
 - Phase 5 adds station crew management plus asset-specific role and qualification assignment using the existing `station_memberships` and `crew_qualifications` tables.
+- Weekend duty rota management is deferred until the availability engine is ready, and it must cover Friday 19:00 through Monday 07:00.
+- Crew capability badges must be reused everywhere instead of being reimplemented per page.
+- Cover and swap requests must remain like-for-like only and audit logged when they are introduced.
 
 ## Run Notes
 

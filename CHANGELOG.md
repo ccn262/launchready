@@ -79,3 +79,9 @@
 - Added asset-specific role assignment with currency states per crew member and per asset.
 - Added qualification management with expiry-aware casualty care tracking.
 - Reused the existing `station_memberships` and `crew_qualifications` tables for the Phase 5 admin surfaces.
+
+## 0.5.1 - 2026-05-07
+
+- Added backlog notes for weekend duty rota management after the availability engine exists.
+- Added backlog notes for reusable crew capability badge rendering across dashboards, rotas, and communication summaries.
+- Added backlog notes for like-for-like cover and swap requests with audit logging and eligibility validation.
