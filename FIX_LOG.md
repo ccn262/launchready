@@ -1,5 +1,11 @@
 # Fix Log
 
+## 2026-05-07 Phase 8 Cover Visibility
+
+- Fixed cover-request visibility for rows with nullable `asset_id` and `operational_role_id` by using left-joined related records in the loader.
+- Added a fallback label of `General station cover` so general cover requests render clearly when no asset, role, or crew type is attached.
+- Added a recent/past requests section so accepted, cancelled, and expired cover requests remain visible instead of disappearing from the UI.
+
 ## 2026-05-07 Phase 8 Cover Request Foundation
 
 - Added the Phase 8 `cover_requests` and `cover_request_responses` schema, RLS, notification placeholders, eligibility helper, and cover management pages.

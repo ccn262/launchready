@@ -76,7 +76,7 @@ function RequestCard({
             {item.requesterName}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            {formatDateTime(request.starts_at)} to {formatDateTime(request.ends_at)}
+            {item.requestLabel} · {formatDateTime(request.starts_at)} to {formatDateTime(request.ends_at)}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -453,23 +453,42 @@ export default async function CrewCoverPage({
               )}
             </SectionShell>
 
-            <SectionShell
-              title="Station open cover requests"
-              description="View the station cover requests that other crew may be able to take."
-            >
-              {activeRequests.length ? (
+        <SectionShell
+          title="Station open cover requests"
+          description="View the station cover requests that other crew may be able to take."
+        >
+          {activeRequests.length ? (
                 <div className="space-y-4">
                   {activeRequests.map((item) => (
                     <RequestCard key={item.request.id} item={item} currentProfileId={data.currentProfile?.id ?? null} />
                   ))}
                 </div>
               ) : (
-                <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
-                  No open station cover requests are available.
-                </div>
-              )}
-            </SectionShell>
-          </>
+            <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
+              No open station cover requests are available.
+            </div>
+          )}
+        </SectionShell>
+
+        <SectionShell
+          title="Recent and resolved"
+          description="Accepted, cancelled, and expired requests remain visible for operational awareness."
+        >
+          {data.coverRequests.filter((item) => item.request.status !== "open").length ? (
+            <div className="space-y-4">
+              {data.coverRequests
+                .filter((item) => item.request.status !== "open")
+                .map((item) => (
+                  <RequestCard key={item.request.id} item={item} currentProfileId={data.currentProfile?.id ?? null} />
+                ))}
+            </div>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
+              No recent cover requests yet.
+            </div>
+          )}
+        </SectionShell>
+      </>
         ) : (
           <SectionShell title="No station selected" description="Choose a station to load or create cover requests.">
             <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">

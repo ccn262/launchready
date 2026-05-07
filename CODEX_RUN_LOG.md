@@ -1,5 +1,15 @@
 # Codex Run Log
 
+## 2026-05-07 17:13 +01:00 - Phase 8 Cover Visibility Fix
+
+- Branch: `feature/cover-swap-requests`
+- Files changed: `src/lib/cover-requests.ts`, `src/app/crew/cover/page.tsx`, `src/app/admin/cover/page.tsx`, `src/app/page.tsx`, `src/app/dla/page.tsx`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, `CHANGELOG.md`, and `SMOKE_TEST.md`.
+- Root cause: the cover UI was too narrow for general requests and historical requests, so rows with nullable asset/role context were not presented clearly and resolved requests could disappear from the main view.
+- Fixes attempted: changed cover-related embeds to left joins, added a `General station cover` fallback label, and added recent/past sections so accepted, cancelled, and expired requests stay visible.
+- Errors: none after the loader and page updates.
+- Tests run: `npm run lint`, `npm run build`.
+- Next recommended step: browser retest `/crew/cover`, `/admin/cover`, `/`, and `/dla` using both general and asset/role-specific cover rows.
+
 ## 2026-05-07 17:13 +01:00
 
 - Branch: `feature/cover-swap-requests`

@@ -77,7 +77,7 @@ function RequestCard({
             {item.requesterName}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            {formatDateTime(request.starts_at)} to {formatDateTime(request.ends_at)}
+            {item.requestLabel} · {formatDateTime(request.starts_at)} to {formatDateTime(request.ends_at)}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -476,6 +476,25 @@ export default async function AdminCoverPage({
               ) : (
                 <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
                   No accepted or cancelled requests yet.
+                </div>
+              )}
+            </SectionShell>
+
+            <SectionShell
+              title="Recent / past cover requests"
+              description="All non-open station requests remain visible so historical requests do not disappear."
+            >
+              {data.coverRequests.filter((item) => item.request.status !== "open").length ? (
+                <div className="space-y-4">
+                  {data.coverRequests
+                    .filter((item) => item.request.status !== "open")
+                    .map((item) => (
+                      <RequestCard key={item.request.id} item={item} />
+                    ))}
+                </div>
+              ) : (
+                <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
+                  No historical cover requests yet.
                 </div>
               )}
             </SectionShell>

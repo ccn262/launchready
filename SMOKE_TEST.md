@@ -78,11 +78,13 @@
 - Crew can open `/crew/cover`.
 - Crew can create a cover request for a weekend, day, night, or custom time window.
 - Crew can see their own open cover requests and station open cover requests.
+- General station cover requests display clearly even when no asset or operational role is assigned.
 - Crew cannot accept their own request.
 - Eligible crew can offer or accept cover when the request is like-for-like.
 - Ineligible crew are blocked or marked `needs_admin_review`.
 - Admin can open `/admin/cover`.
 - Admin can view open, urgent, accepted, and cancelled cover requests for the station.
+- Admin can view recent/past cover requests, including accepted, cancelled, and expired rows.
 - Admin can confirm or cancel cover requests where permitted.
 - DLA can view cover request awareness without managing requests unless also admin or LOM.
 - Cover request creation writes an audit log entry.

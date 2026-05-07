@@ -50,7 +50,7 @@ export default async function DashboardPage() {
                   <div>
                     <p className="text-sm font-semibold text-card-foreground">{item.requesterName}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {item.assetName ?? "General cover"} · {item.roleName ?? item.crewTypeName ?? item.request.cover_type.replace(/_/g, " ")}
+                      {item.requestLabel} · {item.roleName ?? item.crewTypeName ?? item.request.cover_type.replace(/_/g, " ")}
                     </p>
                   </div>
                   <StatusPill tone={item.request.urgency === "urgent" ? "red" : "amber"}>

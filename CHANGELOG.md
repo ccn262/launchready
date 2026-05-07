@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.1 - 2026-05-07
+
+- Fixed cover-request visibility so general station cover requests render even when `asset_id` or `operational_role_id` is null.
+- Added recent/past cover request sections so accepted, cancelled, and expired requests remain visible in the crew and admin UIs.
+
 ## 0.8.0 - 2026-05-07
 
 - Added the Phase 8 cover / swap request foundation on `feature/cover-swap-requests`.

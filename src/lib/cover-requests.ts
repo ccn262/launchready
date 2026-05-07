@@ -169,6 +169,7 @@ export type CoverRequestSummaryItem = {
   request: CoverRequestRecord;
   responses: CoverRequestResponseRecord[];
   requesterName: string;
+  requestLabel: string;
   assetName: string | null;
   roleName: string | null;
   crewTypeName: string | null;
@@ -540,7 +541,7 @@ async function loadCoverRequestRows(stationId: string | null) {
           resolved_at,
           created_at,
           updated_at,
-          requester:profiles (
+          requester:profiles!left (
             id,
             display_name,
             email,
@@ -548,7 +549,7 @@ async function loadCoverRequestRows(stationId: string | null) {
             system_role,
             is_active
           ),
-          asset:assets (
+          asset:assets!left (
             id,
             station_id,
             station_location_id,
@@ -561,7 +562,7 @@ async function loadCoverRequestRows(stationId: string | null) {
             metadata,
             is_active
           ),
-          operational_role:operational_roles (
+          operational_role:operational_roles!left (
             id,
             code,
             name,
@@ -569,14 +570,14 @@ async function loadCoverRequestRows(stationId: string | null) {
             category,
             is_active
           ),
-          crew_type:crew_types (
+          crew_type:crew_types!left (
             id,
             code,
             name,
             description,
             is_active
           ),
-          original_duty_period:duty_periods (
+          original_duty_period:duty_periods!left (
             id,
             station_id,
             profile_id,
@@ -595,7 +596,7 @@ async function loadCoverRequestRows(stationId: string | null) {
             is_active,
             created_by_profile_id
           ),
-          accepted_by_profile:profiles (
+          accepted_by_profile:profiles!left (
             id,
             display_name,
             email,
@@ -622,7 +623,7 @@ async function loadCoverRequestRows(stationId: string | null) {
           responded_at,
           created_at,
           updated_at,
-          responder:profiles (
+          responder:profiles!left (
             id,
             display_name,
             email,
@@ -630,7 +631,7 @@ async function loadCoverRequestRows(stationId: string | null) {
             system_role,
             is_active
           ),
-          cover_request:cover_requests (
+          cover_request:cover_requests!left (
             id,
             station_id,
             requester_profile_id,
@@ -686,6 +687,7 @@ function buildSummaryItem(
     request,
     responses,
     requesterName: getLabel(requester),
+    requestLabel: asset?.name ?? role?.name ?? crewType?.name ?? "General station cover",
     assetName: asset?.name ?? null,
     roleName: role?.name ?? null,
     crewTypeName: crewType?.name ?? null,
