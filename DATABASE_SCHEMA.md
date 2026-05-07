@@ -25,11 +25,18 @@
 - `audit_log`
 - `system_settings`
 
+## Phase 4 Notes Fields
+
+- `station_locations.notes` stores optional operational notes for station locations.
+- `assets.notes` stores optional operational notes for assets.
+
 ## Initial Relationships
 
 - One organisation has many stations.
 - One station has many locations.
 - One location has many assets.
+- One location may also carry optional notes for operational context.
+- One asset may also carry optional notes for operational context.
 - One profile belongs to one organisation and may hold many station memberships.
 - One crew profile has many qualifications and many availability blocks.
 - One station has many rota entries and many incidents.
@@ -58,3 +65,4 @@
 4. Qualifications and rota tables.
 5. Alerts, deliveries, and audit logging.
 6. RLS policies on every table.
+7. Station and asset CRUD notes fields where needed.

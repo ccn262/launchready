@@ -65,3 +65,10 @@
 - Fixed the Vercel Edge middleware compatibility issue by removing imports of server-only auth helpers from middleware.
 - Moved detailed route authorization into server-rendered route helpers for the protected pages.
 - Kept middleware focused on session refresh and login redirects only.
+
+## 0.4.0 - 2026-05-07
+
+- Added the first real admin CRUD surfaces for stations, locations, asset types, and assets.
+- Added station-scoped station, location, and asset management with super-admin-only asset type editing.
+- Added optional operational notes fields for station locations and assets via a corrective schema migration.
+- Updated the admin landing page, smoke tests, and security documentation to reflect the new CRUD routes.

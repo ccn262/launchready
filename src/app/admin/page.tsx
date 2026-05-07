@@ -26,6 +26,12 @@ const adminSections = [
     icon: Anchor,
   },
   {
+    href: "/admin/asset-types",
+    title: "Asset types",
+    description: "Global asset type reference data for stations and equipment.",
+    icon: BadgeCheck,
+  },
+  {
     href: "/admin/crew",
     title: "Crew",
     description: "Profiles, memberships, and visibility boundaries.",

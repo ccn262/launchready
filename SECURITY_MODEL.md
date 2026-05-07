@@ -18,6 +18,9 @@
 
 - Crew users can read and update only their own profile-linked records unless a station policy says otherwise.
 - Station admins can manage assets, locations, and station crew only within their station.
+- Station admins and LOMs can manage stations, locations, and assets only within their own station scope.
+- Super admins can manage station records and global reference data such as asset types across all stations.
+- Asset type CRUD remains super-admin only because it is shared reference data.
 - DLA users can create and manage launch alerts only within their station.
 - Service-role access is reserved for trusted backend workflows and should be tightly constrained.
 - Route access is based on `profiles.system_role = super_admin` and `station_memberships.membership_role` values of `admin`, `lom`, `dla`, and `crew`.
@@ -29,6 +32,7 @@
 
 - Row-level policies on every table containing user or operational data.
 - Server-side session handling via Supabase Auth.
+- Edge middleware only handles session refresh and lightweight login redirects; detailed authorisation happens on the server.
 - Audit rows for create, update, delete, alert, and role-scope changes.
 - No reliance on WhatsApp as the sole critical alert route.
 - `.env.local` is local-only and must never be committed.
@@ -60,3 +64,5 @@
 - `admin` access accepts super admin, admin, and LOM memberships.
 - `dla` access accepts super admin, DLA, admin, and LOM memberships.
 - `crew` access accepts any active station membership.
+- `/admin/stations`, `/admin/locations`, and `/admin/assets` are station-scoped CRUD routes for admin and LOM memberships, or super admins globally.
+- `/admin/asset-types` is visible to authenticated admin users but only editable by super admins.

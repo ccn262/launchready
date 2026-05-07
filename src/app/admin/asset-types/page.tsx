@@ -4,11 +4,10 @@ import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
 import {
   getAdminAccessContext,
-  loadStationOptions,
-  type OrganisationRecord,
-  type StationOption,
+  loadAssetTypes,
+  type AssetTypeRecord,
 } from "@/lib/admin-crud";
-import { saveStationAction } from "@/app/admin/actions";
+import { saveAssetTypeAction } from "@/app/admin/actions";
 
 function getQueryValue(value: string | string[] | undefined, fallback = "") {
   if (Array.isArray(value)) {
@@ -41,78 +40,114 @@ function FlashMessage({
   return null;
 }
 
-function StationCard({
-  station,
+function AssetTypeCard({
+  assetType,
   canEdit,
   returnPath,
 }: Readonly<{
-  station: StationOption;
+  assetType: AssetTypeRecord;
   canEdit: boolean;
   returnPath: string;
 }>) {
   return (
     <form
-      action={saveStationAction}
-      className="rounded-3xl border border-white/10 bg-slate-950/50 p-4 shadow-[0_12px_40px_-24px_rgba(0,0,0,0.8)]"
+      action={saveAssetTypeAction}
+      className="rounded-3xl border border-white/10 bg-slate-950/50 p-4"
     >
-      <input type="hidden" name="station_id" value={station.id} />
+      <input type="hidden" name="asset_type_id" value={assetType.id} />
       <input type="hidden" name="return_path" value={returnPath} />
 
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-base font-semibold text-card-foreground">
-            {station.name}
+            {assetType.name}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            {station.organisation_name}
+            <span className="font-mono">{assetType.code}</span> · {assetType.category}
           </p>
         </div>
-        <StatusPill tone={station.is_active ? "green" : "red"}>
-          {station.is_active ? "Active" : "Inactive"}
+        <StatusPill tone={assetType.is_active ? "green" : "red"}>
+          {assetType.is_active ? "Active" : "Inactive"}
         </StatusPill>
       </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-sm font-medium text-card-foreground">
-            Station name
-          </span>
+          <span className="text-sm font-medium text-card-foreground">Code</span>
+          <input
+            name="code"
+            defaultValue={assetType.code}
+            disabled={!canEdit}
+            className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-foreground outline-none transition disabled:cursor-not-allowed disabled:opacity-60"
+          />
+        </label>
+        <label className="space-y-2">
+          <span className="text-sm font-medium text-card-foreground">Name</span>
           <input
             name="name"
-            defaultValue={station.name}
+            defaultValue={assetType.name}
             disabled={!canEdit}
             className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-foreground outline-none transition disabled:cursor-not-allowed disabled:opacity-60"
           />
         </label>
         <label className="space-y-2">
           <span className="text-sm font-medium text-card-foreground">
-            Station code
+            Category
           </span>
-          <input
-            name="code"
-            defaultValue={station.code ?? ""}
+          <select
+            name="category"
+            defaultValue={assetType.category}
             disabled={!canEdit}
             className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-foreground outline-none transition disabled:cursor-not-allowed disabled:opacity-60"
-            placeholder="AUTO"
-          />
+          >
+            <option value="lifeboat">Lifeboat</option>
+            <option value="launch_recovery">Launch / recovery</option>
+            <option value="vehicle">Vehicle</option>
+            <option value="equipment">Equipment</option>
+            <option value="support">Support</option>
+          </select>
+        </label>
+        <label className="space-y-2">
+          <span className="text-sm font-medium text-card-foreground">
+            Recovery equipment
+          </span>
+          <select
+            name="requires_recovery_equipment"
+            defaultValue={assetType.requires_recovery_equipment ? "true" : "false"}
+            disabled={!canEdit}
+            className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-foreground outline-none transition disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
         </label>
       </div>
+
+      <label className="mt-4 block space-y-2">
+        <span className="text-sm font-medium text-card-foreground">
+          Description
+        </span>
+        <textarea
+          name="description"
+          rows={3}
+          defaultValue={assetType.description ?? ""}
+          disabled={!canEdit}
+          className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-foreground outline-none transition disabled:cursor-not-allowed disabled:opacity-60"
+        />
+      </label>
 
       <label className="mt-4 flex items-center gap-3 text-sm text-card-foreground">
         <input
           type="checkbox"
           name="is_active"
-          defaultChecked={station.is_active}
+          defaultChecked={assetType.is_active}
           disabled={!canEdit}
           className="h-4 w-4 rounded border-white/20 bg-transparent"
         />
         Active
       </label>
 
-      <div className="mt-4 flex items-center justify-between gap-3">
-        <div className="text-xs text-muted-foreground">
-          Slug: <span className="font-mono">{station.slug}</span>
-        </div>
+      <div className="mt-4 flex justify-end">
         <div className="flex items-center gap-2">
           <button
             type="reset"
@@ -134,7 +169,7 @@ function StationCard({
   );
 }
 
-export default async function AdminStationsPage({
+export default async function AdminAssetTypesPage({
   searchParams,
 }: Readonly<{
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -142,86 +177,107 @@ export default async function AdminStationsPage({
   const params = searchParams ? await searchParams : {};
   const success = getQueryValue(params.success);
   const error = getQueryValue(params.error);
-  const { context, supabase } = await getAdminAccessContext("/admin/stations");
-  const stations = await loadStationOptions(context);
-  const organizations = context.isSuperAdmin
-    ? (((await supabase.from("organisations").select("id, name, slug, is_demo").order("name")).data ?? []) as OrganisationRecord[])
-    : [];
+  const { context } = await getAdminAccessContext("/admin/asset-types");
+  const assetTypes = await loadAssetTypes();
 
   return (
     <AppShell>
       <div className="space-y-6">
         <PageHero
-          eyebrow="Admin / Stations"
-          title="Stations"
-          summary="Create and maintain station records with station-scoped access, active state, and organisation ownership."
+          eyebrow="Admin / Asset types"
+          title="Asset types"
+          summary="Global reference data for lifeboats and launch / recovery equipment. Only super admins can create or edit this reference set."
         />
 
         <FlashMessage success={success} error={error} />
 
         <SectionShell
-          title="Current scope"
-          description="Visible stations are limited to the current admin scope unless you are a super admin."
+          title="Reference data"
+          description="Asset types are shared across stations and stay read-only for station admins."
         >
           <div className="flex flex-wrap items-center gap-3">
             <StatusPill tone={context.isSuperAdmin ? "blue" : "green"}>
-              {context.isSuperAdmin ? "Super admin" : "Station scoped"}
+              {context.isSuperAdmin ? "Super admin editor" : "Read only"}
             </StatusPill>
             <span className="text-sm text-muted-foreground">
-              {stations.length} station{stations.length === 1 ? "" : "s"} available
+              {assetTypes.length} type{assetTypes.length === 1 ? "" : "s"}
             </span>
           </div>
         </SectionShell>
 
         {context.isSuperAdmin ? (
           <SectionShell
-            title="Create station"
-            description="Super admins can create stations for any organisation."
+            title="Create asset type"
+            description="Add new global reference types for stations and assets."
           >
             <form
-              action={saveStationAction}
+              action={saveAssetTypeAction}
               className="grid gap-4 rounded-3xl border border-white/10 bg-slate-950/50 p-4 md:grid-cols-2"
             >
-              <input type="hidden" name="return_path" value="/admin/stations" />
-              <div className="space-y-2 md:col-span-2">
-                <span className="text-sm font-medium text-card-foreground">
-                  Organisation
-                </span>
-                <select
-                  name="organisation_id"
-                  defaultValue={organizations[0]?.id ?? ""}
-                  className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-foreground outline-none transition"
-                >
-                  <option value="">Select organisation</option>
-                  {organizations.map((organisation) => (
-                    <option key={organisation.id} value={organisation.id}>
-                      {organisation.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <input type="hidden" name="return_path" value="/admin/asset-types" />
               <label className="space-y-2">
                 <span className="text-sm font-medium text-card-foreground">
-                  Station name
+                  Code
+                </span>
+                <input
+                  name="code"
+                  required
+                  className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-foreground outline-none transition"
+                  placeholder="d-class-lifeboat"
+                />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-medium text-card-foreground">
+                  Name
                 </span>
                 <input
                   name="name"
                   required
                   className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-foreground outline-none transition"
-                  placeholder="Southend Lifeboat Station"
+                  placeholder="D Class"
                 />
               </label>
               <label className="space-y-2">
                 <span className="text-sm font-medium text-card-foreground">
-                  Station code
+                  Category
                 </span>
-                <input
-                  name="code"
+                <select
+                  name="category"
+                  defaultValue="lifeboat"
                   className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-foreground outline-none transition"
-                  placeholder="SOUTHEND"
+                >
+                  <option value="lifeboat">Lifeboat</option>
+                  <option value="launch_recovery">Launch / recovery</option>
+                  <option value="vehicle">Vehicle</option>
+                  <option value="equipment">Equipment</option>
+                  <option value="support">Support</option>
+                </select>
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-medium text-card-foreground">
+                  Recovery equipment
+                </span>
+                <select
+                  name="requires_recovery_equipment"
+                  defaultValue="false"
+                  className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-foreground outline-none transition"
+                >
+                  <option value="false">No</option>
+                  <option value="true">Yes</option>
+                </select>
+              </label>
+              <label className="md:col-span-2 space-y-2">
+                <span className="text-sm font-medium text-card-foreground">
+                  Description
+                </span>
+                <textarea
+                  name="description"
+                  rows={3}
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-foreground outline-none transition"
+                  placeholder="Optional reference description"
                 />
               </label>
-              <label className="flex items-center gap-3 text-sm text-card-foreground md:col-span-2">
+              <label className="flex items-center gap-3 text-sm text-card-foreground">
                 <input
                   type="checkbox"
                   name="is_active"
@@ -242,7 +298,7 @@ export default async function AdminStationsPage({
                     type="submit"
                     className="inline-flex h-11 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
                   >
-                    Create station
+                    Create asset type
                   </button>
                 </div>
               </div>
@@ -251,23 +307,23 @@ export default async function AdminStationsPage({
         ) : null}
 
         <SectionShell
-          title="Station list"
-          description="Update names and active state inline. Station creation is restricted to super admins."
+          title="Asset type list"
+          description="Use the cards below to review and update the global reference set."
         >
-          {stations.length ? (
+          {assetTypes.length ? (
             <div className="space-y-4">
-              {stations.map((station) => (
-                <StationCard
-                  key={station.id}
-                  station={station}
-                  canEdit
-                  returnPath="/admin/stations"
+              {assetTypes.map((assetType) => (
+                <AssetTypeCard
+                  key={assetType.id}
+                  assetType={assetType}
+                  canEdit={context.isSuperAdmin}
+                  returnPath="/admin/asset-types"
                 />
               ))}
             </div>
           ) : (
             <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
-              No stations are visible in your current scope.
+              No asset types exist yet.
             </div>
           )}
         </SectionShell>
