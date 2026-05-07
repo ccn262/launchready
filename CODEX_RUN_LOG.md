@@ -61,5 +61,6 @@
 - Branches pushed: `develop`, `feature/initial-foundation`, `feature/supabase-schema-rls-foundation`, `feature/auth-session-foundation`.
 - Pull requests created: `https://github.com/ccn262/launchready/pull/1` and `https://github.com/ccn262/launchready/pull/2`.
 - PR note: `feature/initial-foundation` could not be opened against `develop` because `develop` was bootstrapped from the same commit, so GitHub reported no commits between the refs.
-- Tests run: pending rerun after the doc update commit.
-- Next recommended step: rerun lint/build, then proceed with merge order checks in GitHub.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: merge the published branches in dependency order, with `feature/supabase-schema-rls-foundation` before `feature/auth-session-foundation`.
