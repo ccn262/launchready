@@ -3,6 +3,7 @@ import { OperationalCard } from "@/components/operational-card";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
+import Link from "next/link";
 import { requireRouteAccess } from "@/lib/auth";
 
 export default async function CrewPage() {
@@ -61,6 +62,27 @@ export default async function CrewPage() {
                   {text}
                 </p>
               </div>
+            ))}
+          </div>
+        </SectionShell>
+
+        <SectionShell
+          title="Availability and rota"
+          description="Crew availability and rota views are now available as dedicated subpages."
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              { href: "/crew/availability", title: "Availability", text: "Record full-day, partial-day, night cover, and weekend unavailability." },
+              { href: "/crew/rota", title: "Rota", text: "Review assigned duty periods and capability badges for the selected station." },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 transition hover:border-emerald-400/25 hover:bg-slate-950/70"
+              >
+                <StatusPill tone="blue">{item.title}</StatusPill>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.text}</p>
+              </Link>
             ))}
           </div>
         </SectionShell>

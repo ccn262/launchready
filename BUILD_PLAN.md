@@ -47,6 +47,15 @@
 - Keep operational role reference data and qualification reference data aligned with the existing schema.
 - Manual browser smoke testing and hardening.
 
+
+## Phase 6
+
+- Build the availability calendar foundation for crew and station admins.
+- Support full-day, partial-day, night-cover, and weekend-unavailable availability windows.
+- Support Monday to Thursday night cover and foundation-level weekend duty rota views.
+- Add reusable crew capability badge rendering for asset-specific roles and currency states.
+- Status: availability and rota foundation added; browser smoke testing and merge review pending.
+
 ## Future Phase: Weekend Duty Rota
 
 - Add weekend duty rota management after the availability engine is ready.

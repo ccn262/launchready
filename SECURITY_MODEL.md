@@ -22,8 +22,9 @@
 - Station admins and LOMs can manage stations, locations, and assets only within their own station scope.
 - Super admins can manage station records and global reference data such as asset types across all stations.
 - Asset type CRUD remains super-admin only because it is shared reference data.
-- Station admins and LOMs can manage crew memberships, operational role assignments, and qualifications only within their station scope.
-- DLA users can create and manage launch alerts only within their station.
+- Station admins and LOMs can manage crew memberships, operational role assignments, qualifications, availability windows, and duty rota periods only within their station scope.
+- Crew users can manage only their own availability windows and can read only their own assigned rota periods.
+- DLA users can read station availability and rota summaries, but they should not manage availability or rota periods unless they also hold an admin or LOM membership.
 - Service-role access is reserved for trusted backend workflows and should be tightly constrained.
 - Route access is based on `profiles.system_role = super_admin` and `station_memberships.membership_role` values of `admin`, `lom`, `dla`, and `crew`.
 - Inactive profiles are blocked before station membership checks are evaluated.
@@ -72,4 +73,7 @@
 - `/admin/stations`, `/admin/locations`, and `/admin/assets` are station-scoped CRUD routes for admin and LOM memberships, or super admins globally.
 - `/admin/asset-types` is visible to authenticated admin users but only editable by super admins.
 - `/admin/crew`, `/admin/roles`, and `/admin/qualifications` are management routes for station admins and LOMs, with operational data still protected by RLS at the table level.
+- `/crew/availability` lets authenticated crew manage their own availability windows only.
+- `/crew/rota` lets authenticated crew read their assigned rota periods only.
+- `/admin/availability` and `/admin/duty-rota` are management routes for station admins and LOMs, with super admins retaining global access.
 - Future readiness-engine views should distinguish service-ready, exercise-only, delayed-launch, and off-service states without claiming launch authorisation.

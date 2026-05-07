@@ -22,3 +22,11 @@
 - Chosen cover-request model: cover swap requests will be like-for-like only, station-scoped, and validated against the required asset, role, currency, qualification, availability, and rota constraints before acceptance.
 - Chosen readiness-engine model: safe-crewing and required-role rules will be effective-dated, asset-type scoped, and operation-type aware, but the system will never authorise launches.
 - Chosen internal-reference rule: restricted SAR crewing guidance is treated as internal project reference only and must not be surfaced as public-facing RNLI approval or endorsement.
+
+
+## 2026-05-07 Phase 6 Decisions
+
+- Chosen availability model: keep crew and station availability on the existing `availability_slots` table, using datetime windows plus the existing slot kind pattern rather than adding a new availability table.
+- Chosen rota model: keep manual weekend and duty rota foundation on the existing `duty_periods` table, with `weekend_cover`, `dla_day`, and `dla_night` as additive kinds.
+- Chosen badge model: centralise asset/role badge formatting in shared helper and component files so the same labels appear consistently across availability and rota views.
+- Chosen crew-write rule: crew availability writes remain crew-scoped, while station-wide availability and rota writes stay admin/LOM-scoped.
