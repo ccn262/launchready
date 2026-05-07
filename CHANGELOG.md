@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.1 - 2026-05-07
+
+- Fixed cover-request visibility so general station cover requests render even when `asset_id` or `operational_role_id` is null.
+- Added recent/past cover request sections so accepted, cancelled, and expired requests remain visible in the crew and admin UIs.
+
+## 0.8.0 - 2026-05-07
+
+- Added the Phase 8 cover / swap request foundation on `feature/cover-swap-requests`.
+- Added station-scoped cover request and response tables with RLS, audit logging, and notification placeholders.
+- Added crew and admin cover pages plus station readiness/dashboard awareness of open cover requests.
+- Added a reusable cover eligibility helper for like-for-like validation without real message sending.
+
 ## 0.1.0 - 2026-05-07
 
 - Created the initial Launch Ready foundation.
@@ -146,3 +158,8 @@
 
 - Removed the `/login` cookie-presence redirect from middleware to eliminate stale-cookie redirect loops.
 - Kept protected-route gating in middleware and server-side authenticated-user redirects in the login page.
+
+## 0.7.9 - 2026-05-07
+
+- Forced cover-request and readiness summary pages to render dynamically so current and future open cover requests are read fresh from Supabase.
+- Added development-only debug visibility for selected station, current profile, and loaded/open cover-request counts.

@@ -1,5 +1,18 @@
 # Fix Log
 
+## 2026-05-07 Phase 8 Cover Visibility
+
+- Fixed cover-request visibility for rows with nullable `asset_id` and `operational_role_id` by using left-joined related records in the loader.
+- Added a fallback label of `General station cover` so general cover requests render clearly when no asset, role, or crew type is attached.
+- Added a recent/past requests section so accepted, cancelled, and expired cover requests remain visible instead of disappearing from the UI.
+
+## 2026-05-07 Phase 8 Cover Request Foundation
+
+- Added the Phase 8 `cover_requests` and `cover_request_responses` schema, RLS, notification placeholders, eligibility helper, and cover management pages.
+- Fixed strict TypeScript errors in `src/app/cover-actions.ts` by aligning query shapes with the existing membership record types and narrowing nullable query results before use.
+- Fixed the cover overview loader so `ownRequests` returns summary items instead of raw request rows.
+- Added the admin cover page `ownMembership` field back into the returned data shape so the admin view compiles cleanly.
+
 ## 2026-05-07
 
 - Replaced the default Next.js starter page with a Launch Ready operational dashboard shell.
@@ -127,3 +140,12 @@
 - Fix: let `/login` remain public in middleware and keep authenticated-user redirect logic in `src/app/login/page.tsx`, where real server-side session validation already exists.
 - Tests run: not yet run in this patch set.
 - Next recommended step: run `npm run lint` and `npm run build`, then update the PR.
+
+## 2026-05-07 Cover Request Visibility Cache Fix
+
+- Branch: `feature/cover-swap-requests`
+- Root cause: cover-request pages could serve a stale empty snapshot, so current and future open requests already present in Supabase were not reliably reflected in the UI.
+- Fix: marked the cover-request data path as dynamic, added `unstable_noStore()` to the loader, and kept development-only debug output for selected station/profile/count visibility.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the cache-bypass change.
+- Next recommended step: browser retest `/crew/cover`, `/admin/cover`, `/`, and `/dla`.

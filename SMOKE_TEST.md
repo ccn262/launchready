@@ -72,3 +72,37 @@
 - Readiness UI now shows qualified crew, available crew, and suggested allocation as separate operational indicators for each asset card.
 - Browser smoke testing should confirm that protected routes redirect cleanly to `/login` when no likely Supabase auth cookie is present and that `/login` remains public.
 - Browser smoke testing should confirm `/login` stays public, authenticated users are redirected by the login page itself, and stale cookies no longer create a `/login` ↔ `/` loop.
+
+## Phase 8 Smoke Test
+
+- Crew can open `/crew/cover`.
+- Crew can create a cover request for a weekend, day, night, or custom time window.
+- Crew can see their own open cover requests and station open cover requests.
+- General station cover requests display clearly even when no asset or operational role is assigned.
+- Crew cannot accept their own request.
+- Eligible crew can offer or accept cover when the request is like-for-like.
+- Ineligible crew are blocked or marked `needs_admin_review`.
+- Admin can open `/admin/cover`.
+- Admin can view open, urgent, accepted, and cancelled cover requests for the station.
+- Admin can view recent/past cover requests, including accepted, cancelled, and expired rows.
+- Admin can confirm or cancel cover requests where permitted.
+- DLA can view cover request awareness without managing requests unless also admin or LOM.
+- Cover request creation writes an audit log entry.
+- Cover request creation writes a notification placeholder row.
+- Cross-station access remains blocked by RLS.
+- No hard delete is exposed for cover requests or responses.
+
+## Phase 8 Pass Criteria
+
+- Lint passes with no errors.
+- Build passes with no errors.
+- `cover_requests` and `cover_request_responses` remain station-scoped and RLS-protected.
+- Like-for-like eligibility remains advisory only and never authorises a launch.
+- No real WhatsApp, SMS, or email sending is enabled yet.
+
+## Phase 8 Visibility Check
+
+- `/crew/cover` shows current and future open requests for the selected station, including general station cover with no asset or role.
+- `/admin/cover` shows current and future open requests, plus accepted, cancelled, and historical rows.
+- `/`, `/dla`, `/crew/cover`, and `/admin/cover` render fresh cover-request counts rather than a stale empty snapshot.
+- Development-only debug output shows selected station, current profile, loaded request count, and visible open request count.

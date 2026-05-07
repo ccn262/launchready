@@ -103,3 +103,12 @@
 - Restricted internal reference notes have been created for `TP-OCF-02` and `GU1007` to inform future readiness, currency, and safe-crewing work without exposing long copied text or public-facing approval claims.
 
 - The readiness board now distinguishes qualified crew, available crew, and suggested allocation for each asset so advisory allocation is explicit instead of implied.
+
+## Phase 8
+
+- Build the cover / swap request foundation after readiness and rota work are stable.
+- Support weekend, day, night, and custom cover requests with like-for-like eligibility checks.
+- Keep notifications as placeholders only until messaging channels are ready.
+- Surface open and urgent cover requests on dashboard, crew, admin, and DLA awareness views.
+- Audit-log cover request, response, acceptance, and cancellation actions.
+- Keep cover acceptance advisory only and never treat it as launch authorisation.

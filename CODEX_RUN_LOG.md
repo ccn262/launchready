@@ -1,5 +1,25 @@
 # Codex Run Log
 
+## 2026-05-07 17:13 +01:00 - Phase 8 Cover Visibility Fix
+
+- Branch: `feature/cover-swap-requests`
+- Files changed: `src/lib/cover-requests.ts`, `src/app/crew/cover/page.tsx`, `src/app/admin/cover/page.tsx`, `src/app/page.tsx`, `src/app/dla/page.tsx`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, `CHANGELOG.md`, and `SMOKE_TEST.md`.
+- Root cause: the cover UI was too narrow for general requests and historical requests, so rows with nullable asset/role context were not presented clearly and resolved requests could disappear from the main view.
+- Fixes attempted: changed cover-related embeds to left joins, added a `General station cover` fallback label, and added recent/past sections so accepted, cancelled, and expired requests stay visible.
+- Errors: none after the loader and page updates.
+- Tests run: `npm run lint`, `npm run build`.
+- Next recommended step: browser retest `/crew/cover`, `/admin/cover`, `/`, and `/dla` using both general and asset/role-specific cover rows.
+
+## 2026-05-07 17:13 +01:00
+
+- Branch: `feature/cover-swap-requests`
+- Files changed: `supabase/migrations/20260512000000_phase8_cover_requests.sql`, `src/lib/cover-requests.ts`, `src/app/cover-actions.ts`, `src/app/crew/cover/page.tsx`, `src/app/admin/cover/page.tsx`, `src/app/page.tsx`, `src/app/dla/page.tsx`, `src/app/crew/page.tsx`, `src/app/admin/page.tsx`, `BUILD_PLAN.md`, `PROJECT_HANDOFF.md`, `DATABASE_SCHEMA.md`, `SECURITY_MODEL.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, and `CODEX_RUN_LOG.md`.
+- Root cause: Phase 8 needed a cover-request schema, loaders, actions, and summary pages that remained station-scoped, RLS-protected, and advisory only.
+- Fixes attempted: added `cover_requests` and `cover_request_responses` tables with enums, RLS policies, notification placeholders, audit logging, eligibility helpers, crew and admin cover pages, and readiness/dashboard awareness sections; then resolved strict TypeScript narrowing issues in the actions and cover overview loader.
+- Errors: initial build failures in `src/app/cover-actions.ts` from nullable query results and missing record shape fields; one summary-shape mismatch in `src/lib/cover-requests.ts`.
+- Tests run: `npm run lint`, `npm run build`.
+- Next recommended step: browser smoke-test `/crew/cover`, `/admin/cover`, `/`, and `/dla`, then decide whether to merge `feature/cover-swap-requests` into `develop`.
+
 ## 2026-05-07 11:11 BST
 
 - Branch: `feature/supabase-schema-rls-foundation`
@@ -225,3 +245,12 @@
 - Files changed: `middleware.ts`, `SECURITY_MODEL.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`.
 - Change: middleware now leaves `/login` public and only cookie-gates protected routes, which removes the stale-cookie redirect loop risk.
 - Next recommended step: rerun lint/build, then update the PR into `develop`.
+
+## 2026-05-07 Cover Request Visibility Cache Fix
+
+- Branch: `feature/cover-swap-requests`
+- Files changed: `src/lib/cover-requests.ts`, `src/app/crew/cover/page.tsx`, `src/app/admin/cover/page.tsx`, `src/app/page.tsx`, `src/app/dla/page.tsx`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, `CHANGELOG.md`, `SMOKE_TEST.md`.
+- Errors: no compile or lint errors after the cache-bypass update.
+- Fixes attempted: added development-only debug output, switched the cover loader to `unstable_noStore()`, and forced the cover/dashboard pages dynamic to avoid stale snapshots.
+- Tests run: `npm run lint`, `npm run build`.
+- Next recommended step: browser retest cover visibility on `/crew/cover`, `/admin/cover`, `/`, and `/dla`.

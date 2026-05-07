@@ -2,7 +2,7 @@ import { AppShell } from "@/components/app-shell";
 import { OperationalCard } from "@/components/operational-card";
 import { SectionShell } from "@/components/section-shell";
 import Link from "next/link";
-import { ArrowUpRight, Building2, MapPinned, Anchor, Users, BadgeCheck, Scale, ClipboardList, CalendarDays, Radio } from "lucide-react";
+import { ArrowUpRight, Building2, MapPinned, Anchor, Users, BadgeCheck, Scale, ClipboardList, CalendarDays, Radio, MessageSquareReply } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { requireRouteAccess } from "@/lib/auth";
 
@@ -72,6 +72,12 @@ const adminSections = [
     title: "Duty rota",
     description: "Station rota planning and Monday to Thursday night cover.",
     icon: Radio,
+  },
+  {
+    href: "/admin/cover",
+    title: "Cover",
+    description: "Station cover requests, eligibility, and acceptance confirmation.",
+    icon: MessageSquareReply,
   },
 ];
 
