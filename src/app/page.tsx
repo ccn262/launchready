@@ -6,6 +6,8 @@ import { ReadinessBoard } from "@/components/readiness-board";
 import { loadCoverRequestOverview } from "@/lib/cover-requests";
 import { loadReadinessSnapshot } from "@/lib/readiness";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const snapshot = await loadReadinessSnapshot({
     pathname: "/",
@@ -30,6 +32,22 @@ export default async function DashboardPage() {
           title="Open cover requests"
           description="Crew and station admins can track active cover needs alongside readiness without authorising launches."
         >
+          {process.env.NODE_ENV !== "production" && coverOverview.debug ? (
+            <div className="mb-4 grid gap-3 md:grid-cols-4">
+              {[
+                ["selectedStationId", coverOverview.debug.selectedStationId ?? "null"],
+                ["currentProfileId", coverOverview.debug.currentProfileId ?? "null"],
+                ["loadedCoverRequestCount", String(coverOverview.debug.loadedCoverRequestCount)],
+                ["visibleOpenRequestCount", String(coverOverview.debug.visibleOpenRequestCount)],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">{label}</p>
+                  <p className="mt-1 text-sm text-card-foreground">{value}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
           <div className="grid gap-4 md:grid-cols-3">
             {[
               ["Open", coverOverview.openCount],

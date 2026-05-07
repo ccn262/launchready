@@ -158,3 +158,8 @@
 
 - Removed the `/login` cookie-presence redirect from middleware to eliminate stale-cookie redirect loops.
 - Kept protected-route gating in middleware and server-side authenticated-user redirects in the login page.
+
+## 0.7.9 - 2026-05-07
+
+- Forced cover-request and readiness summary pages to render dynamically so current and future open cover requests are read fresh from Supabase.
+- Added development-only debug visibility for selected station, current profile, and loaded/open cover-request counts.

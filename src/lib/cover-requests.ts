@@ -1,5 +1,6 @@
 import "server-only";
 
+import { unstable_noStore as noStore } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   getAdminAccessContext,
@@ -190,6 +191,12 @@ export type CoverRequestOverview = {
   cancelledCount: number;
   ownRequests: CoverRequestSummaryItem[];
   responsesByRequestId: Map<string, CoverRequestResponseRecord[]>;
+  debug: {
+    selectedStationId: string | null;
+    currentProfileId: string | null;
+    loadedCoverRequestCount: number;
+    visibleOpenRequestCount: number;
+  } | null;
 };
 
 export type AdminCoverRequestData = CoverRequestOverview & {
@@ -540,70 +547,7 @@ async function loadCoverRequestRows(stationId: string | null) {
           accepted_at,
           resolved_at,
           created_at,
-          updated_at,
-          requester:profiles!left (
-            id,
-            display_name,
-            email,
-            phone,
-            system_role,
-            is_active
-          ),
-          asset:assets!left (
-            id,
-            station_id,
-            station_location_id,
-            asset_type_id,
-            name,
-            asset_code,
-            status,
-            requires_recovery_support,
-            notes,
-            metadata,
-            is_active
-          ),
-          operational_role:operational_roles!left (
-            id,
-            code,
-            name,
-            description,
-            category,
-            is_active
-          ),
-          crew_type:crew_types!left (
-            id,
-            code,
-            name,
-            description,
-            is_active
-          ),
-          original_duty_period:duty_periods!left (
-            id,
-            station_id,
-            profile_id,
-            station_location_id,
-            asset_type_id,
-            asset_id,
-            operational_role_id,
-            period_kind,
-            duty_date,
-            start_time,
-            end_time,
-            starts_at,
-            ends_at,
-            source,
-            notes,
-            is_active,
-            created_by_profile_id
-          ),
-          accepted_by_profile:profiles!left (
-            id,
-            display_name,
-            email,
-            phone,
-            system_role,
-            is_active
-          )
+          updated_at
         `,
       )
       .eq("station_id", stationId)
@@ -622,52 +566,135 @@ async function loadCoverRequestRows(stationId: string | null) {
           notes,
           responded_at,
           created_at,
-          updated_at,
-          responder:profiles!left (
-            id,
-            display_name,
-            email,
-            phone,
-            system_role,
-            is_active
-          ),
-          cover_request:cover_requests!left (
-            id,
-            station_id,
-            requester_profile_id,
-            asset_id,
-            operational_role_id,
-            crew_type_id,
-            cover_type,
-            starts_at,
-            ends_at,
-            status,
-            urgency,
-            reason,
-            notes,
-            accepted_by_profile_id,
-            accepted_at,
-            resolved_at
-          )
+          updated_at
         `,
       )
       .order("created_at", { ascending: false }),
   ]);
 
+  const requests = (requestResult.data ?? []) as CoverRequestRecord[];
+  const responses = (responseResult.data ?? []) as CoverRequestResponseRecord[];
+  const requesterIds = Array.from(
+    new Set([
+      ...requests.map((request) => request.requester_profile_id),
+      ...requests.map((request) => request.accepted_by_profile_id).filter((value): value is string => Boolean(value)),
+      ...responses.map((response) => response.responder_profile_id),
+    ]),
+  );
+  const assetIds = Array.from(new Set(requests.map((request) => request.asset_id).filter((value): value is string => Boolean(value))));
+  const roleIds = Array.from(
+    new Set(requests.map((request) => request.operational_role_id).filter((value): value is string => Boolean(value))),
+  );
+  const dutyPeriodIds = Array.from(
+    new Set(requests.map((request) => request.original_duty_period_id).filter((value): value is string => Boolean(value))),
+  );
+  const crewTypeIds = Array.from(new Set(requests.map((request) => request.crew_type_id).filter((value): value is string => Boolean(value))));
+
+  const [profilesResult, assetsResult, rolesResult, crewTypesResult, dutyPeriodsResult] = await Promise.all([
+    requesterIds.length
+      ? supabase
+          .from("profiles")
+          .select("id, display_name, email, phone, system_role, is_active")
+          .in("id", requesterIds)
+      : Promise.resolve({ data: [] as CoverRequestProfileRecord[] }),
+    assetIds.length
+      ? supabase
+          .from("assets")
+          .select(
+            `
+              id,
+              station_id,
+              station_location_id,
+              asset_type_id,
+              name,
+              asset_code,
+              status,
+              requires_recovery_support,
+              notes,
+              metadata,
+              is_active
+            `,
+          )
+          .in("id", assetIds)
+      : Promise.resolve({ data: [] as AssetRecord[] }),
+    roleIds.length
+      ? supabase
+          .from("operational_roles")
+          .select("id, code, name, description, category, is_active")
+          .in("id", roleIds)
+      : Promise.resolve({ data: [] as OperationalRoleRecord[] }),
+    crewTypeIds.length ? loadCrewTypes() : Promise.resolve([] as CoverRequestCrewTypeRecord[]),
+    dutyPeriodIds.length
+      ? supabase
+          .from("duty_periods")
+          .select(
+            `
+              id,
+              station_id,
+              profile_id,
+              station_location_id,
+              asset_type_id,
+              asset_id,
+              operational_role_id,
+              period_kind,
+              duty_date,
+              start_time,
+              end_time,
+              starts_at,
+              ends_at,
+              source,
+              notes,
+              is_active,
+              created_by_profile_id
+            `,
+          )
+          .in("id", dutyPeriodIds)
+      : Promise.resolve({ data: [] as CoverRequestDutyPeriodRecord[] }),
+  ]);
+
+  const profileMap = new Map<string, CoverRequestProfileRecord>();
+  for (const profile of (profilesResult.data ?? []) as CoverRequestProfileRecord[]) {
+    profileMap.set(profile.id, profile);
+  }
+
+  const assetMap = new Map<string, AssetRecord>();
+  for (const asset of (assetsResult.data ?? []) as AssetRecord[]) {
+    assetMap.set(asset.id, asset);
+  }
+
+  const roleMap = new Map<string, OperationalRoleRecord>();
+  for (const role of (rolesResult.data ?? []) as OperationalRoleRecord[]) {
+    roleMap.set(role.id, role);
+  }
+
+  const crewTypeMap = new Map<string, CoverRequestCrewTypeRecord>();
+  for (const crewType of crewTypesResult as CoverRequestCrewTypeRecord[]) {
+    crewTypeMap.set(crewType.id, crewType);
+  }
+
+  const dutyPeriodMap = new Map<string, CoverRequestDutyPeriodRecord>();
+  for (const dutyPeriod of (dutyPeriodsResult.data ?? []) as CoverRequestDutyPeriodRecord[]) {
+    dutyPeriodMap.set(dutyPeriod.id, dutyPeriod);
+  }
+
   return {
-    requests: ((requestResult.data ?? []) as CoverRequestRecord[]).map((request) => ({
+    requests: requests.map((request) => ({
       ...request,
-      requester: getFirstRecord(request.requester),
-      asset: getFirstRecord(request.asset),
-      operational_role: getFirstRecord(request.operational_role),
-      crew_type: getFirstRecord(request.crew_type),
-      original_duty_period: getFirstRecord(request.original_duty_period),
-      accepted_by_profile: getFirstRecord(request.accepted_by_profile),
+      requester: profileMap.get(request.requester_profile_id) ?? null,
+      asset: request.asset_id ? assetMap.get(request.asset_id) ?? null : null,
+      operational_role: request.operational_role_id ? roleMap.get(request.operational_role_id) ?? null : null,
+      crew_type: request.crew_type_id ? crewTypeMap.get(request.crew_type_id) ?? null : null,
+      original_duty_period: request.original_duty_period_id
+        ? dutyPeriodMap.get(request.original_duty_period_id) ?? null
+        : null,
+      accepted_by_profile: request.accepted_by_profile_id
+        ? profileMap.get(request.accepted_by_profile_id) ?? null
+        : null,
     })),
-    responses: ((responseResult.data ?? []) as CoverRequestResponseRecord[]).map((response) => ({
+    responses: responses.map((response) => ({
       ...response,
-      responder: getFirstRecord(response.responder),
-      cover_request: getFirstRecord(response.cover_request),
+      responder: profileMap.get(response.responder_profile_id) ?? null,
+      cover_request: requests.find((request) => request.id === response.cover_request_id) ?? null,
     })),
   };
 }
@@ -719,6 +746,7 @@ function getMembershipCandidate(
 }
 
 async function loadCoverOverviewBase(pathname: string, requestedStationId: string | null) {
+  noStore();
   const context = await requireRouteAccess(pathname);
   const stationOptions = buildStationOptionsFromContext(context);
   const selectedStationId =
@@ -762,6 +790,15 @@ export async function loadCoverRequestOverview(pathname: string, requestedStatio
     acceptedCount: base.requests.filter((request) => request.status === "accepted").length,
     cancelledCount: base.requests.filter((request) => request.status === "cancelled").length,
     ownRequests: summaryItems.filter((item) => item.request.requester_profile_id === base.context.user?.id),
+    debug:
+      process.env.NODE_ENV === "production"
+        ? null
+        : {
+            selectedStationId: base.selectedStationId,
+            currentProfileId: base.context.user?.id ?? null,
+            loadedCoverRequestCount: base.requests.length,
+            visibleOpenRequestCount: summaryItems.filter((item) => item.request.status === "open").length,
+          },
   } satisfies CoverRequestOverview;
 }
 
@@ -828,6 +865,7 @@ export async function loadCrewCoverPageData(pathname: string, requestedStationId
         return buildSummaryItem(item.request, responseItems, null, currentCandidate);
       }),
     ),
+    debug: overview.debug,
   } satisfies CoverRequestOverview & {
     currentProfile: CrewProfileRecord | null;
     currentCandidate: CoverRequestCandidate | null;
@@ -891,6 +929,7 @@ export async function loadAdminCoverPageData(pathname: string, requestedStationI
     operationalRoles,
     ownMembership,
     coverRequests: sortSummaryItems(coverRequests),
+    debug: overview.debug,
   } satisfies AdminCoverRequestData & {
     stationContext: SelectedStationContext;
     coverRequests: CoverRequestSummaryItem[];

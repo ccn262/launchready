@@ -7,6 +7,8 @@ import { ReadinessBoard } from "@/components/readiness-board";
 import { loadCoverRequestOverview } from "@/lib/cover-requests";
 import { loadReadinessSnapshot } from "@/lib/readiness";
 
+export const dynamic = "force-dynamic";
+
 export default async function DlaPage() {
   const snapshot = await loadReadinessSnapshot({
     pathname: "/dla",
@@ -56,6 +58,22 @@ export default async function DlaPage() {
           title="Cover request awareness"
           description="DLA users can review open station cover needs without managing them unless they also hold admin or LOM access."
         >
+          {process.env.NODE_ENV !== "production" && coverOverview.debug ? (
+            <div className="mb-4 grid gap-3 md:grid-cols-4">
+              {[
+                ["selectedStationId", coverOverview.debug.selectedStationId ?? "null"],
+                ["currentProfileId", coverOverview.debug.currentProfileId ?? "null"],
+                ["loadedCoverRequestCount", String(coverOverview.debug.loadedCoverRequestCount)],
+                ["visibleOpenRequestCount", String(coverOverview.debug.visibleOpenRequestCount)],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">{label}</p>
+                  <p className="mt-1 text-sm text-card-foreground">{value}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
           <div className="grid gap-4 md:grid-cols-3">
             {[
               ["Open", coverOverview.openCount],

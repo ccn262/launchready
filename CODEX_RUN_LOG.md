@@ -245,3 +245,12 @@
 - Files changed: `middleware.ts`, `SECURITY_MODEL.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`.
 - Change: middleware now leaves `/login` public and only cookie-gates protected routes, which removes the stale-cookie redirect loop risk.
 - Next recommended step: rerun lint/build, then update the PR into `develop`.
+
+## 2026-05-07 Cover Request Visibility Cache Fix
+
+- Branch: `feature/cover-swap-requests`
+- Files changed: `src/lib/cover-requests.ts`, `src/app/crew/cover/page.tsx`, `src/app/admin/cover/page.tsx`, `src/app/page.tsx`, `src/app/dla/page.tsx`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, `CHANGELOG.md`, `SMOKE_TEST.md`.
+- Errors: no compile or lint errors after the cache-bypass update.
+- Fixes attempted: added development-only debug output, switched the cover loader to `unstable_noStore()`, and forced the cover/dashboard pages dynamic to avoid stale snapshots.
+- Tests run: `npm run lint`, `npm run build`.
+- Next recommended step: browser retest cover visibility on `/crew/cover`, `/admin/cover`, `/`, and `/dla`.

@@ -99,3 +99,10 @@
 - `cover_requests` and `cover_request_responses` remain station-scoped and RLS-protected.
 - Like-for-like eligibility remains advisory only and never authorises a launch.
 - No real WhatsApp, SMS, or email sending is enabled yet.
+
+## Phase 8 Visibility Check
+
+- `/crew/cover` shows current and future open requests for the selected station, including general station cover with no asset or role.
+- `/admin/cover` shows current and future open requests, plus accepted, cancelled, and historical rows.
+- `/`, `/dla`, `/crew/cover`, and `/admin/cover` render fresh cover-request counts rather than a stale empty snapshot.
+- Development-only debug output shows selected station, current profile, loaded request count, and visible open request count.

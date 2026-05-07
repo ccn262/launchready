@@ -10,6 +10,8 @@ import {
 import { buildRedirectUrl } from "@/lib/admin-crud";
 import { loadAdminCoverPageData } from "@/lib/cover-requests";
 
+export const dynamic = "force-dynamic";
+
 function getQueryValue(value: string | string[] | undefined, fallback = "") {
   if (Array.isArray(value)) {
     return value[0] ?? fallback;
@@ -246,6 +248,27 @@ export default async function AdminCoverPage({
           <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">
             {error}
           </div>
+        ) : null}
+
+        {process.env.NODE_ENV !== "production" && data.debug ? (
+          <SectionShell
+            title="Debug snapshot"
+            description="Temporary development-only request visibility check."
+          >
+            <div className="grid gap-3 md:grid-cols-4">
+              {[
+                ["selectedStationId", data.debug.selectedStationId ?? "null"],
+                ["currentProfileId", data.debug.currentProfileId ?? "null"],
+                ["loadedCoverRequestCount", String(data.debug.loadedCoverRequestCount)],
+                ["visibleOpenRequestCount", String(data.debug.visibleOpenRequestCount)],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">{label}</p>
+                  <p className="mt-1 text-sm text-card-foreground">{value}</p>
+                </div>
+              ))}
+            </div>
+          </SectionShell>
         ) : null}
 
         <SectionShell

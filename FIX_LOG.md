@@ -140,3 +140,12 @@
 - Fix: let `/login` remain public in middleware and keep authenticated-user redirect logic in `src/app/login/page.tsx`, where real server-side session validation already exists.
 - Tests run: not yet run in this patch set.
 - Next recommended step: run `npm run lint` and `npm run build`, then update the PR.
+
+## 2026-05-07 Cover Request Visibility Cache Fix
+
+- Branch: `feature/cover-swap-requests`
+- Root cause: cover-request pages could serve a stale empty snapshot, so current and future open requests already present in Supabase were not reliably reflected in the UI.
+- Fix: marked the cover-request data path as dynamic, added `unstable_noStore()` to the loader, and kept development-only debug output for selected station/profile/count visibility.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the cache-bypass change.
+- Next recommended step: browser retest `/crew/cover`, `/admin/cover`, `/`, and `/dla`.
