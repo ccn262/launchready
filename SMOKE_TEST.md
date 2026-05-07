@@ -23,12 +23,18 @@
 11. Confirm logout returns to `/login`.
 12. Confirm unauthenticated visits to `/`, `/crew`, `/dla`, and `/admin` redirect to `/login`.
 13. Confirm inactive profiles and inactive memberships are blocked from protected routes.
-14. Confirm `/admin/stations` lists visible stations and allows permitted edits.
-15. Confirm `/admin/locations` shows Southend locations and allows create/edit with notes.
-16. Confirm `/admin/asset-types` lists the global asset type reference set and only super admins can edit it.
-17. Confirm `/admin/assets` lists Southend assets, allows create/edit, and preserves duplicate asset names across different locations.
-18. Confirm duplicate `D Class` assets can exist at both Southend locations when `asset_code` remains unique per station.
-19. Confirm non-admin users cannot access the admin CRUD pages.
+14. Confirm the deployed Vercel preview does not return a middleware 500 on protected routes.
+15. Confirm static assets such as images, icons, and CSS files still load normally with the middleware matcher in place.
+16. Confirm `/admin/stations` lists visible stations and allows permitted edits.
+17. Confirm `/admin/locations` shows Southend locations and allows create/edit with notes.
+18. Confirm `/admin/asset-types` lists the global asset type reference set and only super admins can edit it.
+19. Confirm `/admin/assets` lists Southend assets, allows create/edit, and preserves duplicate asset names across different locations.
+20. Confirm duplicate `D Class` assets can exist at both Southend locations when `asset_code` remains unique per station.
+21. Confirm non-admin users cannot access the admin CRUD pages.
+22. Confirm `/admin/crew` lists station crew and allows editing a membership.
+23. Confirm `/admin/roles` allows assigning D Class and B Class roles with different currency states to the same crew member.
+24. Confirm `/admin/qualifications` allows setting Casualty Care expiry and clearly flags expired or near-expiry records.
+25. Confirm DLA access still follows the agreed security model and does not grant management access to the admin pages.
 
 ## Pass Criteria
 
@@ -41,4 +47,5 @@
 - Auth/session redirect behaviour works in the browser.
 - The browser smoke test covers `/login`, `/`, `/crew`, `/dla`, `/admin`, `/unauthorized`, and logout.
 - The browser smoke test also covers `/admin/stations`, `/admin/locations`, `/admin/asset-types`, and `/admin/assets`.
+- The browser smoke test also covers `/admin/crew`, `/admin/roles`, and `/admin/qualifications`.
 - Server-side route helpers block inactive profiles and insufficient role memberships even if middleware only refreshes the session.

@@ -7,6 +7,7 @@
 - Admins and LOMs only manage their own organisation and station scope.
 - DLA users only manage launch alerts for their own station.
 - Operational audit logging is required for important changes.
+- The readiness engine must not authorise launches; it can only describe readiness states and exceptional-review requirements.
 
 ## Data Classes
 
@@ -21,6 +22,7 @@
 - Station admins and LOMs can manage stations, locations, and assets only within their own station scope.
 - Super admins can manage station records and global reference data such as asset types across all stations.
 - Asset type CRUD remains super-admin only because it is shared reference data.
+- Station admins and LOMs can manage crew memberships, operational role assignments, and qualifications only within their station scope.
 - DLA users can create and manage launch alerts only within their station.
 - Service-role access is reserved for trusted backend workflows and should be tightly constrained.
 - Route access is based on `profiles.system_role = super_admin` and `station_memberships.membership_role` values of `admin`, `lom`, `dla`, and `crew`.
@@ -33,9 +35,12 @@
 - Row-level policies on every table containing user or operational data.
 - Server-side session handling via Supabase Auth.
 - Edge middleware only handles session refresh and lightweight login redirects; detailed authorisation happens on the server.
+- Edge middleware must fail closed on missing Supabase config or refresh errors and must not expose stack traces to the browser.
+- Middleware should skip static asset requests and public files so auth checks do not run where they are not needed.
 - Audit rows for create, update, delete, alert, and role-scope changes.
 - No reliance on WhatsApp as the sole critical alert route.
 - `.env.local` is local-only and must never be committed.
+- Future safe-crewing and launch-exception reference data is restricted internal project material and must not be exposed publicly as official RNLI guidance.
 
 ## Phase 2 RLS Baseline
 
@@ -66,3 +71,5 @@
 - `crew` access accepts any active station membership.
 - `/admin/stations`, `/admin/locations`, and `/admin/assets` are station-scoped CRUD routes for admin and LOM memberships, or super admins globally.
 - `/admin/asset-types` is visible to authenticated admin users but only editable by super admins.
+- `/admin/crew`, `/admin/roles`, and `/admin/qualifications` are management routes for station admins and LOMs, with operational data still protected by RLS at the table level.
+- Future readiness-engine views should distinguish service-ready, exercise-only, delayed-launch, and off-service states without claiming launch authorisation.

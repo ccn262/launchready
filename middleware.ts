@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { NextRequest, NextResponse } from "next/server";
 
 const PROTECTED_PATHS = ["/", "/crew", "/dla", "/admin"];
 
@@ -9,63 +9,105 @@ function isProtectedPath(pathname: string) {
   );
 }
 
-function getSupabaseConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+function createRedirect(request: NextRequest, pathname: string, params?: Record<string, string>) {
+  const url = request.nextUrl.clone();
+  url.pathname = pathname;
+  url.search = "";
 
-  if (!url || !anonKey) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-    );
+  for (const [key, value] of Object.entries(params ?? {})) {
+    url.searchParams.set(key, value);
   }
 
-  return { url, anonKey };
+  return NextResponse.redirect(url);
+}
+
+function getSupabaseConfig() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null;
+  }
+
+  return { supabaseUrl, supabaseAnonKey };
 }
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const response = NextResponse.next({ request });
-  const { url, anonKey } = getSupabaseConfig();
-  const supabase = createServerClient(url, anonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
-        });
-      },
+  const isLoginRoute = pathname === "/login";
+  const isUnauthorizedRoute = pathname === "/unauthorized";
+  const config = getSupabaseConfig();
+
+  if (!config) {
+    if (isProtectedPath(pathname)) {
+      return createRedirect(request, "/login", { error: "missing_config", redirectTo: pathname });
+    }
+
+    return NextResponse.next();
+  }
+
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = createServerClient(config.supabaseUrl, config.supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value);
+            response.cookies.set(name, value, options);
+          });
+        },
+      },
+    });
 
-  const isLoginRoute = pathname === "/login";
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
+    if (!user) {
+      if (isProtectedPath(pathname)) {
+        return createRedirect(request, "/login", { redirectTo: pathname });
+      }
+
+      return response;
+    }
+
+    if (isLoginRoute) {
+      return createRedirect(request, "/");
+    }
+
+    if (isUnauthorizedRoute) {
+      return response;
+    }
+
+    return response;
+  } catch {
     if (isProtectedPath(pathname)) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      url.searchParams.set("redirectTo", pathname);
-      return NextResponse.redirect(url);
+      return createRedirect(request, "/login", {
+        error: "session_unavailable",
+        redirectTo: pathname,
+      });
+    }
+
+    if (isLoginRoute) {
+      return response;
+    }
+
+    if (isUnauthorizedRoute) {
+      return response;
     }
 
     return response;
   }
-
-  if (isLoginRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    url.search = "";
-    return NextResponse.redirect(url);
-  }
-
-  return response;
 }
 
 export const config = {
-  matcher: ["/", "/crew/:path*", "/dla/:path*", "/admin/:path*", "/login", "/unauthorized"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };

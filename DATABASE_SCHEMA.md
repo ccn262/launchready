@@ -30,6 +30,13 @@
 - `station_locations.notes` stores optional operational notes for station locations.
 - `assets.notes` stores optional operational notes for assets.
 
+## Future Readiness-Engine Reference Data
+
+- Future safe-crewing rules should be effective-date aware and scoped by `asset_type_id` and `operation_type`.
+- Future required-role rules should track `asset_type_id`, `operation_type`, `operational_role_id`, requirement level, and effective date ranges.
+- Future launch/recovery rules should be modelled separately from boat-crew capability so launch methods can be evaluated without conflating the two.
+- Future exception handling should record reason, approving authority or role, notes, and service-return status.
+
 ## Initial Relationships
 
 - One organisation has many stations.
@@ -56,6 +63,7 @@
 - Availability blocks store start time, end time, cover type, location scope, and the asset or role they support.
 - Night cover, full-day cover, and split-day cover must all be representable.
 - Monday to Thursday rota logic must be representable.
+- Weekend rota and readiness-engine coverage should be added later as separate future phases rather than merged into Phase 2 or Phase 5.
 
 ## Next Migration Set
 

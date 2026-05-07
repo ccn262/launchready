@@ -56,3 +56,16 @@
 - Added the first real admin CRUD pages for stations, locations, asset types, and assets.
 - Added a corrective migration for `station_locations.notes` and `assets.notes` so operational notes can be captured without changing the core schema again.
 - Added cancel/reset handling to the new admin forms for a clearer mobile-first workflow.
+
+## 2026-05-07 Phase 5 Crew and Roles Foundation
+
+- Added crew management for station memberships and active status.
+- Added asset-specific operational role assignment using `crew_qualifications`.
+- Added qualification management with casualty care expiry handling.
+- Fixed a primary-membership edge case so the new membership flow does not accidentally clear the newly created primary record.
+
+## 2026-05-07 Vercel Middleware Runtime Fix
+
+- Reworked `middleware.ts` to be fully Edge-safe and fail closed when Supabase config or session refresh fails.
+- Added defensive redirects for missing config and session refresh errors instead of letting the Edge runtime throw a 500.
+- Tightened the middleware matcher so static assets and public files are excluded from invocation.

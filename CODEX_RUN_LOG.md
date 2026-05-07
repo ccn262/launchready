@@ -84,3 +84,41 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: commit the Phase 4 CRUD branch, push it, and open a PR into `develop` for review and manual browser smoke testing.
+
+## 2026-05-07 14:05 BST
+
+- Branch: `feature/crew-management-asset-roles`
+- Files changed: `src/app/admin/crew/page.tsx`, `src/app/admin/roles/page.tsx`, `src/app/admin/qualifications/page.tsx`, `src/app/admin/phase5-actions.ts`, `src/lib/admin-phase5.ts`, and supporting project logs/docs.
+- Errors: initial TypeScript validation failed because the qualification relation helper carried fields that the query did not actually return, and the primary-membership flow could clear the newly created primary record.
+- Fixes attempted: trimmed the qualification record shape to the actual query result, rewired the primary-membership update logic to clear old primaries before insert/update, and reran the checks.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: do a browser smoke test for crew membership edits, asset-specific role assignment, and qualification expiry handling, then merge once the review pass is clean.
+
+## 2026-05-07 14:20 BST
+
+- Branch: `feature/crew-management-asset-roles`
+- Files changed: `BUILD_PLAN.md`, `DECISIONS_LOG.md`, `PROJECT_HANDOFF.md`, and `CHANGELOG.md`.
+- Purpose: record future roadmap items for weekend duty rota management, reusable crew capability badges, and like-for-like cover/swap requests.
+- Errors: none.
+- Tests run: none, documentation-only update.
+- Next recommended step: leave these items in backlog until the availability engine and rota foundation are in place.
+
+## 2026-05-07 14:33 BST
+
+- Branch: `feature/crew-management-asset-roles`
+- Files changed: `BUILD_PLAN.md`, `DATABASE_SCHEMA.md`, `SECURITY_MODEL.md`, `PROJECT_HANDOFF.md`, `CHANGELOG.md`, and supporting run log references.
+- Purpose: record restricted internal readiness-engine guidance for safe crewing, minimum role complements, launch/recovery separation, and dynamic risk assessment boundaries.
+- Errors: none.
+- Tests run: none, documentation-only update.
+- Next recommended step: defer readiness-engine implementation until availability, rota, and crew capability foundations are stable.
+
+## 2026-05-07 14:04 BST
+
+- Branch: `feature/crew-management-asset-roles`
+- Files changed: `middleware.ts`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, `PROJECT_HANDOFF.md`, `SECURITY_MODEL.md`, and `SMOKE_TEST.md`.
+- Error: Vercel preview was failing in Edge middleware at runtime with `MIDDLEWARE_INVOCATION_FAILED`.
+- Fixes attempted: made middleware self-contained, added defensive config checks and try/catch around Supabase session refresh, and tightened the matcher to skip static assets and public files.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: let Vercel redeploy the preview, then continue Phase 5 browser smoke testing if the preview is green.

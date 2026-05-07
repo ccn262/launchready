@@ -72,3 +72,22 @@
 - Added station-scoped station, location, and asset management with super-admin-only asset type editing.
 - Added optional operational notes fields for station locations and assets via a corrective schema migration.
 - Updated the admin landing page, smoke tests, and security documentation to reflect the new CRUD routes.
+
+## 0.5.0 - 2026-05-07
+
+- Added station crew management for memberships, crew type, membership role, and active status.
+- Added asset-specific role assignment with currency states per crew member and per asset.
+- Added qualification management with expiry-aware casualty care tracking.
+- Reused the existing `station_memberships` and `crew_qualifications` tables for the Phase 5 admin surfaces.
+
+## 0.5.1 - 2026-05-07
+
+- Added backlog notes for weekend duty rota management after the availability engine exists.
+- Added backlog notes for reusable crew capability badge rendering across dashboards, rotas, and communication summaries.
+- Added backlog notes for like-for-like cover and swap requests with audit logging and eligibility validation.
+
+## 0.5.2 - 2026-05-07
+
+- Added future readiness-engine backlog notes for safe-crewing rules by asset type and operation type.
+- Added future readiness-engine backlog notes for minimum role complements, launch/recovery separation, and effective-dated rule sets.
+- Clarified that safe-crewing reference material is restricted internal guidance and not public-facing RNLI approval.

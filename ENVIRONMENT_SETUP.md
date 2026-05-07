@@ -44,3 +44,4 @@
 - Prepare preview and production secrets separately.
 - Ensure deployment checks require lint and build success.
 - Edge middleware should only handle session refresh and login redirects; detailed route authorization remains on the server.
+- If Supabase auth config is missing in a preview or production environment, protected routes should fail closed to `/login` rather than throwing an Edge runtime 500.
