@@ -74,9 +74,9 @@ function RequirementList({
       </p>
       {items.length ? (
         <ul className="space-y-2">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <li
-              key={item.id}
+              key={`${item.id}-${item.label}-${item.severity ?? "none"}-${index}`}
               className="flex items-start justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
             >
               <span className="leading-6 text-card-foreground">{item.label}</span>

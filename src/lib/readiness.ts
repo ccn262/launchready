@@ -486,6 +486,30 @@ function toRequirementGap(
   } satisfies RequirementGap;
 }
 
+function getRequirementGapKey(gap: RequirementGap) {
+  return [
+    gap.id,
+    gap.label,
+    gap.severity,
+    gap.operationalRoleId,
+    gap.assetTypeId ?? "none",
+    gap.bucket,
+  ].join("::");
+}
+
+function dedupeRequirementGaps(gaps: RequirementGap[]) {
+  const seen = new Set<string>();
+  return gaps.filter((gap) => {
+    const key = getRequirementGapKey(gap);
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+}
+
 type AllocationBucket = RequirementGap["bucket"];
 
 type AllocationRequirementSpec = Readonly<{
@@ -1032,7 +1056,7 @@ function aggregateAssetStatus(params: {
       return [toRequirementGap(requirement, availableCount, role, assetType, "launch_recovery")];
     });
 
-  const missingRoles: RequirementGap[] = [...missingHardStopRoles, ...missingRequiredRoles];
+  const missingRoles: RequirementGap[] = dedupeRequirementGaps([...missingHardStopRoles, ...missingRequiredRoles]);
   const roleConflicts = allocation.roleConflicts;
   const capabilityBadges = buildCapabilityBadges(
     currentCrew.flatMap((member) =>
@@ -1076,10 +1100,10 @@ function aggregateAssetStatus(params: {
     minimumCrew: rule.minimum_crew,
     maximumCrew: rule.maximum_crew,
     missingRoles,
-    missingHardStopRoles,
-    missingRequiredRoles,
-    launchRecoveryGaps,
-    preferredGaps,
+    missingHardStopRoles: dedupeRequirementGaps(missingHardStopRoles),
+    missingRequiredRoles: dedupeRequirementGaps(missingRequiredRoles),
+    launchRecoveryGaps: dedupeRequirementGaps(launchRecoveryGaps),
+    preferredGaps: dedupeRequirementGaps(preferredGaps),
     likelyBoatCrew: allocation.likelyBoatCrew,
     likelyLaunchRecoveryCrew: allocation.likelyLaunchRecoveryCrew,
     likelyShoreSupportCrew: allocation.likelyShoreSupportCrew,

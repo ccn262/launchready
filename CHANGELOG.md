@@ -126,3 +126,8 @@
 
 - Made advisory readiness allocation more explicit by separating qualified crew, available crew, and suggested crew counts in the readiness board.
 - Kept Head Launcher handling advisory-only and separate from launch authorisation.
+
+## 0.7.5 - 2026-05-07
+
+- Fixed duplicate React key warnings on the readiness board by switching requirement rows to composite keys.
+- Added defensive deduplication for readiness gap arrays in the readiness loader.

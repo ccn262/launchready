@@ -192,3 +192,13 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed.
 - Next recommended step: browser smoke-test `/`, `/dla`, and `/admin/readiness` to confirm the new crew-state split renders correctly.
+
+## 2026-05-07 Readiness Key Fix
+
+- Branch: `feature/readiness-engine`
+- Files changed: `src/components/readiness-board.tsx`, `src/lib/readiness.ts`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, and `CHANGELOG.md`.
+- Root cause: `RequirementList` used `item.id` as the React key, which was not strong enough when duplicate requirement rows surfaced in the rendered arrays.
+- Fix: switched to a composite key in the component and added defensive deduplication for readiness gap arrays in the loader.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed.
+- Next recommended step: browser retest `/admin/readiness`.

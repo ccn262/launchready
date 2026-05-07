@@ -100,3 +100,8 @@
 
 - Updated the readiness summary to surface qualified crew, available crew, and suggested allocation separately on each asset card.
 - Preserved advisory-only behavior and Head Launcher conflict handling.
+
+## 2026-05-07 Readiness Key Fix
+
+- Fixed duplicate React keys in the readiness board by using a stable composite key for requirement rows.
+- Added defensive deduplication for readiness gap arrays in the loader so repeated rows do not render twice.
