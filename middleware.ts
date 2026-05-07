@@ -39,11 +39,7 @@ export function middleware(request: NextRequest) {
     const isUnauthorizedRoute = pathname === "/unauthorized";
     const hasAuthCookie = hasLikelySupabaseAuthCookie(request);
 
-    if (isLoginRoute) {
-      return hasAuthCookie ? createRedirect(request, "/") : NextResponse.next();
-    }
-
-    if (isUnauthorizedRoute) {
+    if (isLoginRoute || isUnauthorizedRoute) {
       return NextResponse.next();
     }
 

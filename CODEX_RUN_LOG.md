@@ -149,3 +149,10 @@
 - Test result: both passed after moving the pathname read inside the top-level try/catch.
 - Final middleware behavior: protected routes use a lightweight cookie-presence gate, `/login` redirects authenticated users to `/`, and any unexpected Edge error falls back to a redirect for protected routes instead of throwing.
 - Next recommended step: push the branch and open the PR into `develop` for Vercel redeploy.
+
+## 2026-05-07 Middleware Redirect-Loop Fix
+
+- Branch: `fix/vercel-middleware-runtime-failure`
+- Files changed: `middleware.ts`, `SECURITY_MODEL.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`.
+- Change: middleware now leaves `/login` public and only cookie-gates protected routes, which removes the stale-cookie redirect loop risk.
+- Next recommended step: rerun lint/build, then update the PR into `develop`.

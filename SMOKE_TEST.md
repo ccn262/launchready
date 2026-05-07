@@ -57,3 +57,5 @@
 - Server-side route helpers block inactive profiles and insufficient role memberships even if middleware only refreshes the session.
 
 - Browser smoke testing should confirm that protected routes redirect cleanly to `/login` when no likely Supabase auth cookie is present and that `/login` remains public.
+
+- Browser smoke testing should confirm `/login` stays public, authenticated users are redirected by the login page itself, and stale cookies no longer create a `/login` ↔ `/` loop.
