@@ -13,3 +13,9 @@
 - Added admin placeholder routes for the schema areas introduced in Phase 2.
 - Fixed an unused import in the admin overview after the first lint pass.
 - Attempted local Supabase validation, but Docker Desktop is not available in this environment.
+
+## 2026-05-07 Ordering Fix
+
+- Reordered the Phase 2 migration so table-dependent helper functions are defined only after the referenced tables exist.
+- Moved `is_super_admin`, `is_station_member`, `has_station_role`, `can_manage_station`, `can_manage_organisation`, and `can_dla_station` below the table block.
+- Verified the migration file now defines `profiles` before any function that queries it.

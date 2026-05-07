@@ -33,6 +33,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - `npm run build` passed.
 - `supabase db lint --local --fail-on error` was attempted but could not connect because the local Supabase database is not running.
 - `supabase start` was attempted but Docker Desktop is not installed/running in this environment.
+- The Phase 2 migration file was corrected so table-dependent helpers follow the table definitions.
 
 ## Run Notes
 

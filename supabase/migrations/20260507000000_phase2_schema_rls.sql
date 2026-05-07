@@ -143,110 +143,6 @@ begin
 end;
 $$;
 
-create or replace function public.is_super_admin()
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.profiles p
-    where p.id = auth.uid()
-      and p.system_role = 'super_admin'
-      and p.is_active
-  );
-$$;
-
-create or replace function public.is_station_member(target_station_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.station_memberships sm
-    where sm.profile_id = auth.uid()
-      and sm.station_id = target_station_id
-      and sm.is_active
-  );
-$$;
-
-create or replace function public.has_station_role(
-  target_station_id uuid,
-  target_roles public.station_membership_role[]
-)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.station_memberships sm
-    where sm.profile_id = auth.uid()
-      and sm.station_id = target_station_id
-      and sm.is_active
-      and sm.membership_role = any (target_roles)
-  );
-$$;
-
-create or replace function public.can_manage_station(target_station_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select public.is_super_admin()
-      or public.has_station_role(
-        target_station_id,
-        array['admin', 'lom']::public.station_membership_role[]
-      );
-$$;
-
-create or replace function public.can_manage_organisation(target_organisation_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select public.is_super_admin()
-      or exists (
-        select 1
-        from public.profiles p
-        join public.station_memberships sm
-          on sm.profile_id = p.id
-        join public.stations s
-          on s.id = sm.station_id
-        where p.id = auth.uid()
-          and p.organisation_id = target_organisation_id
-          and p.is_active
-          and sm.is_active
-          and sm.membership_role in ('admin', 'lom')
-          and s.organisation_id = target_organisation_id
-      );
-$$;
-
-create or replace function public.can_dla_station(target_station_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select public.is_super_admin()
-      or public.has_station_role(
-        target_station_id,
-        array['admin', 'lom', 'dla']::public.station_membership_role[]
-      );
-$$;
-
 create table if not exists public.organisations (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -555,6 +451,110 @@ create table if not exists public.system_settings (
   updated_at timestamptz not null default now(),
   unique (organisation_id, station_id, setting_key)
 );
+
+create or replace function public.is_super_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.system_role = 'super_admin'
+      and p.is_active
+  );
+$$;
+
+create or replace function public.is_station_member(target_station_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.station_memberships sm
+    where sm.profile_id = auth.uid()
+      and sm.station_id = target_station_id
+      and sm.is_active
+  );
+$$;
+
+create or replace function public.has_station_role(
+  target_station_id uuid,
+  target_roles public.station_membership_role[]
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.station_memberships sm
+    where sm.profile_id = auth.uid()
+      and sm.station_id = target_station_id
+      and sm.is_active
+      and sm.membership_role = any (target_roles)
+  );
+$$;
+
+create or replace function public.can_manage_station(target_station_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select public.is_super_admin()
+      or public.has_station_role(
+        target_station_id,
+        array['admin', 'lom']::public.station_membership_role[]
+      );
+$$;
+
+create or replace function public.can_manage_organisation(target_organisation_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select public.is_super_admin()
+      or exists (
+        select 1
+        from public.profiles p
+        join public.station_memberships sm
+          on sm.profile_id = p.id
+        join public.stations s
+          on s.id = sm.station_id
+        where p.id = auth.uid()
+          and p.organisation_id = target_organisation_id
+          and p.is_active
+          and sm.is_active
+          and sm.membership_role in ('admin', 'lom')
+          and s.organisation_id = target_organisation_id
+      );
+$$;
+
+create or replace function public.can_dla_station(target_station_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select public.is_super_admin()
+      or public.has_station_role(
+        target_station_id,
+        array['admin', 'lom', 'dla']::public.station_membership_role[]
+      );
+$$;
 
 create index if not exists stations_organisation_id_idx on public.stations (organisation_id);
 create index if not exists station_locations_station_id_idx on public.station_locations (station_id);

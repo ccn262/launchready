@@ -1,10 +1,10 @@
 # Codex Run Log
 
-## 2026-05-07 11:07 BST
+## 2026-05-07 10:58 BST
 
 - Branch: `feature/supabase-schema-rls-foundation`
-- Files changed: Supabase migration and seed files, admin placeholder routes, shared admin placeholder component, and project governance docs.
-- Errors: `supabase db lint --local --fail-on error` could not connect because the local database was not running; `supabase start` failed because Docker Desktop is unavailable in this environment.
-- Fixes attempted: added the first schema/RLS migration, created safe seed data, added admin placeholder pages, and updated docs/logs to reflect the new phase.
+- Files changed: Supabase migration ordering fix, phase logs, and no product feature changes.
+- Errors: the Supabase migration previously referenced `public.profiles` before table creation; `supabase db lint --local --fail-on error` still cannot run here because Docker Desktop is unavailable.
+- Fixes attempted: moved table-dependent helper functions below the table definitions in `supabase/migrations/20260507000000_phase2_schema_rls.sql` and rechecked the line order.
 - Tests run: `npm run lint`, `npm run build`, `supabase db lint --local --fail-on error`, `supabase start`.
-- Next recommended step: install/start Docker Desktop or provide a linked Supabase database connection, then rerun migration validation and follow with auth/session wiring.
+- Next recommended step: rerun local Supabase validation in an environment with Docker Desktop, then apply the same migration to the SQL Editor or linked project.

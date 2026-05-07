@@ -15,3 +15,9 @@
 - Added initial station-scoped RLS policies and auth user profile provisioning.
 - Added safe Southend demo seed data for development.
 - Added admin placeholder pages for stations, locations, assets, crew, roles, minimum crewing, qualifications, availability, and duty rota.
+
+## 0.2.1 - 2026-05-07
+
+- Fixed the Phase 2 migration ordering so tables are created before helper functions that reference them.
+- Reordered `profiles`-dependent and membership-dependent SQL helpers below the table block.
+- Confirmed the corrected file order places `profiles` before `is_super_admin` and the remaining access helpers.
