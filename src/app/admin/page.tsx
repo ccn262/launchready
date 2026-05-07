@@ -1,8 +1,66 @@
 import { AppShell } from "@/components/app-shell";
 import { OperationalCard } from "@/components/operational-card";
-import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
-import { StatusPill } from "@/components/status-pill";
+import Link from "next/link";
+import { ArrowUpRight, Building2, MapPinned, Anchor, Users, BadgeCheck, Scale, ClipboardList, CalendarDays, Radio } from "lucide-react";
+import { PageHero } from "@/components/page-hero";
+
+const adminSections = [
+  {
+    href: "/admin/stations",
+    title: "Stations",
+    description: "Organisation-scoped station records and station ownership.",
+    icon: Building2,
+  },
+  {
+    href: "/admin/locations",
+    title: "Locations",
+    description: "Inshore and offshore operational locations under a station.",
+    icon: MapPinned,
+  },
+  {
+    href: "/admin/assets",
+    title: "Assets",
+    description: "Lifeboats and launch/recovery equipment tied to a location.",
+    icon: Anchor,
+  },
+  {
+    href: "/admin/crew",
+    title: "Crew",
+    description: "Profiles, memberships, and visibility boundaries.",
+    icon: Users,
+  },
+  {
+    href: "/admin/roles",
+    title: "Roles",
+    description: "Operational roles applied per asset.",
+    icon: BadgeCheck,
+  },
+  {
+    href: "/admin/minimum-crewing",
+    title: "Minimum crewing",
+    description: "Asset-specific crewing baselines and launch authority.",
+    icon: Scale,
+  },
+  {
+    href: "/admin/qualifications",
+    title: "Qualifications",
+    description: "Qualification states, expiry, and currency tracking.",
+    icon: ClipboardList,
+  },
+  {
+    href: "/admin/availability",
+    title: "Availability",
+    description: "Day, partial, and night cover blocks for crew members.",
+    icon: CalendarDays,
+  },
+  {
+    href: "/admin/duty-rota",
+    title: "Duty rota",
+    description: "Station rota planning and Monday to Thursday night cover.",
+    icon: Radio,
+  },
+];
 
 export default function AdminPage() {
   return (
@@ -41,26 +99,37 @@ export default function AdminPage() {
 
         <SectionShell
           title="Admin placeholder controls"
-          description="This section reserves room for station configuration, notifications, and audit review."
+          description="These routes map directly to the Phase 2 schema so the next build step is implementation, not redesign."
         >
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              "Manage organisations and stations",
-              "Configure locations and assets",
-              "Review operational audit history",
-            ].map((label, index) => (
-              <div
-                key={label}
-                className="rounded-2xl border border-white/10 bg-slate-950/50 p-4"
-              >
-                <StatusPill tone={index === 1 ? "amber" : "green"}>
-                  Control
-                </StatusPill>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                  {label}
-                </p>
-              </div>
-            ))}
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {adminSections.map((section) => {
+              const Icon = section.icon;
+
+              return (
+                <Link
+                  key={section.href}
+                  href={section.href}
+                  className="group rounded-2xl border border-white/10 bg-slate-950/50 p-4 transition hover:border-emerald-400/25 hover:bg-slate-950/70"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-3">
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-emerald-200">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <div>
+                        <h3 className="text-base font-semibold text-card-foreground">
+                          {section.title}
+                        </h3>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                          {section.description}
+                        </p>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 text-muted-foreground transition group-hover:text-emerald-200" />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </SectionShell>
       </div>
