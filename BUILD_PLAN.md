@@ -98,3 +98,4 @@
 - Calculate station, location, and asset readiness using availability, rota, qualifications, asset-specific roles, and safe-crewing roadmap data.
 - Surface missing hard-stop roles, required roles, preferred gaps, launch/recovery gaps, and current DLA context.
 - Add an admin readiness console so calculated readiness can be reviewed without authorising launches.
+- Add advisory likely crew composition so the readiness view can suggest likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and explicit Head Launcher status without authorising launches.

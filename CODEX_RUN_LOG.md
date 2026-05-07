@@ -157,3 +157,13 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: rerun `supabase/seed.sql` in Supabase SQL Editor, then continue Phase 7 browser smoke testing.
+
+## 2026-05-07 15:46 BST
+
+- Branch: `feature/readiness-engine`
+- Files changed: `src/lib/readiness.ts`, `src/components/readiness-board.tsx`, `BUILD_PLAN.md`, `PROJECT_HANDOFF.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, `DECISIONS_LOG.md`, and this run log.
+- Error: initial advisory allocation implementation triggered lint/build failures from an unused matcher and readonly Head Launcher assignment in the readiness helper.
+- Fixes attempted: removed the stale matcher, simplified the candidate matching helpers, added empty allocation fallbacks, and switched Head Launcher selection to local mutable state before constructing the readonly summary.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: run the browser smoke test for `/`, `/dla`, and `/admin/readiness` to confirm the advisory allocation summaries and Head Launcher states render correctly.

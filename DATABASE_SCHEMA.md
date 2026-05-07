@@ -85,3 +85,4 @@
 6. RLS policies on every table.
 7. Station and asset CRUD notes fields where needed.
 8. Availability and rota foundation datetime columns plus extended slot and period kinds.
+9. Readiness engine outputs are computed server-side and now include advisory allocation fields for likely boat crew, likely launch/recovery crew, role conflicts, readiness-restoration candidates, and Head Launcher status. No new database columns were added for those computed outputs.

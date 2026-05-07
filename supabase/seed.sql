@@ -496,16 +496,7 @@ insert into public.asset_launch_recovery_requirements (
   requirement_level,
   notes
 )
-select
-  asset_record.id,
-  role.id,
-  asset_rule.required_count,
-  asset_rule.requirement_level,
-  asset_rule.notes
-from public.stations s
-join public.station_locations sl on sl.station_id = s.id
-join public.assets asset_record on asset_record.station_location_id = sl.id
-cross join (
+with asset_rule(location_name, asset_name, role_code, required_count, requirement_level, notes) as (
   values
     ('Inshore Station'::text, 'D Class'::text, 'tractor_driver'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'D Class inshore launch support requirement.'),
     ('Offshore / Pier Station'::text, 'D Class'::text, 'davit_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'D Class pier launch support requirement.'),
@@ -514,11 +505,22 @@ cross join (
     ('Inshore Station'::text, 'Tractor'::text, 'tractor_driver'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'Tractor support requirement.'),
     ('Inshore Station'::text, 'Winch'::text, 'winch_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'Winch support requirement.'),
     ('Offshore / Pier Station'::text, 'Davit'::text, 'davit_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'Davit support requirement.')
-) as asset_rule(location_name, asset_name, role_code, required_count, requirement_level, notes)
-join public.operational_roles role on role.code = asset_rule.role_code
-where s.slug = 'southend-lifeboat-station'
+) select
+  asset_record.id,
+  role.id,
+  asset_rule.required_count,
+  asset_rule.requirement_level,
+  asset_rule.notes
+from asset_rule
+join public.stations s on s.slug = 'southend-lifeboat-station'
+join public.station_locations sl
+  on sl.station_id = s.id
   and sl.name = asset_rule.location_name
+join public.assets asset_record
+  on asset_record.station_location_id = sl.id
   and asset_record.name = asset_rule.asset_name
+join public.operational_roles role
+  on role.code = asset_rule.role_code
 on conflict (asset_id, operational_role_id, requirement_level) do update
 set
   required_count = excluded.required_count,

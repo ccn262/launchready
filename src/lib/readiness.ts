@@ -2,7 +2,13 @@ import "server-only";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireRouteAccess, type CurrentUserContext } from "@/lib/auth";
-import { buildCapabilityBadges } from "@/lib/capability-badges";
+import {
+  buildCapabilityBadges,
+  buildCapabilityBadgeLabel,
+  getAssetShortCode,
+  getBadgeTone,
+  getRoleShortCode,
+} from "@/lib/capability-badges";
 import {
   loadAdminAvailabilityContext,
   loadCrewAvailabilityContext,
@@ -85,6 +91,45 @@ type RequirementGap = Readonly<{
   severity: RequirementLevel;
   requiredCount: number;
   availableCount: number;
+  operationalRoleId: string;
+  assetTypeId: string | null;
+  bucket: "boat" | "launch_recovery" | "shore";
+}>;
+
+type AllocationTone = "green" | "amber" | "red" | "grey";
+
+export type AdvisoryAllocationCrew = Readonly<{
+  profile: ProfileSummary;
+  membershipRole: StationMembershipRecord["membership_role"];
+  badge: Readonly<{
+    id: string;
+    label: string;
+    assetLabel: string;
+    roleLabel: string;
+    tone: AllocationTone;
+  }>;
+  roleName: string;
+  source: "exact_asset" | "asset_type" | "general";
+  notes: string[];
+}>;
+
+export type HeadLauncherAdvisory = Readonly<{
+  status: "missing" | "available" | "conflict_boat_crew" | "conflict_launch_authority";
+  label: string;
+  crew: AdvisoryAllocationCrew[];
+  notes: string[];
+}>;
+
+export type AdvisoryAllocationSummary = Readonly<{
+  likelyBoatCrew: AdvisoryAllocationCrew[];
+  likelyLaunchRecoveryCrew: AdvisoryAllocationCrew[];
+  likelyShoreSupportCrew: AdvisoryAllocationCrew[];
+  missingHardStopRoles: RequirementGap[];
+  missingRequiredRoles: RequirementGap[];
+  preferredGaps: RequirementGap[];
+  roleConflicts: string[];
+  crewWhoCouldRestoreReadiness: ProfileSummary[];
+  headLauncher: HeadLauncherAdvisory;
 }>;
 
 export type ReadinessAssetSummary = Readonly<{
@@ -99,8 +144,17 @@ export type ReadinessAssetSummary = Readonly<{
   maximumCrew: number | null;
   currentCrew: CrewCandidate[];
   missingRoles: RequirementGap[];
+  missingHardStopRoles: RequirementGap[];
+  missingRequiredRoles: RequirementGap[];
   launchRecoveryGaps: RequirementGap[];
   preferredGaps: RequirementGap[];
+  likelyBoatCrew: AdvisoryAllocationCrew[];
+  likelyLaunchRecoveryCrew: AdvisoryAllocationCrew[];
+  likelyShoreSupportCrew: AdvisoryAllocationCrew[];
+  roleConflicts: string[];
+  crewWhoCouldRestoreReadiness: ProfileSummary[];
+  headLauncher: HeadLauncherAdvisory;
+  allocation: AdvisoryAllocationSummary;
   notes: string[];
   capabilityBadges: ReturnType<typeof buildCapabilityBadges>;
 }>;
@@ -411,40 +465,12 @@ function getAssetCandidatesForCrew(
   });
 }
 
-function getMatchingAssignments(
-  crew: CrewCandidate[],
-  asset: AssetRecord,
-  roleId: string,
-  windowStart: Date,
-) {
-  return crew.filter((member) =>
-    member.qualifications.some((qualification) => {
-      if (!isQualificationCurrent(qualification, windowStart)) {
-        return false;
-      }
-
-      if (qualification.currency_state !== "green") {
-        return false;
-      }
-
-      if (qualification.operational_role_id !== roleId) {
-        return false;
-      }
-
-      if (qualification.asset_id === asset.id) {
-        return true;
-      }
-
-      return Boolean(qualification.asset_type_id && qualification.asset_type_id === asset.asset_type_id);
-    }),
-  );
-}
-
 function toRequirementGap(
   requirement: { id: string; required_count: number; requirement_level: RequirementLevel; operational_role_id: string },
   availableCount: number,
   role: OperationalRoleRecord | null,
   assetType: AssetTypeRecord | null,
+  bucket: "boat" | "launch_recovery" | "shore",
 ) {
   return {
     id: requirement.id,
@@ -452,7 +478,430 @@ function toRequirementGap(
     severity: requirement.requirement_level,
     requiredCount: requirement.required_count,
     availableCount,
+    operationalRoleId: requirement.operational_role_id,
+    assetTypeId: assetType?.id ?? null,
+    bucket,
   } satisfies RequirementGap;
+}
+
+type AllocationBucket = RequirementGap["bucket"];
+
+type AllocationRequirementSpec = Readonly<{
+  requirement: RequirementGap;
+  role: OperationalRoleRecord | null;
+  bucket: AllocationBucket;
+  priority: number;
+}>;
+
+type AllocationMatch = Readonly<{
+  candidate: CrewCandidate;
+  qualification: CrewQualificationRecord;
+  role: OperationalRoleRecord;
+  source: "exact_asset" | "asset_type";
+  score: number;
+  requirementLabel: string;
+  roleLabel: string;
+  bucket: AllocationBucket;
+}>;
+
+function getRoleByCode(roles: OperationalRoleRecord[], code: string) {
+  return roles.find((role) => role.code === code) ?? null;
+}
+
+function getRequirementBucket(role: OperationalRoleRecord | null, fallback: AllocationBucket = "boat"): AllocationBucket {
+  if (!role) {
+    return fallback;
+  }
+
+  if (role.category === "launch_recovery") {
+    return "launch_recovery";
+  }
+
+  if (role.code === "shore_crew") {
+    return "shore";
+  }
+
+  return "boat";
+}
+
+function getRolePriority(role: OperationalRoleRecord, requirementCode: string | null) {
+  if (requirementCode && role.code === requirementCode) {
+    return 100;
+  }
+
+  if (requirementCode === "boat_crew") {
+    if (role.code === "helm" || role.code === "pilot" || role.code === "navigator" || role.code === "commander") {
+      return 90;
+    }
+    if (role.code === "tier_2") {
+      return 80;
+    }
+    if (role.code === "tier_1" || role.code === "boat_crew") {
+      return 75;
+    }
+    if (role.category === "support") {
+      return 60;
+    }
+    return 50;
+  }
+
+  if (requirementCode === "shore_crew") {
+    if (role.code === "shore_crew") {
+      return 100;
+    }
+    if (role.category === "support") {
+      return 80;
+    }
+    return 0;
+  }
+
+  return role.category === "operational" ? 70 : 40;
+}
+
+function isQualificationRelevantToAsset(qualification: CrewQualificationRecord, asset: AssetRecord) {
+  if (qualification.asset_id === asset.id) {
+    return true;
+  }
+
+  return Boolean(qualification.asset_type_id && qualification.asset_type_id === asset.asset_type_id);
+}
+
+function isQualificationCurrentGreenForAsset(qualification: CrewQualificationRecord, asset: AssetRecord, windowStart: Date) {
+  return isQualificationCurrent(qualification, windowStart) && qualification.currency_state === "green" && isQualificationRelevantToAsset(qualification, asset);
+}
+
+function isRoleEligibleForRequirement(role: OperationalRoleRecord, requirementRoleCode: string | null, bucket: AllocationBucket) {
+  if (requirementRoleCode && role.code === requirementRoleCode) {
+    return true;
+  }
+
+  if (bucket === "launch_recovery") {
+    return false;
+  }
+
+  if (bucket === "shore") {
+    return role.code === "shore_crew" || role.category === "support";
+  }
+
+  if (requirementRoleCode === "boat_crew") {
+    return role.category === "operational" || role.category === "support";
+  }
+
+  if (requirementRoleCode === "shore_crew") {
+    return role.code === "shore_crew" || role.category === "support";
+  }
+
+  return false;
+}
+
+function getQualificationSource(qualification: CrewQualificationRecord, asset: AssetRecord) {
+  return qualification.asset_id === asset.id ? ("exact_asset" as const) : ("asset_type" as const);
+}
+
+function buildCandidateAllocationMatch(
+  candidate: CrewCandidate,
+  asset: AssetRecord,
+  roles: OperationalRoleRecord[],
+  requirement: RequirementGap,
+  requirementRole: OperationalRoleRecord | null,
+  windowStart: Date,
+) {
+  const requirementRoleCode = requirementRole?.code ?? null;
+  let bestMatch: AllocationMatch | null = null;
+
+  for (const qualification of candidate.qualifications) {
+    if (!isQualificationCurrentGreenForAsset(qualification, asset, windowStart)) {
+      continue;
+    }
+
+    const candidateRole = getRoleById(roles, qualification.operational_role_id);
+    if (!candidateRole) {
+      continue;
+    }
+
+    if (!isRoleEligibleForRequirement(candidateRole, requirementRoleCode, requirement.bucket)) {
+      continue;
+    }
+
+    const source = getQualificationSource(qualification, asset);
+    const score = (source === "exact_asset" ? 100 : 80) + getRolePriority(candidateRole, requirementRoleCode);
+    const match: AllocationMatch = {
+      candidate,
+      qualification,
+      role: candidateRole,
+      source,
+      score,
+      requirementLabel: requirement.label,
+      roleLabel: candidateRole.name,
+      bucket: requirement.bucket,
+    };
+
+    if (!bestMatch || match.score > bestMatch.score) {
+      bestMatch = match;
+    }
+  }
+
+  return bestMatch;
+}
+
+function buildRequirementMatches(
+  candidates: CrewCandidate[],
+  asset: AssetRecord,
+  roles: OperationalRoleRecord[],
+  requirement: RequirementGap,
+  requirementRole: OperationalRoleRecord | null,
+  windowStart: Date,
+) {
+  return candidates
+    .map((candidate) => buildCandidateAllocationMatch(candidate, asset, roles, requirement, requirementRole, windowStart))
+    .filter((match): match is AllocationMatch => Boolean(match))
+    .sort((a, b) => {
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+
+      const aName = a.candidate.profile.display_name ?? a.candidate.profile.email ?? a.candidate.profile.id;
+      const bName = b.candidate.profile.display_name ?? b.candidate.profile.email ?? b.candidate.profile.id;
+      return aName.localeCompare(bName);
+    });
+}
+
+function buildAllocationCrew(match: AllocationMatch, assetType: AssetTypeRecord | null): AdvisoryAllocationCrew {
+  return {
+    profile: match.candidate.profile,
+    membershipRole: match.candidate.membership.membership_role,
+    badge: {
+      id: match.qualification.id,
+      label: buildCapabilityBadgeLabel(
+        getAssetShortCode(assetType?.code, assetType?.name),
+        getRoleShortCode(match.role.code, match.role.name),
+      ),
+      assetLabel: getAssetShortCode(assetType?.code, assetType?.name),
+      roleLabel: getRoleShortCode(match.role.code, match.role.name),
+      tone: getBadgeTone(match.qualification.currency_state, match.qualification.is_active),
+    },
+    roleName: match.role.name,
+    source: match.source,
+    notes: [
+      match.source === "exact_asset" ? "Exact asset qualification." : "Asset type qualification.",
+      match.qualification.notes ?? null,
+    ].filter((value): value is string => Boolean(value)),
+  };
+}
+
+function buildAllocationSummary(params: {
+  candidates: CrewCandidate[];
+  asset: AssetRecord;
+  assetType: AssetTypeRecord | null;
+  roleRequirements: SafeCrewingRoleRequirementRecord[];
+  launchRecoveryRequirements: AssetLaunchRecoveryRequirementRecord[];
+  roles: OperationalRoleRecord[];
+  windowStart: Date;
+  currentDlaProfileId: string | null;
+}) {
+  const {
+    candidates,
+    asset,
+    assetType,
+    roleRequirements,
+    launchRecoveryRequirements,
+    roles,
+    windowStart,
+    currentDlaProfileId,
+  } = params;
+
+  const usedProfileIds = new Set<string>();
+  const selectedByProfileId = new Map<string, string>();
+  const roleConflicts = new Set<string>();
+  const restoreReadyCrew = new Map<string, ProfileSummary>();
+  const likelyBoatCrew: AdvisoryAllocationCrew[] = [];
+  const likelyLaunchRecoveryCrew: AdvisoryAllocationCrew[] = [];
+  const likelyShoreSupportCrew: AdvisoryAllocationCrew[] = [];
+  const missingHardStopRoles: RequirementGap[] = [];
+  const missingRequiredRoles: RequirementGap[] = [];
+  const preferredGaps: RequirementGap[] = [];
+
+  const headLauncherRole = getRoleByCode(roles, "head_launcher");
+  let headLauncherStatus: HeadLauncherAdvisory["status"] = headLauncherRole ? "available" : "missing";
+  let headLauncherLabel = headLauncherRole ? "Head Launcher available" : "Missing Head Launcher";
+  let headLauncherCrew: AdvisoryAllocationCrew[] = [];
+  const headLauncherNotes: string[] = headLauncherRole ? [] : ["Head Launcher role is not yet configured in operational roles."];
+
+  const allocationSpecs: AllocationRequirementSpec[] = [
+    ...roleRequirements.map((requirement) => {
+      const role = getRoleById(roles, requirement.operational_role_id);
+      const bucket = getRequirementBucket(role, "boat");
+      return {
+        requirement: toRequirementGap(requirement, 0, role, assetType, bucket),
+        role,
+        bucket,
+        priority: requirement.requirement_level === "hard_stop" ? 0 : requirement.requirement_level === "required" ? 1 : 2,
+      };
+    }),
+    ...launchRecoveryRequirements.map((requirement) => {
+      const role = getRoleById(roles, requirement.operational_role_id);
+      return {
+        requirement: {
+          id: requirement.id,
+          label: getRequirementLabel(assetType?.name ?? null, role?.name ?? null),
+          severity: requirement.requirement_level,
+          requiredCount: requirement.required_count,
+          availableCount: 0,
+          operationalRoleId: requirement.operational_role_id,
+          assetTypeId: assetType?.id ?? null,
+          bucket: "launch_recovery" as const,
+        },
+        role,
+        bucket: "launch_recovery" as const,
+        priority: requirement.requirement_level === "hard_stop" ? 0 : requirement.requirement_level === "required" ? 1 : 2,
+      };
+    }),
+  ].sort((a, b) => {
+    if (a.priority !== b.priority) {
+      return a.priority - b.priority;
+    }
+
+    const aMatches = buildRequirementMatches(candidates, asset, roles, a.requirement, a.role, windowStart).length;
+    const bMatches = buildRequirementMatches(candidates, asset, roles, b.requirement, b.role, windowStart).length;
+    if (aMatches !== bMatches) {
+      return aMatches - bMatches;
+    }
+
+    return a.requirement.label.localeCompare(b.requirement.label);
+  });
+
+  for (const spec of allocationSpecs) {
+    const matches = buildRequirementMatches(candidates, asset, roles, spec.requirement, spec.role, windowStart);
+    const availableCount = matches.length;
+    const gap = { ...spec.requirement, availableCount } satisfies RequirementGap;
+
+    if (gap.severity === "preferred") {
+      if (availableCount < gap.requiredCount) {
+        preferredGaps.push(gap);
+      }
+    } else if (availableCount < gap.requiredCount) {
+      if (gap.severity === "hard_stop") {
+        missingHardStopRoles.push(gap);
+      } else {
+        missingRequiredRoles.push(gap);
+      }
+    }
+
+    let remaining = gap.requiredCount;
+    for (const match of matches) {
+      if (remaining <= 0) {
+        break;
+      }
+
+      if (usedProfileIds.has(match.candidate.profile.id)) {
+        roleConflicts.add(
+          `${match.candidate.profile.display_name ?? match.candidate.profile.email ?? match.candidate.profile.id} is already allocated as ${selectedByProfileId.get(match.candidate.profile.id) ?? "another role"} and was skipped for ${match.requirementLabel}.`,
+        );
+        continue;
+      }
+
+      const allocated = buildAllocationCrew(match, assetType);
+      usedProfileIds.add(match.candidate.profile.id);
+      selectedByProfileId.set(match.candidate.profile.id, match.roleLabel);
+      remaining -= 1;
+
+      if (spec.bucket === "launch_recovery") {
+        likelyLaunchRecoveryCrew.push(allocated);
+      } else if (spec.bucket === "shore") {
+        likelyShoreSupportCrew.push(allocated);
+      } else {
+        likelyBoatCrew.push(allocated);
+      }
+    }
+
+    if (remaining > 0 && gap.severity !== "preferred") {
+      for (const match of matches) {
+        restoreReadyCrew.set(match.candidate.profile.id, match.candidate.profile);
+      }
+    }
+  }
+
+  if (headLauncherRole) {
+    const headLauncherMatch = candidates
+      .map((candidate) => {
+        const qualification = candidate.qualifications.find((item) => {
+          return isQualificationCurrentGreenForAsset(item, asset, windowStart) && item.operational_role_id === headLauncherRole.id;
+        });
+
+        if (!qualification) {
+          return null;
+        }
+
+        return {
+          candidate,
+          qualification,
+          role: headLauncherRole,
+          source: getQualificationSource(qualification, asset),
+          score: 0,
+          requirementLabel: "Head Launcher",
+          roleLabel: headLauncherRole.name,
+          bucket: "launch_recovery" as const,
+        } satisfies AllocationMatch;
+      })
+      .find((match) => Boolean(match)) as AllocationMatch | null;
+
+    if (headLauncherMatch) {
+      headLauncherCrew = [buildAllocationCrew(headLauncherMatch, assetType)];
+
+      if (usedProfileIds.has(headLauncherMatch.candidate.profile.id)) {
+        headLauncherStatus = "conflict_boat_crew";
+        headLauncherLabel = "Head Launcher conflict";
+        roleConflicts.add(
+          `Head Launcher conflict: ${headLauncherMatch.candidate.profile.display_name ?? headLauncherMatch.candidate.profile.email ?? headLauncherMatch.candidate.profile.id} is also counted as boat crew.`,
+        );
+      } else if (currentDlaProfileId && headLauncherMatch.candidate.profile.id === currentDlaProfileId) {
+        headLauncherStatus = "conflict_launch_authority";
+        headLauncherLabel = "Head Launcher conflict";
+        roleConflicts.add(
+          `Head Launcher conflict: ${headLauncherMatch.candidate.profile.display_name ?? headLauncherMatch.candidate.profile.email ?? headLauncherMatch.candidate.profile.id} is acting as Launch Authority / DLA.`,
+        );
+      } else {
+        headLauncherStatus = "available";
+        headLauncherLabel = "Head Launcher available";
+      }
+    }
+  }
+
+  return {
+    likelyBoatCrew,
+    likelyLaunchRecoveryCrew,
+    likelyShoreSupportCrew,
+    missingHardStopRoles,
+    missingRequiredRoles,
+    preferredGaps,
+    roleConflicts: [...roleConflicts],
+    crewWhoCouldRestoreReadiness: [...restoreReadyCrew.values()],
+    headLauncher: {
+      status: headLauncherStatus,
+      label: headLauncherLabel,
+      crew: headLauncherCrew,
+      notes: headLauncherNotes,
+    },
+  } satisfies AdvisoryAllocationSummary;
+}
+
+function createEmptyAllocationSummary(additionalNotes: string[] = []): AdvisoryAllocationSummary {
+  return {
+    likelyBoatCrew: [],
+    likelyLaunchRecoveryCrew: [],
+    likelyShoreSupportCrew: [],
+    missingHardStopRoles: [],
+    missingRequiredRoles: [],
+    preferredGaps: [],
+    roleConflicts: [],
+    crewWhoCouldRestoreReadiness: [],
+    headLauncher: {
+      status: "missing",
+      label: "Missing Head Launcher",
+      crew: [],
+      notes: ["Head Launcher role is not yet configured in operational roles.", ...additionalNotes],
+    },
+  };
 }
 
 function aggregateAssetStatus(params: {
@@ -466,6 +915,7 @@ function aggregateAssetStatus(params: {
   windowStart: Date;
   windowEnd: Date;
   operationType: OperationType;
+  currentDlaProfileId: string | null;
 }) {
   const {
     rule,
@@ -478,6 +928,7 @@ function aggregateAssetStatus(params: {
     windowStart,
     windowEnd,
     operationType,
+    currentDlaProfileId,
   } = params;
 
   if (!asset.is_active || asset.status === "off_service") {
@@ -489,8 +940,17 @@ function aggregateAssetStatus(params: {
       minimumCrew: rule?.minimum_crew ?? 0,
       maximumCrew: rule?.maximum_crew ?? null,
       missingRoles: [] as RequirementGap[],
+      missingHardStopRoles: [] as RequirementGap[],
+      missingRequiredRoles: [] as RequirementGap[],
       launchRecoveryGaps: [] as RequirementGap[],
       preferredGaps: [] as RequirementGap[],
+      likelyBoatCrew: [],
+      likelyLaunchRecoveryCrew: [],
+      likelyShoreSupportCrew: [],
+      roleConflicts: [],
+      crewWhoCouldRestoreReadiness: [],
+      headLauncher: createEmptyAllocationSummary(["Asset is marked inactive or off service."]).headLauncher,
+      allocation: createEmptyAllocationSummary(["Asset is marked inactive or off service."]),
       notes: ["Asset is marked inactive or off service."],
       currentCrew: [] as CrewCandidate[],
       capabilityBadges: [] as ReturnType<typeof buildCapabilityBadges>,
@@ -506,8 +966,17 @@ function aggregateAssetStatus(params: {
       minimumCrew: 0,
       maximumCrew: null,
       missingRoles: [] as RequirementGap[],
+      missingHardStopRoles: [] as RequirementGap[],
+      missingRequiredRoles: [] as RequirementGap[],
       launchRecoveryGaps: [] as RequirementGap[],
       preferredGaps: [] as RequirementGap[],
+      likelyBoatCrew: [],
+      likelyLaunchRecoveryCrew: [],
+      likelyShoreSupportCrew: [],
+      roleConflicts: [],
+      crewWhoCouldRestoreReadiness: [],
+      headLauncher: createEmptyAllocationSummary([`No safe-crewing rule exists for ${assetType?.name ?? asset.name} (${operationType}).`]).headLauncher,
+      allocation: createEmptyAllocationSummary([`No safe-crewing rule exists for ${assetType?.name ?? asset.name} (${operationType}).`]),
       notes: [`No safe-crewing rule exists for ${assetType?.name ?? asset.name} (${operationType}).`],
       currentCrew: [] as CrewCandidate[],
       capabilityBadges: [] as ReturnType<typeof buildCapabilityBadges>,
@@ -517,59 +986,52 @@ function aggregateAssetStatus(params: {
   const currentCrew = getAssetCandidatesForCrew(candidates, asset, windowStart, windowEnd);
   const matchingRoleRequirements = roleRequirements.filter((requirement) => requirement.asset_type_id === asset.asset_type_id);
   const matchingLaunchRecovery = launchRecoveryRequirements.filter((requirement) => requirement.asset_id === asset.id);
-
-  const missingRoles: RequirementGap[] = [];
-  const launchRecoveryGaps: RequirementGap[] = [];
-  const preferredGaps: RequirementGap[] = [];
-
-  for (const requirement of matchingRoleRequirements) {
-    const role = getRoleById(roles, requirement.operational_role_id);
-    const availableCount = getMatchingAssignments(currentCrew, asset, requirement.operational_role_id, windowStart).length;
-    if (availableCount < requirement.required_count) {
-      const gap = toRequirementGap(requirement, availableCount, role, assetType);
-      if (requirement.requirement_level === "preferred") {
-        preferredGaps.push(gap);
-      } else {
-        missingRoles.push(gap);
+  const allocation = buildAllocationSummary({
+    candidates: currentCrew,
+    asset,
+    assetType,
+    roleRequirements: matchingRoleRequirements,
+    launchRecoveryRequirements: matchingLaunchRecovery,
+    roles,
+    windowStart,
+    currentDlaProfileId,
+  });
+  const missingHardStopRoles = allocation.missingHardStopRoles;
+  const missingRequiredRoles = allocation.missingRequiredRoles;
+  const preferredGaps = allocation.preferredGaps;
+  const launchRecoveryGaps = matchingLaunchRecovery
+    .filter((requirement) => requirement.requirement_level !== "preferred")
+    .flatMap((requirement) => {
+      const role = getRoleById(roles, requirement.operational_role_id);
+      const requirementGap = {
+        id: requirement.id,
+        label: getRequirementLabel(assetType?.name ?? null, role?.name ?? null),
+        severity: requirement.requirement_level,
+        requiredCount: requirement.required_count,
+        availableCount: 0,
+        operationalRoleId: requirement.operational_role_id,
+        assetTypeId: assetType?.id ?? null,
+        bucket: "launch_recovery" as const,
+      } satisfies RequirementGap;
+      const availableCount = buildRequirementMatches(currentCrew, asset, roles, requirementGap, role, windowStart).length;
+      if (availableCount >= requirement.required_count) {
+        return [];
       }
-    }
-  }
 
-  for (const requirement of matchingLaunchRecovery) {
-    const role = getRoleById(roles, requirement.operational_role_id);
-    const availableCount = getMatchingAssignments(currentCrew, asset, requirement.operational_role_id, windowStart).length;
-    if (availableCount < requirement.required_count) {
-      const gap = toRequirementGap(requirement, availableCount, role, assetType);
-      if (requirement.requirement_level === "preferred") {
-        preferredGaps.push(gap);
-      } else {
-        launchRecoveryGaps.push(gap);
-      }
-    }
-  }
+      return [toRequirementGap(requirement, availableCount, role, assetType, "launch_recovery")];
+    });
+
+  const missingRoles: RequirementGap[] = [...missingHardStopRoles, ...missingRequiredRoles];
+  const roleConflicts = allocation.roleConflicts;
+  const capabilityBadges = buildCapabilityBadges(
+    currentCrew.flatMap((member) =>
+      member.qualifications.filter((qualification) => isQualificationCurrent(qualification, windowStart) && qualification.currency_state === "green" && isQualificationRelevantToAsset(qualification, asset)),
+    ),
+  );
 
   const availableCrewCount = currentCrew.length;
-  const currentCrewBadgeRows = currentCrew.flatMap((member) =>
-    member.qualifications.filter((qualification) => {
-      if (!isQualificationCurrent(qualification, windowStart)) {
-        return false;
-      }
-
-      if (qualification.currency_state !== "green") {
-        return false;
-      }
-
-      if (qualification.asset_id === asset.id) {
-        return true;
-      }
-
-      return Boolean(qualification.asset_type_id && qualification.asset_type_id === asset.asset_type_id);
-    }),
-  );
-  const capabilityBadges = buildCapabilityBadges(currentCrewBadgeRows);
-
-  const hasHardStopGaps = missingRoles.some((gap) => gap.severity === "hard_stop") || launchRecoveryGaps.some((gap) => gap.severity === "hard_stop");
-  const hasRequiredGaps = missingRoles.some((gap) => gap.severity === "required") || launchRecoveryGaps.some((gap) => gap.severity === "required");
+  const hasHardStopGaps = missingHardStopRoles.length > 0 || launchRecoveryGaps.some((gap) => gap.severity === "hard_stop");
+  const hasRequiredGaps = missingRequiredRoles.length > 0 || launchRecoveryGaps.some((gap) => gap.severity === "required");
   const hasPreferredGaps = preferredGaps.length > 0;
   const belowMinimumCrew = availableCrewCount < rule.minimum_crew;
   const aboveMaximumCrew = rule.maximum_crew !== null && availableCrewCount > rule.maximum_crew;
@@ -596,8 +1058,17 @@ function aggregateAssetStatus(params: {
     minimumCrew: rule.minimum_crew,
     maximumCrew: rule.maximum_crew,
     missingRoles,
+    missingHardStopRoles,
+    missingRequiredRoles,
     launchRecoveryGaps,
     preferredGaps,
+    likelyBoatCrew: allocation.likelyBoatCrew,
+    likelyLaunchRecoveryCrew: allocation.likelyLaunchRecoveryCrew,
+    likelyShoreSupportCrew: allocation.likelyShoreSupportCrew,
+    roleConflicts,
+    crewWhoCouldRestoreReadiness: allocation.crewWhoCouldRestoreReadiness,
+    headLauncher: allocation.headLauncher,
+    allocation,
     notes: [
       rule.source_reference ? `Source: ${rule.source_reference}` : null,
       rule.notes ?? null,
@@ -739,6 +1210,19 @@ export async function loadReadinessSnapshot({
     );
     const windowStart = asDate(window.startsAt);
     const windowEnd = asDate(window.endsAt);
+    const currentDlaDuty = stationContext.dutyPeriods.find((period) => {
+      const range = getDutyRange(period);
+      if (!range) {
+        return false;
+      }
+
+      return (
+        period.is_active &&
+        (period.period_kind === "dla_day" || period.period_kind === "dla_night") &&
+        overlapsWindow(range.startsAt, range.endsAt, windowStart, asDate(window.endsAt))
+      );
+    });
+    const currentDlaProfileId = getFirstRecord(currentDlaDuty?.profile)?.id ?? null;
 
     const assets = stationContext.assets.map((asset) => {
       const assetType = getAssetTypeById(stationContext.assetTypes, asset.asset_type_id);
@@ -767,6 +1251,7 @@ export async function loadReadinessSnapshot({
         windowStart,
         windowEnd,
         operationType,
+        currentDlaProfileId,
       });
 
       return {
@@ -801,19 +1286,6 @@ export async function loadReadinessSnapshot({
     });
 
     const overallStatus = worstStatus(assets.map((asset) => asset.status));
-    const currentDlaDuty = stationContext.dutyPeriods.find((period) => {
-      const range = getDutyRange(period);
-      if (!range) {
-        return false;
-      }
-
-      return (
-        period.is_active &&
-        (period.period_kind === "dla_day" || period.period_kind === "dla_night") &&
-        overlapsWindow(range.startsAt, range.endsAt, windowStart, asDate(window.endsAt))
-      );
-    });
-
     const currentDla = currentDlaDuty
       ? {
           id: currentDlaDuty.profile?.id ?? "unknown",

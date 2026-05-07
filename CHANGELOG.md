@@ -111,3 +111,7 @@
 
 - Fixed the Phase 7 seed SQL syntax error in the launch/recovery requirements block.
 - Kept the Phase 7 seed idempotent while preserving duplicate asset names across locations.
+
+## 0.7.2 - 2026-05-07
+
+- Added advisory readiness allocation output for likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and Head Launcher status on the readiness board.

@@ -71,6 +71,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - The future readiness engine must support effective-dated safe-crewing rules, required-role complements, launch method checks, and non-authorising risk assessment states.
 - Phase 7 now adds a dedicated readiness console plus dashboard and DLA readiness views on `feature/readiness-engine`; it still needs browser smoke testing before merge.
 - The Phase 7 seed file now runs cleanly in Supabase SQL Editor after fixing the launch/recovery join ordering issue.
+- The readiness engine now includes advisory allocation output for likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and explicit Head Launcher status. This is advisory only and does not authorise launches.
 
 ## Run Notes
 

@@ -36,3 +36,8 @@
 - Chosen readiness surface: expose the first readiness engine through a reusable server-rendered readiness board rather than a client-side calculator.
 - Chosen rule fallback: allow `boat_movement` and `assurance_activity` to fall back to service rules until dedicated rows are introduced.
 - Chosen visibility model: reuse the same readiness snapshot in `/`, `/dla`, and `/admin/readiness` so the calculated state stays consistent.
+
+## 2026-05-07 Phase 7 Advisory Allocation Decisions
+
+- Chosen allocation model: keep likely crew composition advisory only, and surface the output as suggested boat crew, launch/recovery crew, role conflicts, and readiness-restoration candidates.
+- Chosen Head Launcher fallback: treat Head Launcher as missing until the role exists in the operational role data, rather than adding a schema dependency during Phase 7.

@@ -67,3 +67,5 @@
 - Launch/recovery gaps display separately from boat crew gaps.
 - DLA and admin users can open `/dla` and `/admin/readiness`.
 - Non-members cannot access station readiness.
+- The readiness board shows advisory-only likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and Head Launcher status.
+- Head Launcher renders as missing until the role exists in data, then it should show available or conflict states as appropriate.

@@ -95,7 +95,101 @@ function RequirementList({
   );
 }
 
+function CrewAllocationList({
+  title,
+  items,
+  emptyLabel,
+}: Readonly<{
+  title: string;
+  items: ReadonlyArray<{
+    profile: {
+      id: string;
+      display_name: string | null;
+      email: string | null;
+    };
+    badge: {
+      label: string;
+      tone: "green" | "amber" | "red" | "grey";
+    };
+    roleName: string;
+    source: string;
+    notes: string[];
+  }>;
+  emptyLabel: string;
+}>) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+        {title}
+      </p>
+      {items.length ? (
+        <ul className="space-y-2">
+          {items.map((item) => (
+            <li
+              key={`${item.profile.id}-${item.roleName}`}
+              className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-card-foreground">
+                    {item.profile.display_name ?? item.profile.email ?? item.profile.id}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.roleName} · {item.source}
+                  </p>
+                </div>
+                <StatusPill tone={item.badge.tone}>{item.badge.label}</StatusPill>
+              </div>
+              {item.notes.length ? (
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {item.notes.join(" ")}
+                </p>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-muted-foreground">{emptyLabel}</p>
+      )}
+    </div>
+  );
+}
+
+function StringList({
+  title,
+  items,
+  emptyLabel,
+}: Readonly<{
+  title: string;
+  items: string[];
+  emptyLabel: string;
+}>) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">{title}</p>
+      {items.length ? (
+        <ul className="space-y-2">
+          {items.map((item) => (
+            <li key={item} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-card-foreground">
+              {item}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-muted-foreground">{emptyLabel}</p>
+      )}
+    </div>
+  );
+}
+
 function AssetReadinessCard({ asset }: Readonly<{ asset: ReadinessAssetSummary }>) {
+  const headLauncherTone: "green" | "amber" | "red" | "grey" =
+    asset.headLauncher.status === "available"
+      ? "green"
+      : asset.headLauncher.status === "missing"
+        ? "red"
+        : "amber";
+
   return (
     <article className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
       <div className="flex items-start justify-between gap-3">
@@ -129,9 +223,14 @@ function AssetReadinessCard({ asset }: Readonly<{ asset: ReadinessAssetSummary }
 
       <div className="mt-4 grid gap-4">
         <RequirementList
-          title="Missing roles"
-          items={asset.missingRoles}
-          emptyLabel="No missing boat crew roles."
+          title="Missing hard-stop roles"
+          items={asset.missingHardStopRoles}
+          emptyLabel="No missing hard-stop roles."
+        />
+        <RequirementList
+          title="Missing required roles"
+          items={asset.missingRequiredRoles}
+          emptyLabel="No missing required roles."
         />
         <RequirementList
           title="Launch / recovery gaps"
@@ -143,6 +242,84 @@ function AssetReadinessCard({ asset }: Readonly<{ asset: ReadinessAssetSummary }
           items={asset.preferredGaps}
           emptyLabel="No preferred gaps."
         />
+      </div>
+
+      <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-card-foreground">Advisory allocation only</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              This section suggests a likely crew composition. It does not authorise a launch.
+            </p>
+          </div>
+          <StatusPill tone="grey">Advisory</StatusPill>
+        </div>
+
+        <div className="mt-4 grid gap-4">
+          <CrewAllocationList
+            title="Likely boat crew"
+            items={asset.allocation.likelyBoatCrew}
+            emptyLabel="No likely boat crew allocation."
+          />
+          <CrewAllocationList
+            title="Likely launch / recovery crew"
+            items={asset.allocation.likelyLaunchRecoveryCrew}
+            emptyLabel="No likely launch / recovery crew allocation."
+          />
+          <CrewAllocationList
+            title="Likely shore support crew"
+            items={asset.allocation.likelyShoreSupportCrew}
+            emptyLabel="No likely shore support crew allocation."
+          />
+          <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Head Launcher</p>
+                <p className="text-sm font-medium text-card-foreground">{asset.headLauncher.label}</p>
+              </div>
+              <StatusPill tone={headLauncherTone}>{asset.headLauncher.status.replaceAll("_", " ")}</StatusPill>
+            </div>
+            {asset.headLauncher.notes.length ? (
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {asset.headLauncher.notes.join(" ")}
+              </p>
+            ) : null}
+          </div>
+          <StringList
+            title="Role conflicts"
+            items={asset.roleConflicts}
+            emptyLabel="No role conflicts detected."
+          />
+          <div className="space-y-2">
+            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+              Crew who could restore readiness
+            </p>
+            {asset.crewWhoCouldRestoreReadiness.length ? (
+              <div className="flex flex-wrap gap-2">
+                {asset.crewWhoCouldRestoreReadiness.map((member) => (
+                  <span
+                    key={member.id}
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-card-foreground"
+                  >
+                    {member.display_name ?? member.email ?? member.id}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No obvious readiness restoration candidates.</p>
+            )}
+          </div>
+          {asset.allocation.headLauncher.status === "conflict_boat_crew" ? (
+            <p className="text-xs text-amber-200">
+              Head Launcher conflict: also counted as boat crew.
+            </p>
+          ) : null}
+          {asset.allocation.headLauncher.status === "conflict_launch_authority" ? (
+            <p className="text-xs text-amber-200">
+              Head Launcher conflict: acting as Launch Authority / DLA.
+            </p>
+          ) : null}
+        </div>
       </div>
 
       {asset.currentCrew.length ? (

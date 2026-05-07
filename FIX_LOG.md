@@ -90,3 +90,8 @@
 
 - Fixed the launch/recovery seed block in `supabase/seed.sql` by converting the inline `VALUES` list to a `CROSS JOIN`.
 - Kept the `WHERE` filters before `ON CONFLICT` so the statement remains valid and idempotent in Supabase SQL Editor.
+
+## 2026-05-07 Phase 7 Advisory Allocation Fix
+
+- Fixed the readiness allocation helper so advisory crew allocation compiles cleanly and can surface likely boat crew, likely launch/recovery crew, role conflicts, and Head Launcher status.
+- Removed the stale legacy matcher after the advisory allocation path replaced it.
