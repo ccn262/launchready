@@ -17,6 +17,7 @@
 4. Add the Resend API key and from-address when email alerts are enabled.
 5. Run `npm install`.
 6. Start the app with `npm run dev`.
+7. Keep `.env.local` out of version control. It must never be committed.
 
 ## Supabase Setup
 

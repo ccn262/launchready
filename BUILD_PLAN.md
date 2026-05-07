@@ -30,4 +30,6 @@
 - Add operational reporting and readiness calculations.
 - Add push, SMS placeholder, and WhatsApp awareness orchestration.
 - Prepare PWA support.
+- Future backlog item: RNLI public station reference/import for admin pre-population only, with manual confirmation/editing and no operational overwrite.
+- Check RNLI website terms before any scraping or automated import work.
 - Hardening, testing, and release preparation.

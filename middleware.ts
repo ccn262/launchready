@@ -19,7 +19,6 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isLoginRoute = pathname === "/login";
-  const isUnauthorizedRoute = pathname === "/unauthorized";
 
   if (!user) {
     if (isProtectedPath(pathname)) {
@@ -52,20 +51,34 @@ export async function middleware(request: NextRequest) {
       .eq("is_active", true),
   ]);
 
+  const isProfileActive = profile?.is_active === true;
+  if (user && !isProfileActive && pathname !== "/unauthorized") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/unauthorized";
+    url.searchParams.set(
+      "reason",
+      "Your account profile is inactive. Please contact a station admin or LOM.",
+    );
+    return NextResponse.redirect(url);
+  }
+
   const roleSet = new Set(
     ((memberships ?? []) as { membership_role: string; is_active: boolean }[])
       .filter((membership) => membership.is_active)
       .map((membership) => membership.membership_role),
   );
-  const isSuperAdmin = profile?.system_role === "super_admin" && profile?.is_active;
-  const canAccessCrew = !!user && (isSuperAdmin || roleSet.size > 0);
+  const isSuperAdmin = isProfileActive && profile?.system_role === "super_admin";
+  const canAccessCrew = !!user && isProfileActive && (isSuperAdmin || roleSet.size > 0);
   const canAccessDla =
-    !!user && (isSuperAdmin || roleSet.has("dla") || roleSet.has("lom") || roleSet.has("admin"));
+    !!user &&
+    isProfileActive &&
+    (isSuperAdmin || roleSet.has("dla") || roleSet.has("lom") || roleSet.has("admin"));
   const canAccessAdmin =
-    !!user && (isSuperAdmin || roleSet.has("lom") || roleSet.has("admin"));
+    !!user && isProfileActive && (isSuperAdmin || roleSet.has("lom") || roleSet.has("admin"));
 
   const authorized = canAccessPath(pathname, {
     isAuthenticated: !!user,
+    isProfileActive,
     canAccessCrew,
     canAccessDla,
     canAccessAdmin,
@@ -76,13 +89,6 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/unauthorized";
     url.searchParams.set("reason", getUnauthorizedReason(pathname));
-    return NextResponse.redirect(url);
-  }
-
-  if (isUnauthorizedRoute && authorized) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    url.search = "";
     return NextResponse.redirect(url);
   }
 

@@ -33,3 +33,23 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Protected routes: `/`, `/crew`, `/dla`, `/admin`.
 - Next recommended step: perform the manual Supabase Auth setup steps, then verify sign-in, sign-out, and route redirects in the browser.
+
+## 2026-05-07 12:05 BST
+
+- Branch: `feature/auth-session-foundation`
+- Files changed: auth helper and middleware hardening plus security, smoke-test, environment, handoff, changelog, and fix-log updates.
+- Errors: inactive profiles could still gain access through active memberships, and the unauthorized redirect path could bounce blocked users back to `/`.
+- Fixes attempted: gated access on `profiles.is_active`, excluded inactive profiles from route checks, removed the redirect-away behavior from `/unauthorized`, and restored the missing `.env.example` template.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Browser smoke notes: documented `/login`, `/`, `/crew`, `/dla`, `/admin`, `/unauthorized`, and logout checks.
+- Next recommended step: verify the browser route matrix against the authenticated test account, then merge Phase 3 into `develop` if the manual smoke pass is clean.
+
+## 2026-05-07 12:40 BST
+
+- Branch: `feature/auth-session-foundation`
+- Files changed: build plan, decisions log, project handoff, code run log, and changelog.
+- Purpose: record RNLI public station pages as a future reference-only backlog item for admin pre-population, with manual confirmation required and no automated import.
+- Errors: none.
+- Tests run: none.
+- Next recommended step: keep RNLI import work deferred until CRUD and readiness engine work is stable, then review site terms before any automation.

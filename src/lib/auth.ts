@@ -40,6 +40,7 @@ export type CurrentUserContext = {
   profile: ProfileRecord | null;
   memberships: StationMembership[];
   isAuthenticated: boolean;
+  isProfileActive: boolean;
   isSuperAdmin: boolean;
   canAccessCrew: boolean;
   canAccessDla: boolean;
@@ -84,6 +85,7 @@ export async function getCurrentUserContext(): Promise<CurrentUserContext> {
       profile: null,
       memberships: [],
       isAuthenticated: false,
+      isProfileActive: false,
       isSuperAdmin: false,
       canAccessCrew: false,
       canAccessDla: false,
@@ -128,15 +130,17 @@ export async function getCurrentUserContext(): Promise<CurrentUserContext> {
   );
   const roleSet = new Set(activeMemberships.map((membership) => membership.membership_role));
   const profileRecord = (profile ?? null) as ProfileRecord | null;
-  const isSuperAdmin = profileRecord?.system_role === "super_admin";
-  const canAccessCrew = isSuperAdmin || activeMemberships.length > 0;
+  const isProfileActive = profileRecord?.is_active === true;
+  const isSuperAdmin = isProfileActive && profileRecord?.system_role === "super_admin";
+  const canAccessCrew = isProfileActive && (isSuperAdmin || activeMemberships.length > 0);
   const canAccessDla =
-    isSuperAdmin ||
+    isProfileActive &&
+    (isSuperAdmin ||
     roleSet.has("dla") ||
     roleSet.has("lom") ||
-    roleSet.has("admin");
+    roleSet.has("admin"));
   const canAccessAdmin =
-    isSuperAdmin || roleSet.has("lom") || roleSet.has("admin");
+    isProfileActive && (isSuperAdmin || roleSet.has("lom") || roleSet.has("admin"));
   const primaryMembership =
     activeMemberships.find((membership) => membership.is_primary) ??
     activeMemberships[0] ??
@@ -149,7 +153,8 @@ export async function getCurrentUserContext(): Promise<CurrentUserContext> {
     user,
     profile: profileRecord,
     memberships: activeMemberships,
-    isAuthenticated: true,
+    isAuthenticated: isProfileActive,
+    isProfileActive,
     isSuperAdmin,
     canAccessCrew,
     canAccessDla,
@@ -194,23 +199,28 @@ export function canAccessPath(
   pathname: string,
   context: Pick<
     CurrentUserContext,
-    "isAuthenticated" | "canAccessCrew" | "canAccessDla" | "canAccessAdmin" | "isSuperAdmin"
+    | "isAuthenticated"
+    | "isProfileActive"
+    | "canAccessCrew"
+    | "canAccessDla"
+    | "canAccessAdmin"
+    | "isSuperAdmin"
   >,
 ) {
   if (pathname === "/") {
-    return context.isAuthenticated;
+    return context.isAuthenticated && context.isProfileActive;
   }
 
   if (pathname.startsWith("/crew")) {
-    return context.isAuthenticated && context.canAccessCrew;
+    return context.isAuthenticated && context.isProfileActive && context.canAccessCrew;
   }
 
   if (pathname.startsWith("/dla")) {
-    return context.isAuthenticated && context.canAccessDla;
+    return context.isAuthenticated && context.isProfileActive && context.canAccessDla;
   }
 
   if (pathname.startsWith("/admin")) {
-    return context.isAuthenticated && context.canAccessAdmin;
+    return context.isAuthenticated && context.isProfileActive && context.canAccessAdmin;
   }
 
   return true;

@@ -37,3 +37,10 @@
 - Added middleware-based protection for `/`, `/crew`, `/dla`, and `/admin`.
 - Added login and unauthorized pages plus server-side sign-in/sign-out actions.
 - Refactored the sidebar shell so it can render role-aware navigation from the current Supabase profile and memberships.
+
+## 2026-05-07 Auth Hardening
+
+- Blocked inactive profiles from satisfying route access checks.
+- Kept inactive memberships out of the access decision set.
+- Removed the redirect-away behavior from `/unauthorized` so blocked sessions can reach the access-denied page.
+- Restored the missing `.env.example` template after the working tree delete.

@@ -40,3 +40,16 @@
 - Added Supabase Auth login/logout flows, middleware route protection, and current user/profile loading.
 - Added role-aware navigation labels and unauthorized handling.
 - Added server-side session handling for protected routes.
+
+## 0.3.1 - 2026-05-07
+
+- Hardened the Phase 3 auth/session checks so inactive profiles cannot access protected routes.
+- Removed the unauthorized-page redirect loop so blocked users can reach the access-denied screen.
+- Restored the `.env.example` template and documented that `.env.local` must remain uncommitted.
+- Recorded browser smoke-test coverage for `/login`, `/`, `/crew`, `/dla`, `/admin`, `/unauthorized`, and logout.
+
+## 0.3.2 - 2026-05-07
+
+- Added a deferred backlog note for RNLI public station reference/import.
+- Clarified that RNLI public station data is reference-only for future admin pre-population and must not overwrite operational data automatically.
+- Noted that any future RNLI import work must review site terms first and capture source URL and last checked date.
