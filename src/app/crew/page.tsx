@@ -3,8 +3,11 @@ import { OperationalCard } from "@/components/operational-card";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
+import { requireRouteAccess } from "@/lib/auth";
 
-export default function CrewPage() {
+export default async function CrewPage() {
+  await requireRouteAccess("/crew");
+
   return (
     <AppShell>
       <div className="space-y-6">

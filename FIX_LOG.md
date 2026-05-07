@@ -44,3 +44,9 @@
 - Kept inactive memberships out of the access decision set.
 - Removed the redirect-away behavior from `/unauthorized` so blocked sessions can reach the access-denied page.
 - Restored the missing `.env.example` template after the working tree delete.
+
+## 2026-05-07 Vercel Edge Fix
+
+- Removed `@/lib/auth` and `@/lib/supabase/middleware` imports from `middleware.ts` so the Edge bundle only uses edge-safe code.
+- Inlined the minimal Supabase session refresh logic in middleware.
+- Moved detailed role checks into server-rendered page guards for `/`, `/crew`, `/dla`, and `/admin`.

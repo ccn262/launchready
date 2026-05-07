@@ -53,7 +53,8 @@
 
 - Supabase Auth is the source of truth for session state.
 - The browser never receives a service role key.
-- Middleware protects the authenticated routes and handles redirects for unauthorised access.
+- Edge middleware refreshes the session cookie and performs lightweight login redirect handling only.
+- Server-rendered route helpers enforce inactive-profile blocking and role-aware access for `/`, `/crew`, `/dla`, and `/admin`.
 - Login and logout are server-action driven.
 - Current user/profile loading happens on the server before rendering the shell.
 - `admin` access accepts super admin, admin, and LOM memberships.

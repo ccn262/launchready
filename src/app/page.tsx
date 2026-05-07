@@ -4,6 +4,7 @@ import { OperationalCard } from "@/components/operational-card";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
+import { requireRouteAccess } from "@/lib/auth";
 
 const referenceStations = [
   {
@@ -18,7 +19,9 @@ const referenceStations = [
   },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  await requireRouteAccess("/");
+
   return (
     <AppShell>
       <div className="space-y-6">
