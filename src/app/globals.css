@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --background: #07111f;
+  --foreground: #eaf2ff;
+  --card: rgba(11, 20, 36, 0.92);
+  --card-foreground: #f8fbff;
+  --popover: #0b1628;
+  --popover-foreground: #f8fbff;
+  --primary: #22c55e;
+  --primary-foreground: #04110a;
+  --secondary: #13233d;
+  --secondary-foreground: #d7e6ff;
+  --muted: #14233b;
+  --muted-foreground: #97aac4;
+  --accent: #172841;
+  --accent-foreground: #f8fbff;
+  --destructive: #ef4444;
+  --destructive-foreground: #fff7f7;
+  --border: #22324d;
+  --input: #243654;
+  --ring: #60a5fa;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  background-image:
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 30%),
+    linear-gradient(180deg, rgba(11, 20, 36, 0.3), rgba(7, 17, 31, 0.95));
+  background-attachment: fixed;
+}
+
+* {
+  border-color: var(--border);
+}
+
+::selection {
+  background: rgba(34, 197, 94, 0.25);
+  color: var(--foreground);
+}
