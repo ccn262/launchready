@@ -38,3 +38,16 @@
 - DLA access is station-scoped and limited to incidents, availability visibility, and operational alerting.
 - Audit logs are append-only.
 - No table is publicly readable without an authenticated policy.
+
+## Phase 2 Validation
+
+- Phase 2 was manually validated in Supabase project `yhddbkkjpyeetihrlxrw`.
+- The Southend demo data and RLS baseline are considered ready for integration into `develop`.
+
+## Phase 3 Auth Baseline
+
+- Supabase Auth is the source of truth for session state.
+- The browser never receives a service role key.
+- Middleware protects the authenticated routes and handles redirects for unauthorised access.
+- Login and logout are server-action driven.
+- Current user/profile loading happens on the server before rendering the shell.

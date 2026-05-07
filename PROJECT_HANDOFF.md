@@ -2,7 +2,7 @@
 
 ## Status
 
-Launch Ready now has the initial Next.js App Router foundation, strict TypeScript, Tailwind, a dark operational design system, placeholder dashboards, and Supabase client scaffolding.
+Launch Ready now has the initial Next.js App Router foundation, strict TypeScript, Tailwind, a dark operational design system, placeholder dashboards, Supabase client scaffolding, a manually validated Phase 2 Supabase schema/RLS foundation, and the Phase 3 auth/session foundation in progress.
 
 ## What Exists
 
@@ -21,20 +21,22 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 
 ## Immediate Next Work
 
-1. Add Supabase auth flows and session handling.
-2. Replace placeholders with crew, station, and alert data models.
-3. Add audit logging write paths into the app.
-4. Validate the migration locally once Docker Desktop is available.
+1. Complete manual Supabase Auth setup.
+2. Verify sign-in, sign-out, and redirect handling in the browser.
+3. Continue Phase 3 route and session hardening.
+4. Replace placeholders with crew, station, and alert data models.
+5. Add audit logging write paths into the app.
 
 ## Verification
 
 - `npm install` completed successfully after dependency additions.
 - `npm run lint` passed.
 - `npm run build` passed.
-- `supabase db lint --local --fail-on error` was attempted but could not connect because the local Supabase database is not running.
-- `supabase start` was attempted but Docker Desktop is not installed/running in this environment.
 - The Phase 2 migration file was corrected so table-dependent helpers follow the table definitions.
 - The seed file now contains the missing asset insert block and uses deterministic asset codes for idempotency.
+- Manual Supabase validation completed successfully against project `yhddbkkjpyeetihrlxrw`.
+- The Phase 2 schema/RLS work is safe to merge into `develop`.
+- Phase 3 auth/session work now protects `/`, `/crew`, `/dla`, and `/admin`.
 
 ## Run Notes
 

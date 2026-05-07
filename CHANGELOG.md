@@ -27,3 +27,16 @@
 - Fixed `supabase/seed.sql` so the Southend assets are inserted idempotently.
 - Added deterministic asset codes for inshore and offshore assets to avoid conflicts across locations.
 - Preserved duplicate asset names across different station locations.
+
+## 0.2.3 - 2026-05-07
+
+- Manually validated the Phase 2 Supabase schema, seed, and RLS setup in project `yhddbkkjpyeetihrlxrw`.
+- Confirmed all nine Southend assets are present and the schema is safe to merge into `develop`.
+- Marked the Phase 2 guard-rail documents as complete and ready for the next phase.
+
+## 0.3.0 - 2026-05-07
+
+- Added the Phase 3 auth/session foundation on `feature/auth-session-foundation`.
+- Added Supabase Auth login/logout flows, middleware route protection, and current user/profile loading.
+- Added role-aware navigation labels and unauthorized handling.
+- Added server-side session handling for protected routes.
