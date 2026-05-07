@@ -63,3 +63,9 @@
 - Added asset-specific operational role assignment using `crew_qualifications`.
 - Added qualification management with casualty care expiry handling.
 - Fixed a primary-membership edge case so the new membership flow does not accidentally clear the newly created primary record.
+
+## 2026-05-07 Vercel Middleware Runtime Fix
+
+- Reworked `middleware.ts` to be fully Edge-safe and fail closed when Supabase config or session refresh fails.
+- Added defensive redirects for missing config and session refresh errors instead of letting the Edge runtime throw a 500.
+- Tightened the middleware matcher so static assets and public files are excluded from invocation.

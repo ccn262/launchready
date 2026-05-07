@@ -103,3 +103,13 @@
 - Errors: none.
 - Tests run: none, documentation-only update.
 - Next recommended step: leave these items in backlog until the availability engine and rota foundation are in place.
+
+## 2026-05-07 14:04 BST
+
+- Branch: `feature/crew-management-asset-roles`
+- Files changed: `middleware.ts`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, `PROJECT_HANDOFF.md`, `SECURITY_MODEL.md`, and `SMOKE_TEST.md`.
+- Error: Vercel preview was failing in Edge middleware at runtime with `MIDDLEWARE_INVOCATION_FAILED`.
+- Fixes attempted: made middleware self-contained, added defensive config checks and try/catch around Supabase session refresh, and tightened the matcher to skip static assets and public files.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: let Vercel redeploy the preview, then continue Phase 5 browser smoke testing if the preview is green.

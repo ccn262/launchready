@@ -34,6 +34,8 @@
 - Row-level policies on every table containing user or operational data.
 - Server-side session handling via Supabase Auth.
 - Edge middleware only handles session refresh and lightweight login redirects; detailed authorisation happens on the server.
+- Edge middleware must fail closed on missing Supabase config or refresh errors and must not expose stack traces to the browser.
+- Middleware should skip static asset requests and public files so auth checks do not run where they are not needed.
 - Audit rows for create, update, delete, alert, and role-scope changes.
 - No reliance on WhatsApp as the sole critical alert route.
 - `.env.local` is local-only and must never be committed.

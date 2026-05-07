@@ -21,6 +21,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Admin and DLA permissions are station-scoped.
 - Inactive profiles and inactive memberships are blocked before route access is granted.
 - Edge middleware only refreshes the session and handles login redirects; server-side route helpers enforce detailed access control.
+- Edge middleware now fails closed on missing Supabase config or session refresh errors and skips static/public asset requests via the matcher.
 - Admin CRUD access is station-scoped for admin and LOM memberships, while asset types remain super-admin reference data.
 - Crew management, asset-specific role assignment, and qualification tracking are station-scoped for admins and LOMs, with DLA visibility remaining database-scoped rather than management-scoped.
 - WhatsApp is awareness-only and cannot be the only critical alert path.
@@ -37,7 +38,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 7. Add audit logging write paths into the app.
 8. Keep RNLI public station reference/import in the future backlog until the CRUD and readiness engine are stable.
 9. Keep weekend duty rota, crew capability badges, and cover/swap request work in the backlog until the availability engine and rota foundation are ready.
-10. Merge the published branches in order once review is complete.
+10. Verify the Vercel preview redeploy for the middleware fix, then merge the published branches in order once review is complete.
 
 ## Verification
 
@@ -52,6 +53,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Phase 3 access checks now rely on `profiles.display_name`, `profiles.system_role`, `station_memberships.profile_id`, and `station_memberships.membership_role`.
 - `/unauthorized` is the blocked-access landing page and should not bounce users back into a redirect loop.
 - The Vercel Edge middleware bundle is now self-contained and no longer imports server-only auth helpers.
+- The Vercel Edge middleware now fails closed instead of throwing a 500 if Supabase config or session refresh fails.
 - RNLI public station pages are a future reference source only, with manual admin confirmation required and no operational overwrite.
 - GitHub branches are now published and draft PRs exist for schema/RLS and auth/session work.
 - Phase 4 adds real admin CRUD pages for stations, locations, asset types, and assets.
