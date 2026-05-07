@@ -21,3 +21,9 @@
 - Fixed the Phase 2 migration ordering so tables are created before helper functions that reference them.
 - Reordered `profiles`-dependent and membership-dependent SQL helpers below the table block.
 - Confirmed the corrected file order places `profiles` before `is_super_admin` and the remaining access helpers.
+
+## 0.2.2 - 2026-05-07
+
+- Fixed `supabase/seed.sql` so the Southend assets are inserted idempotently.
+- Added deterministic asset codes for inshore and offshore assets to avoid conflicts across locations.
+- Preserved duplicate asset names across different station locations.

@@ -47,6 +47,75 @@ set name = excluded.name,
     requires_recovery_equipment = excluded.requires_recovery_equipment,
     is_active = excluded.is_active;
 
+with station as (
+  select id
+  from public.stations
+  where slug = 'southend-lifeboat-station'
+),
+locations as (
+  select id, name
+  from public.station_locations
+  where station_id = (select id from station)
+),
+asset_type_lookup as (
+  select id, code
+  from public.asset_types
+  where code in (
+    'tractor',
+    'd-class-lifeboat',
+    'hovercraft',
+    'rnli-buggy',
+    'winch',
+    'b-class-lifeboat',
+    'davit'
+  )
+)
+insert into public.assets (
+  station_id,
+  station_location_id,
+  asset_type_id,
+  name,
+  asset_code,
+  status,
+  requires_recovery_support,
+  metadata,
+  is_active
+)
+select
+  station.id,
+  location.id,
+  asset_type.id,
+  asset_row.name,
+  asset_row.asset_code,
+  'ready',
+  asset_row.requires_recovery_support,
+  '{}'::jsonb,
+  true
+from station
+join (
+  values
+    ('Inshore Station', 'tractor', 'Tractor', 'inshore-tractor', false),
+    ('Inshore Station', 'd-class-lifeboat', 'D Class', 'inshore-d-class', false),
+    ('Inshore Station', 'hovercraft', 'Hovercraft', 'inshore-hovercraft', true),
+    ('Inshore Station', 'rnli-buggy', 'RNLI Buggy 1', 'inshore-rnli-buggy-1', false),
+    ('Inshore Station', 'rnli-buggy', 'RNLI Buggy 2', 'inshore-rnli-buggy-2', false),
+    ('Inshore Station', 'winch', 'Winch', 'inshore-winch', false),
+    ('Offshore / Pier Station', 'd-class-lifeboat', 'D Class', 'offshore-d-class', false),
+    ('Offshore / Pier Station', 'b-class-lifeboat', 'B Class', 'offshore-b-class', false),
+    ('Offshore / Pier Station', 'davit', 'Davit', 'offshore-davit', false)
+) as asset_row(location_name, asset_type_code, name, asset_code, requires_recovery_support)
+  on true
+join locations location on location.name = asset_row.location_name
+join asset_type_lookup asset_type on asset_type.code = asset_row.asset_type_code
+on conflict (station_id, asset_code) do update
+set station_location_id = excluded.station_location_id,
+    asset_type_id = excluded.asset_type_id,
+    name = excluded.name,
+    status = excluded.status,
+    requires_recovery_support = excluded.requires_recovery_support,
+    metadata = excluded.metadata,
+    is_active = excluded.is_active;
+
 insert into public.crew_types (code, name, description, is_active)
 values
   ('boat_crew', 'Boat Crew', 'Crewing for afloat operational assets.', true),

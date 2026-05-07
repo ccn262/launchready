@@ -19,3 +19,9 @@
 - Reordered the Phase 2 migration so table-dependent helper functions are defined only after the referenced tables exist.
 - Moved `is_super_admin`, `is_station_member`, `has_station_role`, `can_manage_station`, `can_manage_organisation`, and `can_dla_station` below the table block.
 - Verified the migration file now defines `profiles` before any function that queries it.
+
+## 2026-05-07 Seed Fix
+
+- Added the missing asset seed block to `supabase/seed.sql`.
+- Switched asset inserts to deterministic `asset_code` values so the seed is idempotent across repeated runs.
+- Kept duplicate asset names valid across different station locations by using `station_id + asset_code` as the conflict target.

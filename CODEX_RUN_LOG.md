@@ -1,10 +1,22 @@
 # Codex Run Log
 
-## 2026-05-07 10:58 BST
+## 2026-05-07 11:11 BST
 
 - Branch: `feature/supabase-schema-rls-foundation`
-- Files changed: Supabase migration ordering fix, phase logs, and no product feature changes.
-- Errors: the Supabase migration previously referenced `public.profiles` before table creation; `supabase db lint --local --fail-on error` still cannot run here because Docker Desktop is unavailable.
-- Fixes attempted: moved table-dependent helper functions below the table definitions in `supabase/migrations/20260507000000_phase2_schema_rls.sql` and rechecked the line order.
-- Tests run: `npm run lint`, `npm run build`, `supabase db lint --local --fail-on error`, `supabase start`.
-- Next recommended step: rerun local Supabase validation in an environment with Docker Desktop, then apply the same migration to the SQL Editor or linked project.
+- Files changed: `supabase/seed.sql` plus supporting run/fix logs.
+- Errors: the seed had no asset insert block, so `assets` remained empty after manual execution in Supabase SQL Editor.
+- Fixes attempted: added deterministic asset upserts keyed by `station_id + asset_code` and ordered inserts after station/location/type seed rows.
+- Tests run: `npm run lint`, `npm run build`.
+- Verification SQL to rerun in Supabase SQL Editor:
+  ```sql
+  select name from organisations;
+  select name from stations;
+  select name from station_locations order by name;
+  select name from asset_types order by name;
+  select a.name, sl.name as location_name, at.name as asset_type_name
+  from assets a
+  join station_locations sl on sl.id = a.station_location_id
+  join asset_types at on at.id = a.asset_type_id
+  order by sl.name, a.name;
+  ```
+- Next recommended step: rerun `supabase/seed.sql` in Supabase SQL Editor and confirm the nine expected assets are present.
