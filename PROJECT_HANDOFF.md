@@ -69,6 +69,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - The Phase 6 foundation uses the existing `availability_slots` and `duty_periods` tables with `starts_at`, `ends_at`, and `created_by_profile_id` support to keep the rota work lightweight and reviewable.
 - Cover and swap requests must remain like-for-like only and audit logged when they are introduced.
 - The future readiness engine must support effective-dated safe-crewing rules, required-role complements, launch method checks, and non-authorising risk assessment states.
+- Phase 7 now adds a dedicated readiness console plus dashboard and DLA readiness views on `feature/readiness-engine`; it still needs browser smoke testing before merge.
 
 ## Run Notes
 

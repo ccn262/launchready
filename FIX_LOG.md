@@ -78,3 +78,10 @@
 - Fixed loader tuple typing in the Phase 6 helper so array-returning helpers are destructured correctly.
 - Fixed build-time nullability issues in the Phase 6 actions by narrowing profile and datetime values before payload assembly.
 - Confirmed `npm run lint` and `npm run build` pass after the Phase 6 fixes.
+
+## 2026-05-07 Phase 7 Readiness Engine
+
+- Fixed `src/lib/readiness.ts` to import shared asset and asset type records from the modules that actually export them.
+- Added the missing `rule` field to every readiness asset summary branch so the summary type stays stable.
+- Changed safe-crewing rule selection so `boat_movement` and `assurance_activity` can fall back to service baselines when no exact row exists.
+- Corrected the safe-crewing seed join order for launch/recovery requirements so the SQL remains valid and idempotent.

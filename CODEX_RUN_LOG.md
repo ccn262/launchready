@@ -133,3 +133,13 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: run the browser smoke test for `/crew/availability`, `/crew/rota`, `/admin/availability`, and `/admin/duty-rota`, then merge Phase 6 if the review pass is clean.
+
+## 2026-05-07 15:08 BST
+
+- Branch: `feature/readiness-engine`
+- Files changed: readiness engine helper, readiness board component, dashboard and DLA readiness views, admin readiness page, admin availability and duty rota handoff links, safe-crewing seed data, build plan, project handoff, database schema, security model, smoke test, changelog, fix log, decisions log, and this run log.
+- Errors: initial TypeScript validation failed because `AssetRecord` and `AssetTypeRecord` were imported from the wrong helper module, and the asset summary type was missing its `rule` field in early-return branches.
+- Fixes attempted: moved shared record types to `src/lib/admin-crud.ts`, added `rule` to every readiness asset return path, broadened the safe-crewing rule picker to fall back to service baselines, and corrected the safe-crewing seed join order for launch/recovery inserts.
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: run the browser smoke test for `/`, `/dla`, and `/admin/readiness`, then decide whether to merge the readiness branch into `develop`.

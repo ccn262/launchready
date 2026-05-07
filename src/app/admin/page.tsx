@@ -32,6 +32,12 @@ const adminSections = [
     icon: BadgeCheck,
   },
   {
+    href: "/admin/readiness",
+    title: "Readiness",
+    description: "Operational visibility, gaps, and safe-crewing outputs.",
+    icon: ClipboardList,
+  },
+  {
     href: "/admin/crew",
     title: "Crew",
     description: "Profiles, memberships, and visibility boundaries.",

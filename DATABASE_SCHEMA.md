@@ -37,6 +37,13 @@
 - Future launch/recovery rules should be modelled separately from boat-crew capability so launch methods can be evaluated without conflating the two.
 - Future exception handling should record reason, approving authority or role, notes, and service-return status.
 
+## Phase 7 Readiness Tables
+
+- `safe_crewing_rules` stores effective-dated minimum and maximum crew baselines by asset type and operation type.
+- `safe_crewing_role_requirements` stores effective-dated required-role complements by asset type, operation type, and requirement level.
+- `asset_launch_recovery_requirements` stores launch/recovery role requirements per asset.
+- The readiness engine combines these tables with availability slots, duty periods, crew qualifications, station memberships, assets, and locations.
+
 ## Initial Relationships
 
 - One organisation has many stations.

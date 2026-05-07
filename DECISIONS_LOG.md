@@ -30,3 +30,9 @@
 - Chosen rota model: keep manual weekend and duty rota foundation on the existing `duty_periods` table, with `weekend_cover`, `dla_day`, and `dla_night` as additive kinds.
 - Chosen badge model: centralise asset/role badge formatting in shared helper and component files so the same labels appear consistently across availability and rota views.
 - Chosen crew-write rule: crew availability writes remain crew-scoped, while station-wide availability and rota writes stay admin/LOM-scoped.
+
+## 2026-05-07 Phase 7 Decisions
+
+- Chosen readiness surface: expose the first readiness engine through a reusable server-rendered readiness board rather than a client-side calculator.
+- Chosen rule fallback: allow `boat_movement` and `assurance_activity` to fall back to service rules until dedicated rows are introduced.
+- Chosen visibility model: reuse the same readiness snapshot in `/`, `/dla`, and `/admin/readiness` so the calculated state stays consistent.

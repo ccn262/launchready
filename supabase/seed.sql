@@ -387,6 +387,144 @@ join public.asset_types atype on atype.code in ('tractor', 'winch', 'davit')
 where s.slug = 'southend-lifeboat-station'
 on conflict do nothing;
 
+insert into public.safe_crewing_rules (
+  asset_type_id,
+  operation_type,
+  minimum_crew,
+  maximum_crew,
+  darkness_minimum_crew,
+  effective_from,
+  effective_to,
+  source_reference,
+  notes
+)
+select
+  atype.id,
+  rule.operation_type,
+  rule.minimum_crew,
+  rule.maximum_crew,
+  rule.darkness_minimum_crew,
+  rule.effective_from,
+  rule.effective_to,
+  rule.source_reference,
+  rule.notes
+from public.stations s
+cross join (
+  values
+    ('b-class-lifeboat'::text, 'service'::public.safe_crewing_operation_type, 3, 4, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'B Class baseline for service operations.'),
+    ('b-class-lifeboat'::text, 'exercise'::public.safe_crewing_operation_type, 3, 4, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'B Class baseline for exercise operations.'),
+    ('b-class-lifeboat'::text, 'passage'::public.safe_crewing_operation_type, 2, 4, 3, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'B Class baseline for passage operations.'),
+    ('d-class-lifeboat'::text, 'service'::public.safe_crewing_operation_type, 3, 4, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'D Class baseline for service operations.'),
+    ('d-class-lifeboat'::text, 'exercise'::public.safe_crewing_operation_type, 3, 4, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'D Class baseline for exercise operations.'),
+    ('d-class-lifeboat'::text, 'passage'::public.safe_crewing_operation_type, 3, 4, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'D Class baseline for passage operations.'),
+    ('hovercraft'::text, 'service'::public.safe_crewing_operation_type, 3, 4, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Hovercraft baseline for service operations.'),
+    ('hovercraft'::text, 'exercise'::public.safe_crewing_operation_type, 3, 4, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Hovercraft baseline for exercise operations.'),
+    ('hovercraft'::text, 'passage'::public.safe_crewing_operation_type, 3, 4, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Hovercraft baseline for passage operations.'),
+    ('tractor'::text, 'service'::public.safe_crewing_operation_type, 1, 1, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Tractor baseline for launch support.'),
+    ('tractor'::text, 'exercise'::public.safe_crewing_operation_type, 1, 1, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Tractor baseline for exercise support.'),
+    ('tractor'::text, 'passage'::public.safe_crewing_operation_type, 1, 1, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Tractor baseline for passage support.'),
+    ('winch'::text, 'service'::public.safe_crewing_operation_type, 1, 1, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Winch baseline for recovery support.'),
+    ('winch'::text, 'exercise'::public.safe_crewing_operation_type, 1, 1, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Winch baseline for exercise support.'),
+    ('winch'::text, 'passage'::public.safe_crewing_operation_type, 1, 1, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Winch baseline for passage support.'),
+    ('davit'::text, 'service'::public.safe_crewing_operation_type, 1, 1, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Davit baseline for recovery support.'),
+    ('davit'::text, 'exercise'::public.safe_crewing_operation_type, 1, 1, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Davit baseline for exercise support.'),
+    ('davit'::text, 'passage'::public.safe_crewing_operation_type, 1, 1, null::integer, '2026-03-20'::date, null::date, 'GU1007 internal reference', 'Davit baseline for passage support.')
+) as rule(asset_code, operation_type, minimum_crew, maximum_crew, darkness_minimum_crew, effective_from, effective_to, source_reference, notes)
+join public.asset_types atype on atype.code = rule.asset_code
+where s.slug = 'southend-lifeboat-station'
+on conflict (asset_type_id, operation_type, effective_from) do update
+set
+  minimum_crew = excluded.minimum_crew,
+  maximum_crew = excluded.maximum_crew,
+  darkness_minimum_crew = excluded.darkness_minimum_crew,
+  effective_to = excluded.effective_to,
+  source_reference = excluded.source_reference,
+  notes = excluded.notes,
+  updated_at = now();
+
+insert into public.safe_crewing_role_requirements (
+  asset_type_id,
+  operation_type,
+  operational_role_id,
+  required_count,
+  requirement_level,
+  effective_from,
+  effective_to,
+  notes
+)
+select
+  atype.id,
+  role_rule.operation_type,
+  role.id,
+  role_rule.required_count,
+  role_rule.requirement_level,
+  role_rule.effective_from,
+  role_rule.effective_to,
+  role_rule.notes
+from public.stations s
+cross join (
+  values
+    ('b-class-lifeboat'::text, 'service'::public.safe_crewing_operation_type, 'helm'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'B Class helm requirement.'),
+    ('b-class-lifeboat'::text, 'service'::public.safe_crewing_operation_type, 'tier_2'::text, 1, 'required'::public.safe_crewing_requirement_level, '2026-03-20'::date, '2026-12-31'::date, 'B Class Tier 2 requirement until Navigator requirement takes effect.'),
+    ('b-class-lifeboat'::text, 'service'::public.safe_crewing_operation_type, 'navigator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, '2027-01-01'::date, null::date, 'B Class Navigator requirement from 1 January 2027.'),
+    ('b-class-lifeboat'::text, 'service'::public.safe_crewing_operation_type, 'boat_crew'::text, 1, 'required'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'B Class boat crew support requirement.'),
+    ('d-class-lifeboat'::text, 'service'::public.safe_crewing_operation_type, 'helm'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'D Class helm requirement.'),
+    ('d-class-lifeboat'::text, 'service'::public.safe_crewing_operation_type, 'tier_2'::text, 1, 'required'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'D Class Tier 2 requirement.'),
+    ('d-class-lifeboat'::text, 'service'::public.safe_crewing_operation_type, 'boat_crew'::text, 1, 'required'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'D Class boat crew requirement.'),
+    ('hovercraft'::text, 'service'::public.safe_crewing_operation_type, 'commander'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'Hovercraft commander requirement.'),
+    ('hovercraft'::text, 'service'::public.safe_crewing_operation_type, 'pilot'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'Hovercraft pilot requirement.'),
+    ('hovercraft'::text, 'service'::public.safe_crewing_operation_type, 'boat_crew'::text, 1, 'required'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'Hovercraft crew requirement.'),
+    ('tractor'::text, 'service'::public.safe_crewing_operation_type, 'tractor_driver'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'Tractor driver requirement.'),
+    ('winch'::text, 'service'::public.safe_crewing_operation_type, 'winch_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'Winch operator requirement.'),
+    ('davit'::text, 'service'::public.safe_crewing_operation_type, 'davit_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, '2026-03-20'::date, null::date, 'Davit operator requirement.')
+) as role_rule(asset_code, operation_type, role_code, required_count, requirement_level, effective_from, effective_to, notes)
+join public.asset_types atype on atype.code = role_rule.asset_code
+join public.operational_roles role on role.code = role_rule.role_code
+where s.slug = 'southend-lifeboat-station'
+on conflict (asset_type_id, operation_type, operational_role_id, effective_from) do update
+set
+  required_count = excluded.required_count,
+  requirement_level = excluded.requirement_level,
+  effective_to = excluded.effective_to,
+  notes = excluded.notes,
+  updated_at = now();
+
+insert into public.asset_launch_recovery_requirements (
+  asset_id,
+  operational_role_id,
+  required_count,
+  requirement_level,
+  notes
+)
+select
+  asset_record.id,
+  role.id,
+  asset_rule.required_count,
+  asset_rule.requirement_level,
+  asset_rule.notes
+from public.stations s
+join public.station_locations sl on sl.station_id = s.id
+join public.assets asset_record on asset_record.station_location_id = sl.id
+join (
+  values
+    ('Inshore Station'::text, 'D Class'::text, 'tractor_driver'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'D Class inshore launch support requirement.'),
+    ('Offshore / Pier Station'::text, 'D Class'::text, 'davit_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'D Class pier launch support requirement.'),
+    ('Offshore / Pier Station'::text, 'B Class'::text, 'davit_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'B Class pier launch support requirement.'),
+    ('Inshore Station'::text, 'Hovercraft'::text, 'winch_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'Hovercraft recovery support requirement.'),
+    ('Inshore Station'::text, 'Tractor'::text, 'tractor_driver'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'Tractor support requirement.'),
+    ('Inshore Station'::text, 'Winch'::text, 'winch_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'Winch support requirement.'),
+    ('Offshore / Pier Station'::text, 'Davit'::text, 'davit_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'Davit support requirement.')
+) as asset_rule(location_name, asset_name, role_code, required_count, requirement_level, notes)
+join public.operational_roles role on role.code = asset_rule.role_code
+where s.slug = 'southend-lifeboat-station'
+  and sl.name = asset_rule.location_name
+  and asset_record.name = asset_rule.asset_name
+on conflict (asset_id, operational_role_id, requirement_level) do update
+set
+  required_count = excluded.required_count,
+  notes = excluded.notes,
+  updated_at = now();
+
 insert into public.system_settings (
   organisation_id,
   station_id,

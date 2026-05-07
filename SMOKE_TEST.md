@@ -55,3 +55,15 @@
 - The browser smoke test also covers `/admin/crew`, `/admin/roles`, and `/admin/qualifications`.
 - The browser smoke test also covers `/crew/availability`, `/crew/rota`, `/admin/availability`, and `/admin/duty-rota`.
 - Server-side route helpers block inactive profiles and insufficient role memberships even if middleware only refreshes the session.
+
+## Phase 7 Smoke Test
+
+- Dashboard loads readiness cards at `/`.
+- Southend Inshore and Southend Offshore / Pier assets display readiness and missing roles.
+- Crew with green asset roles count toward readiness.
+- Crew with amber or red asset roles do not count as launch-ready.
+- Unavailable crew do not count.
+- Expired qualifications do not count where required.
+- Launch/recovery gaps display separately from boat crew gaps.
+- DLA and admin users can open `/dla` and `/admin/readiness`.
+- Non-members cannot access station readiness.

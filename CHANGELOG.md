@@ -99,3 +99,10 @@
 - Added reusable crew capability badge rendering for asset-specific roles and currency states.
 - Added weekend-unavailable availability support and weekend duty rota foundation fields.
 - Kept auto-rota generation, cover/swap requests, and the full readiness engine in backlog.
+
+## 0.7.0 - 2026-05-07
+
+- Added the first readiness engine foundation with effective-dated safe-crewing rules.
+- Added a reusable readiness board for the dashboard, DLA, and admin readiness console.
+- Added readiness calculations for station, location, and asset status using crew availability, duty periods, qualifications, and asset-specific roles.
+- Seeded conservative safe-crewing baseline rules and launch/recovery requirements for the Southend reference station.

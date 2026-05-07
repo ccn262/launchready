@@ -54,6 +54,12 @@
 - Audit logs are append-only.
 - No table is publicly readable without an authenticated policy.
 
+## Phase 7 Access Boundaries
+
+- `safe_crewing_rules` and `safe_crewing_role_requirements` are readable by authenticated users and writable by super admins only.
+- `asset_launch_recovery_requirements` remain station-scoped through RLS and writable only within permitted station scope.
+- The readiness console is advisory only and continues to rely on RLS plus server-side route checks.
+
 ## Phase 2 Validation
 
 - Phase 2 was manually validated in Supabase project `yhddbkkjpyeetihrlxrw`.
