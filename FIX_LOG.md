@@ -105,3 +105,25 @@
 
 - Fixed duplicate React keys in the readiness board by using a stable composite key for requirement rows.
 - Added defensive deduplication for readiness gap arrays in the loader so repeated rows do not render twice.
+
+## 2026-05-07 Middleware Runtime Failure Fix
+
+- Branch: `fix/vercel-middleware-runtime-failure`
+- Root cause: Edge middleware was still attempting Supabase session handling on Vercel, which could fail before the app-level route helpers had a chance to recover.
+- Fix: removed Supabase client creation from middleware, wrapped the entire middleware body in a single try/catch, and switched to a lightweight cookie-presence gate for protected routes.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed.
+- Next recommended step: verify the Vercel `develop` deployment no longer shows `MIDDLEWARE_INVOCATION_FAILED`.
+
+## 2026-05-07 Middleware Runtime Failure Validation
+
+- Confirmed the Edge middleware now fails closed via a top-level try/catch and no longer creates a Supabase client in middleware.
+- Protected routes redirect to `/login?error=middleware_fallback` on unexpected middleware failure, while public routes remain accessible.
+
+## 2026-05-07 Middleware Redirect-Loop Fix
+
+- Branch: `fix/vercel-middleware-runtime-failure`
+- Root cause: middleware was still redirecting `/login` to `/` based on cookie presence alone, which could loop when stale cookies were present.
+- Fix: let `/login` remain public in middleware and keep authenticated-user redirect logic in `src/app/login/page.tsx`, where real server-side session validation already exists.
+- Tests run: not yet run in this patch set.
+- Next recommended step: run `npm run lint` and `npm run build`, then update the PR.

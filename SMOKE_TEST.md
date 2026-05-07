@@ -69,5 +69,6 @@
 - Non-members cannot access station readiness.
 - The readiness board shows advisory-only likely boat crew, likely launch/recovery crew, role conflicts, crew who could restore readiness, and Head Launcher status.
 - Head Launcher renders as missing until the role exists in data, then it should show available or conflict states as appropriate.
-
 - Readiness UI now shows qualified crew, available crew, and suggested allocation as separate operational indicators for each asset card.
+- Browser smoke testing should confirm that protected routes redirect cleanly to `/login` when no likely Supabase auth cookie is present and that `/login` remains public.
+- Browser smoke testing should confirm `/login` stays public, authenticated users are redirected by the login page itself, and stale cookies no longer create a `/login` ↔ `/` loop.

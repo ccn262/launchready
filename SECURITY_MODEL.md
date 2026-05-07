@@ -85,3 +85,5 @@
 - Future readiness-engine views should distinguish service-ready, exercise-only, delayed-launch, and off-service states without claiming launch authorisation.
 
 - Restricted PDF notes under `docs/reference/` are internal-only project artefacts; they must not be exposed in public routes, assets, or marketing copy, and they must not be presented as official RNLI approval.
+- Middleware is deliberately lightweight on Vercel Edge and now uses cookie presence only as a temporary fail-closed gate for protected routes; detailed session and role checks remain server-side.
+- Middleware no longer redirects `/login` based on cookie presence; the login page handles authenticated-user redirects with real server-side session validation.
