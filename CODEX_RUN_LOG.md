@@ -143,3 +143,17 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Test result: both passed.
 - Next recommended step: run the browser smoke test for `/`, `/dla`, and `/admin/readiness`, then decide whether to merge the readiness branch into `develop`.
+
+## 2026-05-07 15:20 BST
+
+- Branch: `feature/readiness-engine`
+- Files changed: `supabase/seed.sql`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, `CHANGELOG.md`, and `PROJECT_HANDOFF.md`.
+- Error: Phase 7 seed SQL failed in Supabase SQL Editor because the launch/recovery seed block used `JOIN (...)` without a valid join condition before the `WHERE` clause.
+- Fixes attempted: converted the inline `VALUES` table to a `CROSS JOIN`, kept the `WHERE` filters before `ON CONFLICT`, and preserved idempotent upserts.
+- Verification SQL to run in Supabase:
+  select asset_type_id, operation_type, minimum_crew, maximum_crew, darkness_minimum_crew, effective_from from safe_crewing_rules order by asset_type_id, operation_type, effective_from;
+  select asset_type_id, operation_type, operational_role_id, required_count, requirement_level, effective_from from safe_crewing_role_requirements order by asset_type_id, operation_type, effective_from;
+  select asset_id, operational_role_id, required_count, requirement_level from asset_launch_recovery_requirements order by asset_id, operational_role_id;
+- Tests run: `npm run lint`, `npm run build`.
+- Test result: both passed.
+- Next recommended step: rerun `supabase/seed.sql` in Supabase SQL Editor, then continue Phase 7 browser smoke testing.

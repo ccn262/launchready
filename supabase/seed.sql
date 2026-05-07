@@ -505,7 +505,7 @@ select
 from public.stations s
 join public.station_locations sl on sl.station_id = s.id
 join public.assets asset_record on asset_record.station_location_id = sl.id
-join (
+cross join (
   values
     ('Inshore Station'::text, 'D Class'::text, 'tractor_driver'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'D Class inshore launch support requirement.'),
     ('Offshore / Pier Station'::text, 'D Class'::text, 'davit_operator'::text, 1, 'hard_stop'::public.safe_crewing_requirement_level, 'D Class pier launch support requirement.'),

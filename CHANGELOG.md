@@ -106,3 +106,8 @@
 - Added a reusable readiness board for the dashboard, DLA, and admin readiness console.
 - Added readiness calculations for station, location, and asset status using crew availability, duty periods, qualifications, and asset-specific roles.
 - Seeded conservative safe-crewing baseline rules and launch/recovery requirements for the Southend reference station.
+
+## 0.7.1 - 2026-05-07
+
+- Fixed the Phase 7 seed SQL syntax error in the launch/recovery requirements block.
+- Kept the Phase 7 seed idempotent while preserving duplicate asset names across locations.

@@ -70,6 +70,7 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Cover and swap requests must remain like-for-like only and audit logged when they are introduced.
 - The future readiness engine must support effective-dated safe-crewing rules, required-role complements, launch method checks, and non-authorising risk assessment states.
 - Phase 7 now adds a dedicated readiness console plus dashboard and DLA readiness views on `feature/readiness-engine`; it still needs browser smoke testing before merge.
+- The Phase 7 seed file now runs cleanly in Supabase SQL Editor after fixing the launch/recovery join ordering issue.
 
 ## Run Notes
 
