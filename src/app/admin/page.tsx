@@ -79,6 +79,12 @@ const adminSections = [
     description: "Station cover requests, eligibility, and acceptance confirmation.",
     icon: MessageSquareReply,
   },
+  {
+    href: "/dla/incidents",
+    title: "Incidents",
+    description: "Launch initiation, response tracking, and incident state control.",
+    icon: Radio,
+  },
 ];
 
 export default async function AdminPage() {

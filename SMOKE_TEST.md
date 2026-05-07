@@ -106,3 +106,21 @@
 - `/admin/cover` shows current and future open requests, plus accepted, cancelled, and historical rows.
 - `/`, `/dla`, `/crew/cover`, and `/admin/cover` render fresh cover-request counts rather than a stale empty snapshot.
 - Development-only debug output shows selected station, current profile, loaded request count, and visible open request count.
+
+## Phase 9 Smoke Test
+
+- `/dla/launch` loads a launch draft form and readiness preview for the selected station, location, and assets.
+- DLA/admin can create a launch draft and see the current readiness snapshot before initiation.
+- Missing hard-stop roles, launch/recovery gaps, and Head Launcher status are visible before initiation.
+- DLA/admin can initiate a launch placeholder and create incident, incident-asset, readiness-snapshot, notification, and audit-log records.
+- `/dla/incidents` shows active incidents, crew response counts, and stand down / close controls for the station.
+- `/crew/incidents` shows active station incidents and allows the logged-in crew member to submit attending, not attending, delayed, or fallback responses.
+- `/` shows active incident awareness without implying launch authorisation.
+- Cross-station incident access remains blocked by RLS and route helpers.
+
+## Phase 9 Pass Criteria
+
+- Launch initiation remains advisory only and never authorises a launch.
+- Readiness snapshots are stored at initiation time and can be reviewed later.
+- Crew responses are station-scoped and only apply to the logged-in profile.
+- Notification rows are placeholders only and no external messages are sent yet.

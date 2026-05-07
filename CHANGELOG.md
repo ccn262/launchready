@@ -163,3 +163,8 @@
 
 - Forced cover-request and readiness summary pages to render dynamically so current and future open cover requests are read fresh from Supabase.
 - Added development-only debug visibility for selected station, current profile, and loaded/open cover-request counts.
+
+## 0.8.0 - 2026-05-07
+
+- Added the Phase 9 DLA launch initiation foundation with launch drafts, readiness previews, readiness snapshots, crew response tracking, and placeholder incident notifications.
+- Kept launch initiation advisory only and preserved incident audit logging for operational visibility rather than authorisation.

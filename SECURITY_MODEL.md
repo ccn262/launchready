@@ -52,6 +52,15 @@
 - Notification rows created for cover-request placeholders remain internal operational records and do not send email, SMS, or WhatsApp messages.
 - Cover eligibility stays advisory only; middleware and route access must never treat cover acceptance as launch authorisation.
 
+## Phase 9 Access Boundaries
+
+- `incidents`, `incident_assets`, and `incident_responses` remain station-scoped and protected by RLS.
+- DLA, station admins, and LOMs can create incident drafts and initiate launches only within their own station scope.
+- Crew users can view only active incidents for their station and can create or update only their own incident responses.
+- Draft incidents are intentionally hidden from crew views so only DLA/admin/LOM users can manage draft-to-initiation workflows.
+- Launch readiness snapshots, selected asset IDs, and incident response records remain advisory operational data only and must never imply that the system authorises a launch.
+- Notification rows for incident placeholders remain internal operational records and do not send external messages.
+
 ## Phase 2 RLS Baseline
 
 - `profiles` is auto-created from an auth.users trigger and remains private by default.

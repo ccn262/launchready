@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { OperationalCard } from "@/components/operational-card";
 import { PageHero } from "@/components/page-hero";
@@ -5,6 +6,7 @@ import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
 import { ReadinessBoard } from "@/components/readiness-board";
 import { loadCoverRequestOverview } from "@/lib/cover-requests";
+import { loadIncidentBoardData } from "@/lib/incidents";
 import { loadReadinessSnapshot } from "@/lib/readiness";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +19,7 @@ export default async function DlaPage() {
     windowPreset: "current",
   });
   const coverOverview = await loadCoverRequestOverview("/dla", snapshot.selectedStationId);
+  const incidentBoard = await loadIncidentBoardData("/dla", snapshot.selectedStationId);
 
   return (
     <AppShell>
@@ -111,6 +114,61 @@ export default async function DlaPage() {
                 No open cover requests are active for the selected station.
               </div>
             ) : null}
+          </div>
+        </SectionShell>
+
+        <SectionShell
+          title="Incident awareness"
+          description="Launch drafts and active incidents stay visible to DLA and admin users for operational control."
+        >
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              ["Drafts", incidentBoard.draftCount],
+              ["Active", incidentBoard.activeCount],
+              ["Responses", incidentBoard.responseCount],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">{label}</p>
+                <p className="mt-2 text-3xl font-semibold text-card-foreground">{value as number}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 space-y-4">
+            {incidentBoard.activeIncidents.slice(0, 3).map((incident) => (
+              <div key={incident.incident.id} className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-card-foreground">{incident.incident.title}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {incident.incident.operation_type.replace(/_/g, " ")} · {incident.selectedAssetNames.join(", ") || "No assets selected"}
+                    </p>
+                  </div>
+                  <StatusPill tone={incident.statusTone}>{incident.statusLabel}</StatusPill>
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Responses attending {incident.attendingCount} · delayed {incident.delayedCount} · fallback {incident.fallbackAvailableCount}
+                </p>
+              </div>
+            ))}
+            {!incidentBoard.activeIncidents.length ? (
+              <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
+                No active incidents are open for the selected station.
+              </div>
+            ) : null}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/dla/launch"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              Open launch draft screen
+            </Link>
+            <Link
+              href="/dla/incidents"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              Open incident board
+            </Link>
           </div>
         </SectionShell>
       </div>

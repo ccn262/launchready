@@ -92,6 +92,13 @@
 - Show service-ready, exercise-only, delayed-launch, and off-service states without authorising launches.
 - Require dynamic risk assessment, approving authority, reason, notes, and service-return logging for exceptions, while never overriding hard-stop role requirements.
 
+## Phase 9: DLA Launch Initiation Foundation
+
+- Add a DLA launch initiation workflow after readiness and cover visibility are stable.
+- Support launch drafts, selected station/location/assets, operation type selection, and readiness previews before initiation.
+- Capture readiness snapshots, crew response tracking, notification placeholders, and audit events at initiation time.
+- Keep launch initiation advisory only and never treat the workflow as launch authorisation.
+
 ## Phase 7
 
 - Status: readiness engine foundation is now built on `feature/readiness-engine`.
@@ -112,3 +119,11 @@
 - Surface open and urgent cover requests on dashboard, crew, admin, and DLA awareness views.
 - Audit-log cover request, response, acceptance, and cancellation actions.
 - Keep cover acceptance advisory only and never treat it as launch authorisation.
+
+## Phase 9
+
+- Build the DLA launch initiation foundation after readiness and cover visibility are stable.
+- Support launch drafts, incident initiation, selected assets, readiness snapshots, and crew response tracking.
+- Treat readiness as advisory only and keep launch initiation as a decision-support workflow rather than an authorisation mechanism.
+- Preserve incident state, audit logging, and notification placeholders for operational visibility only.
+- Keep real external messaging out of scope until the notification pipelines are intentionally enabled.

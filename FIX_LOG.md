@@ -149,3 +149,12 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed after the cache-bypass change.
 - Next recommended step: browser retest `/crew/cover`, `/admin/cover`, `/`, and `/dla`.
+
+## 2026-05-07 Phase 9 Launch Initiation Foundation
+
+- Branch: `feature/dla-launch-initiation`
+- Scope: added DLA launch initiation drafts, readiness previews, launch snapshots, incident response tracking, and placeholder notifications.
+- Fixes: narrowed incident action payload types, aligned draft/initiation status handling, and kept launch initiation advisory only.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the Phase 9 implementation.
+- Next recommended step: browser smoke-test `/dla/launch`, `/dla/incidents`, `/crew/incidents`, and the incident summary on `/`.

@@ -75,6 +75,7 @@ export default async function CrewPage() {
               { href: "/crew/availability", title: "Availability", text: "Record full-day, partial-day, night cover, and weekend unavailability." },
               { href: "/crew/rota", title: "Rota", text: "Review assigned duty periods and capability badges for the selected station." },
               { href: "/crew/cover", title: "Cover", text: "Create cover requests and respond to station open cover requests." },
+              { href: "/crew/incidents", title: "Incidents", text: "View active incidents and update your crew response while the incident is active." },
             ].map((item) => (
               <Link
                 key={item.href}

@@ -49,3 +49,9 @@
 - Chosen cover-request model: keep cover / swap requests station-scoped, like-for-like, and advisory only, with acceptance validated against active membership, availability, currency, and qualification state.
 - Chosen notification model: write placeholder notification records only for cover request lifecycle events; do not send real WhatsApp, SMS, or email messages in Phase 8.
 - Chosen audit model: log create, response, accept, confirm, and cancel actions for cover requests and responses so operational changes remain traceable.
+
+## 2026-05-07 Phase 9 Decisions
+
+- Chosen launch-initiation model: keep DLA launch initiation advisory only, with incidents used as decision-support records rather than authorising launches.
+- Chosen incident snapshot model: capture readiness, cover-request, and crew-response context at initiation time so later reporting can show what the DLA saw.
+- Chosen notification model: placeholder incident notifications are recorded for visibility and audit, but no real WhatsApp, SMS, or email sending is enabled in Phase 9.

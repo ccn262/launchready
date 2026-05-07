@@ -55,6 +55,17 @@
 - `cover_request_eligibility_status` captures `eligible`, `ineligible`, and `needs_admin_review`.
 - Notification rows for cover-request placeholders are written without sending real messages.
 
+## Phase 9 Incident and Launch Tables
+
+- `incidents` now stores launch drafts, initiated incidents, standing-down states, closed states, and cancelled states using the existing incident table plus additional launch metadata columns.
+- `incidents.operation_type` records `service`, `exercise`, `passage`, `boat_movement`, or `assurance_activity` for launch-draft and incident tracking.
+- `incidents.station_location_id` records the selected station location for the launch draft or incident.
+- `incidents.launch_authority_profile_id` records the initiating DLA/admin/LOM user for audit and response context.
+- `incidents.incident_type`, `dynamic_risk_assessment_notes`, `readiness_snapshot`, `selected_asset_ids`, `drafted_at`, `initiated_at`, and `cancelled_at` support the launch workflow without turning the model into an authorising system.
+- `incident_assets.readiness_status_at_initiation` and `incident_assets.readiness_snapshot` store the readiness state captured when the incident is initiated.
+- `incident_responses` remains crew-facing and is constrained by a unique `(incident_id, profile_id)` response boundary so one crew member can update their own response for an active incident.
+- The application maps `incidents.status = open` to draft and `incidents.status = active` to initiated for UI purposes, while `stood_down`, `closed`, and `cancelled` remain explicit operational states.
+
 ## Initial Relationships
 
 - One organisation has many stations.

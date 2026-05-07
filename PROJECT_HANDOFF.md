@@ -89,3 +89,10 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - `cover_requests` and `cover_request_responses` are station-scoped, RLS-protected, and audit logged.
 - Notifications are placeholders only; no real WhatsApp, SMS, or email sending is enabled.
 - Cover eligibility is advisory only and must not be treated as launch authorisation.
+
+## Phase 9
+
+- DLA launch initiation foundation now exists on `feature/dla-launch-initiation`.
+- Incidents now support launch drafts, selected station locations and assets, readiness previews, readiness snapshots, and crew response tracking.
+- Launch initiation remains advisory only and does not authorise a launch.
+- Notification rows and audit events are used as placeholders for operational visibility only until real messaging is intentionally enabled.

@@ -254,3 +254,13 @@
 - Fixes attempted: added development-only debug output, switched the cover loader to `unstable_noStore()`, and forced the cover/dashboard pages dynamic to avoid stale snapshots.
 - Tests run: `npm run lint`, `npm run build`.
 - Next recommended step: browser retest cover visibility on `/crew/cover`, `/admin/cover`, `/`, and `/dla`.
+
+## 2026-05-07 18:18 BST Phase 9 Launch Initiation Foundation
+
+- Branch: `feature/dla-launch-initiation`
+- Date/time: `2026-05-07 18:18 BST`
+- Files changed: `supabase/migrations/20260513000000_phase9_dla_launch_initiation.sql`, `src/lib/incidents.ts`, `src/app/incident-actions.ts`, `src/app/dla/launch/page.tsx`, `src/app/dla/incidents/page.tsx`, `src/app/crew/incidents/page.tsx`, `src/app/page.tsx`, `src/app/dla/page.tsx`, `src/app/crew/page.tsx`, `src/app/admin/page.tsx`, `BUILD_PLAN.md`, `DATABASE_SCHEMA.md`, `SECURITY_MODEL.md`, `PROJECT_HANDOFF.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `DECISIONS_LOG.md`, `FIX_LOG.md`.
+- Errors: initial TypeScript validation surfaced nullable incident and status typing issues in the launch initiation actions and loader.
+- Fixes attempted: narrowed incident records before mutation, aligned incident status handling to the current enum, and removed stale helper imports and variables.
+- Tests run: `npm run lint`, `npm run build`.
+- Next recommended step: browser smoke-test `/dla/launch`, `/dla/incidents`, `/crew/incidents`, and the incident summary sections before merge.
