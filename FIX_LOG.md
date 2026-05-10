@@ -167,3 +167,12 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed.
 - Next recommended step: run the demo seed in Supabase SQL Editor and verify the Southend demo rows.
+
+## 2026-05-10 Demo Seed UUID Cast Fix
+
+- Branch: `feature/dla-launch-initiation`
+- Scope: fixed `supabase/demo-seed.sql` so CTE-backed inserts cast `row_id` values to `uuid` before inserting into UUID primary-key columns.
+- Fixes: applied explicit `::uuid` casts for membership, qualification, availability, duty-period, and cover-request inserts.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the cast fix.
+- Next recommended step: rerun `supabase/demo-seed.sql` in Supabase SQL Editor and verify the Southend demo rows.

@@ -106,3 +106,4 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Use the demo seed after the base Supabase schema/data seed so the Southend station, assets, roles, and readiness rules already exist.
 - In Supabase SQL Editor, run `supabase/demo-seed.sql` after the main seed and then verify the demo crew with the SQL listed in `CODEX_RUN_LOG.md`.
 - For browser testing, the existing Test Admin account can be used immediately; the demo profiles become login-capable only after matching Supabase Auth users are created.
+- If Supabase SQL Editor reports a UUID type mismatch, rerun the updated `supabase/demo-seed.sql`; the CTE-backed inserts now cast their row IDs explicitly to `uuid`.

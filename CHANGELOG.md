@@ -174,3 +174,4 @@
 - Added `supabase/demo-seed.sql` as a safe Southend development/demo dataset for browser testing Phase 9 workflows.
 - Seeded fake crew profiles, memberships, qualifications, availability, duty periods, cover requests, notification placeholders, and audit entries using fixed UUIDs and `example.test` addresses only.
 - Documented that demo profiles do not create Supabase Auth users and must be paired with matching login accounts separately if browser sign-in is required.
+- Fixed the demo seed so CTE-backed inserts cast row IDs to UUID before inserting into UUID primary-key columns.

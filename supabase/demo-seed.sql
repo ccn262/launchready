@@ -147,7 +147,7 @@ insert into public.station_memberships (
   is_active
 )
 select
-  mr.row_id,
+  mr.row_id::uuid,
   mr.profile_id,
   dc.station_id,
   ct.id,
@@ -260,7 +260,7 @@ insert into public.crew_qualifications (
   is_active
 )
 select
-  qr.row_id,
+  qr.row_id::uuid,
   qr.profile_id,
   dc.station_id,
   qt.id as qualification_type_id,
@@ -364,7 +364,7 @@ insert into public.availability_slots (
   created_by_profile_id
 )
 select
-  ar.row_id,
+  ar.row_id::uuid,
   ar.profile_id,
   dc.station_id,
   ll.id as station_location_id,
@@ -462,7 +462,7 @@ insert into public.duty_periods (
   created_by_profile_id
 )
 select
-  dr.row_id,
+  dr.row_id::uuid,
   dc.station_id,
   dr.profile_id,
   ll.id as station_location_id,
@@ -566,7 +566,7 @@ insert into public.cover_requests (
   resolved_at
 )
 select
-  cr.row_id,
+  cr.row_id::uuid,
   dc.station_id,
   cr.requester_profile_id,
   cr.original_duty_period_id,
