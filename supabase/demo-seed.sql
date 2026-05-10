@@ -22,18 +22,18 @@ insert into public.profiles (
   is_active
 )
 values
-  ('11111111-1111-4111-8111-000000000101', (select id from public.organisations where slug = 'launch-ready-demo'), 'Chris Helm Demo', 'chris.helm.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-000000000102', (select id from public.organisations where slug = 'launch-ready-demo'), 'Alex Tier1 Demo', 'alex.tier1.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-000000000103', (select id from public.organisations where slug = 'launch-ready-demo'), 'Sam Tier2 Demo', 'sam.tier2.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-000000000104', (select id from public.organisations where slug = 'launch-ready-demo'), 'Jess Navigator Demo', 'jess.navigator.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-000000000105', (select id from public.organisations where slug = 'launch-ready-demo'), 'Pat Head Launcher Demo', 'pat.headlauncher.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-000000000106', (select id from public.organisations where slug = 'launch-ready-demo'), 'Taylor Tractor Demo', 'taylor.tractor.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-000000000107', (select id from public.organisations where slug = 'launch-ready-demo'), 'Casey Winch Demo', 'casey.winch.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-000000000108', (select id from public.organisations where slug = 'launch-ready-demo'), 'Jordan Davit Demo', 'jordan.davit.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-000000000109', (select id from public.organisations where slug = 'launch-ready-demo'), 'Morgan Hovercraft Demo', 'morgan.hoverpilot.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-00000000010a', (select id from public.organisations where slug = 'launch-ready-demo'), 'Robin Shore Demo', 'robin.shore.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-00000000010b', (select id from public.organisations where slug = 'launch-ready-demo'), 'DLA Day Demo', 'dla.day.demo@example.test', null, 'standard', true),
-  ('11111111-1111-4111-8111-00000000010c', (select id from public.organisations where slug = 'launch-ready-demo'), 'DLA Night Demo', 'dla.night.demo@example.test', null, 'standard', true)
+  ('11111111-1111-4111-8111-000000000101'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Chris Helm Demo', 'chris.helm.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-000000000102'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Alex Tier1 Demo', 'alex.tier1.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-000000000103'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Sam Tier2 Demo', 'sam.tier2.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-000000000104'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Jess Navigator Demo', 'jess.navigator.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-000000000105'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Pat Head Launcher Demo', 'pat.headlauncher.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-000000000106'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Taylor Tractor Demo', 'taylor.tractor.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-000000000107'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Casey Winch Demo', 'casey.winch.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-000000000108'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Jordan Davit Demo', 'jordan.davit.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-000000000109'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Morgan Hovercraft Demo', 'morgan.hoverpilot.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-00000000010a'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'Robin Shore Demo', 'robin.shore.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-00000000010b'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'DLA Day Demo', 'dla.day.demo@example.test', null, 'standard', true),
+  ('11111111-1111-4111-8111-00000000010c'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), 'DLA Night Demo', 'dla.night.demo@example.test', null, 'standard', true)
 on conflict (id) do update
 set
   organisation_id = excluded.organisation_id,
@@ -48,8 +48,8 @@ set local session_replication_role = origin;
 
 insert into public.crew_types (id, code, name, description, is_active)
 values
-  ('22222222-2222-4222-8222-000000000201', 'boat_crew', 'Boat Crew', 'Demo boat crew membership type.', true),
-  ('22222222-2222-4222-8222-000000000202', 'shore_crew', 'Shore Crew', 'Demo shore crew membership type.', true)
+  ('22222222-2222-4222-8222-000000000201'::uuid, 'boat_crew', 'Boat Crew', 'Demo boat crew membership type.', true),
+  ('22222222-2222-4222-8222-000000000202'::uuid, 'shore_crew', 'Shore Crew', 'Demo shore crew membership type.', true)
 on conflict (code) do update
 set
   name = excluded.name,
@@ -59,20 +59,20 @@ set
 
 insert into public.operational_roles (id, code, name, description, category, is_active)
 values
-  ('33333333-3333-4333-8333-000000000301', 'helm', 'Helm', 'Demo helm qualification.', 'operational', true),
-  ('33333333-3333-4333-8333-000000000302', 'tier_1', 'Tier 1', 'Demo tier 1 qualification.', 'operational', true),
-  ('33333333-3333-4333-8333-000000000303', 'tier_2', 'Tier 2', 'Demo tier 2 qualification.', 'operational', true),
-  ('33333333-3333-4333-8333-000000000304', 'boat_crew', 'Boat Crew', 'Demo boat crew qualification.', 'operational', true),
-  ('33333333-3333-4333-8333-000000000305', 'navigator', 'Navigator', 'Demo navigator qualification.', 'operational', true),
-  ('33333333-3333-4333-8333-000000000306', 'commander', 'Commander', 'Demo hovercraft commander qualification.', 'operational', true),
-  ('33333333-3333-4333-8333-000000000307', 'pilot', 'Pilot', 'Demo hovercraft pilot qualification.', 'operational', true),
-  ('33333333-3333-4333-8333-000000000308', 'tractor_driver', 'Tractor Driver', 'Demo tractor driver qualification.', 'launch_recovery', true),
-  ('33333333-3333-4333-8333-000000000309', 'winch_operator', 'Winch Operator', 'Demo winch operator qualification.', 'launch_recovery', true),
-  ('33333333-3333-4333-8333-00000000030a', 'davit_operator', 'Davit Operator', 'Demo davit operator qualification.', 'launch_recovery', true),
-  ('33333333-3333-4333-8333-00000000030b', 'head_launcher', 'Head Launcher', 'Demo head launcher qualification.', 'launch_recovery', true),
-  ('33333333-3333-4333-8333-00000000030c', 'launcher', 'Launcher', 'Demo launcher qualification.', 'launch_recovery', true),
-  ('33333333-3333-4333-8333-00000000030d', 'shore_crew', 'Shore Crew', 'Demo shore support qualification.', 'shore', true),
-  ('33333333-3333-4333-8333-00000000030e', 'vehicle_driver', 'Vehicle Driver', 'Demo buggy / support vehicle driver qualification.', 'shore', true)
+  ('33333333-3333-4333-8333-000000000301'::uuid, 'helm', 'Helm', 'Demo helm qualification.', 'operational', true),
+  ('33333333-3333-4333-8333-000000000302'::uuid, 'tier_1', 'Tier 1', 'Demo tier 1 qualification.', 'operational', true),
+  ('33333333-3333-4333-8333-000000000303'::uuid, 'tier_2', 'Tier 2', 'Demo tier 2 qualification.', 'operational', true),
+  ('33333333-3333-4333-8333-000000000304'::uuid, 'boat_crew', 'Boat Crew', 'Demo boat crew qualification.', 'operational', true),
+  ('33333333-3333-4333-8333-000000000305'::uuid, 'navigator', 'Navigator', 'Demo navigator qualification.', 'operational', true),
+  ('33333333-3333-4333-8333-000000000306'::uuid, 'commander', 'Commander', 'Demo hovercraft commander qualification.', 'operational', true),
+  ('33333333-3333-4333-8333-000000000307'::uuid, 'pilot', 'Pilot', 'Demo hovercraft pilot qualification.', 'operational', true),
+  ('33333333-3333-4333-8333-000000000308'::uuid, 'tractor_driver', 'Tractor Driver', 'Demo tractor driver qualification.', 'launch_recovery', true),
+  ('33333333-3333-4333-8333-000000000309'::uuid, 'winch_operator', 'Winch Operator', 'Demo winch operator qualification.', 'launch_recovery', true),
+  ('33333333-3333-4333-8333-00000000030a'::uuid, 'davit_operator', 'Davit Operator', 'Demo davit operator qualification.', 'launch_recovery', true),
+  ('33333333-3333-4333-8333-00000000030b'::uuid, 'head_launcher', 'Head Launcher', 'Demo head launcher qualification.', 'launch_recovery', true),
+  ('33333333-3333-4333-8333-00000000030c'::uuid, 'launcher', 'Launcher', 'Demo launcher qualification.', 'launch_recovery', true),
+  ('33333333-3333-4333-8333-00000000030d'::uuid, 'shore_crew', 'Shore Crew', 'Demo shore support qualification.', 'shore', true),
+  ('33333333-3333-4333-8333-00000000030e'::uuid, 'vehicle_driver', 'Vehicle Driver', 'Demo buggy / support vehicle driver qualification.', 'shore', true)
 on conflict (code) do update
 set
   name = excluded.name,
@@ -83,21 +83,21 @@ set
 
 insert into public.qualification_types (id, code, name, kind, description, requires_expiry, is_active)
 values
-  ('44444444-4444-4444-8444-000000000401', 'helm', 'Helm', 'operational', 'Demo helm qualification type.', false, true),
-  ('44444444-4444-4444-8444-000000000402', 'tier_1', 'Tier 1', 'operational', 'Demo tier 1 qualification type.', false, true),
-  ('44444444-4444-4444-8444-000000000403', 'tier_2', 'Tier 2', 'operational', 'Demo tier 2 qualification type.', false, true),
-  ('44444444-4444-4444-8444-000000000404', 'boat_crew', 'Boat Crew', 'operational', 'Demo boat crew qualification type.', false, true),
-  ('44444444-4444-4444-8444-000000000405', 'navigator', 'Navigator', 'operational', 'Demo navigator qualification type.', false, true),
-  ('44444444-4444-4444-8444-000000000406', 'commander', 'Commander', 'operational', 'Demo commander qualification type.', false, true),
-  ('44444444-4444-4444-8444-000000000407', 'pilot', 'Pilot', 'operational', 'Demo pilot qualification type.', false, true),
-  ('44444444-4444-4444-8444-000000000408', 'tractor_driver', 'Tractor Driver', 'operational', 'Demo tractor driver qualification type.', false, true),
-  ('44444444-4444-4444-8444-000000000409', 'winch_operator', 'Winch Operator', 'operational', 'Demo winch operator qualification type.', false, true),
-  ('44444444-4444-4444-8444-00000000040a', 'davit_operator', 'Davit Operator', 'operational', 'Demo davit operator qualification type.', false, true),
-  ('44444444-4444-4444-8444-00000000040b', 'head_launcher', 'Head Launcher', 'operational', 'Demo head launcher qualification type.', false, true),
-  ('44444444-4444-4444-8444-00000000040c', 'launcher', 'Launcher', 'operational', 'Demo launcher qualification type.', false, true),
-  ('44444444-4444-4444-8444-00000000040d', 'shore_crew', 'Shore Crew', 'operational', 'Demo shore crew qualification type.', false, true),
-  ('44444444-4444-4444-8444-00000000040e', 'vehicle_driver', 'Vehicle Driver', 'operational', 'Demo buggy / support vehicle driver qualification type.', false, true),
-  ('44444444-4444-4444-8444-0000000004ff', 'casualty_care', 'Casualty Care', 'casualty_care', 'Demo casualty care qualification type.', true, true)
+  ('44444444-4444-4444-8444-000000000401'::uuid, 'helm', 'Helm', 'operational', 'Demo helm qualification type.', false, true),
+  ('44444444-4444-4444-8444-000000000402'::uuid, 'tier_1', 'Tier 1', 'operational', 'Demo tier 1 qualification type.', false, true),
+  ('44444444-4444-4444-8444-000000000403'::uuid, 'tier_2', 'Tier 2', 'operational', 'Demo tier 2 qualification type.', false, true),
+  ('44444444-4444-4444-8444-000000000404'::uuid, 'boat_crew', 'Boat Crew', 'operational', 'Demo boat crew qualification type.', false, true),
+  ('44444444-4444-4444-8444-000000000405'::uuid, 'navigator', 'Navigator', 'operational', 'Demo navigator qualification type.', false, true),
+  ('44444444-4444-4444-8444-000000000406'::uuid, 'commander', 'Commander', 'operational', 'Demo commander qualification type.', false, true),
+  ('44444444-4444-4444-8444-000000000407'::uuid, 'pilot', 'Pilot', 'operational', 'Demo pilot qualification type.', false, true),
+  ('44444444-4444-4444-8444-000000000408'::uuid, 'tractor_driver', 'Tractor Driver', 'operational', 'Demo tractor driver qualification type.', false, true),
+  ('44444444-4444-4444-8444-000000000409'::uuid, 'winch_operator', 'Winch Operator', 'operational', 'Demo winch operator qualification type.', false, true),
+  ('44444444-4444-4444-8444-00000000040a'::uuid, 'davit_operator', 'Davit Operator', 'operational', 'Demo davit operator qualification type.', false, true),
+  ('44444444-4444-4444-8444-00000000040b'::uuid, 'head_launcher', 'Head Launcher', 'operational', 'Demo head launcher qualification type.', false, true),
+  ('44444444-4444-4444-8444-00000000040c'::uuid, 'launcher', 'Launcher', 'operational', 'Demo launcher qualification type.', false, true),
+  ('44444444-4444-4444-8444-00000000040d'::uuid, 'shore_crew', 'Shore Crew', 'operational', 'Demo shore crew qualification type.', false, true),
+  ('44444444-4444-4444-8444-00000000040e'::uuid, 'vehicle_driver', 'Vehicle Driver', 'operational', 'Demo buggy / support vehicle driver qualification type.', false, true),
+  ('44444444-4444-4444-8444-0000000004ff'::uuid, 'casualty_care', 'Casualty Care', 'casualty_care', 'Demo casualty care qualification type.', true, true)
 on conflict (code) do update
 set
   name = excluded.name,
@@ -148,9 +148,9 @@ insert into public.station_memberships (
 )
 select
   mr.row_id::uuid,
-  mr.profile_id,
-  dc.station_id,
-  ct.id,
+  mr.profile_id::uuid,
+  dc.station_id::uuid,
+  ct.id::uuid,
   mr.membership_role,
   mr.is_primary,
   true
@@ -261,12 +261,12 @@ insert into public.crew_qualifications (
 )
 select
   qr.row_id::uuid,
-  qr.profile_id,
-  dc.station_id,
-  qt.id as qualification_type_id,
-  al.asset_type_id,
-  al.asset_id,
-  orole.id as operational_role_id,
+  qr.profile_id::uuid,
+  dc.station_id::uuid,
+  qt.id::uuid as qualification_type_id,
+  al.asset_type_id::uuid,
+  al.asset_id::uuid,
+  orole.id::uuid as operational_role_id,
   qr.currency_state,
   qr.starts_on,
   qr.expires_on,
@@ -365,9 +365,9 @@ insert into public.availability_slots (
 )
 select
   ar.row_id::uuid,
-  ar.profile_id,
-  dc.station_id,
-  ll.id as station_location_id,
+  ar.profile_id::uuid,
+  dc.station_id::uuid,
+  ll.id::uuid as station_location_id,
   null::uuid,
   null::uuid,
   null::uuid,
@@ -381,7 +381,7 @@ select
   ar.notes,
   ar.starts_at,
   ar.ends_at,
-  ar.created_by_profile_id
+  ar.created_by_profile_id::uuid
 from availability_rows ar
 cross join demo_context dc
 left join location_lookup ll on ll.name = ar.station_location_name
@@ -463,9 +463,9 @@ insert into public.duty_periods (
 )
 select
   dr.row_id::uuid,
-  dc.station_id,
-  dr.profile_id,
-  ll.id as station_location_id,
+  dc.station_id::uuid,
+  dr.profile_id::uuid,
+  ll.id::uuid as station_location_id,
   null::uuid,
   null::uuid,
   null::uuid,
@@ -478,7 +478,7 @@ select
   dr.is_active,
   dr.starts_at,
   dr.ends_at,
-  dr.created_by_profile_id
+  dr.created_by_profile_id::uuid
 from duty_rows dr
 cross join demo_context dc
 left join location_lookup ll on ll.name = dr.station_location_name
@@ -567,12 +567,12 @@ insert into public.cover_requests (
 )
 select
   cr.row_id::uuid,
-  dc.station_id,
-  cr.requester_profile_id,
-  cr.original_duty_period_id,
-  al.asset_id,
-  orole.id,
-  ctype.id,
+  dc.station_id::uuid,
+  cr.requester_profile_id::uuid,
+  cr.original_duty_period_id::uuid,
+  al.asset_id::uuid,
+  orole.id::uuid,
+  ctype.id::uuid,
   cr.cover_type,
   cr.starts_at,
   cr.ends_at,
@@ -580,7 +580,7 @@ select
   cr.urgency,
   cr.reason,
   cr.notes,
-  cr.accepted_by_profile_id,
+  cr.accepted_by_profile_id::uuid,
   cr.accepted_at,
   cr.resolved_at
 from cover_rows cr
@@ -623,8 +623,8 @@ insert into public.cover_request_responses (
   responded_at
 )
 values
-  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000a01', '99999999-9999-4999-8999-000000000901', '11111111-1111-4111-8111-000000000102', 'offered', 'eligible', 'DEMO like-for-like eligible response.', 'Available to cover the D Class helm request.', now() - interval '30 minutes'),
-  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000a02', '99999999-9999-4999-8999-000000000903', '11111111-1111-4111-8111-000000000103', 'accepted', 'eligible', 'DEMO accepted cover response.', 'Accepted the B Class Tier 1 cover request.', now() - interval '20 minutes')
+  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000a01'::uuid, '99999999-9999-4999-8999-000000000901'::uuid, '11111111-1111-4111-8111-000000000102'::uuid, 'offered', 'eligible', 'DEMO like-for-like eligible response.', 'Available to cover the D Class helm request.', now() - interval '30 minutes'),
+  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000a02'::uuid, '99999999-9999-4999-8999-000000000903'::uuid, '11111111-1111-4111-8111-000000000103'::uuid, 'accepted', 'eligible', 'DEMO accepted cover response.', 'Accepted the B Class Tier 1 cover request.', now() - interval '20 minutes')
 on conflict (cover_request_id, responder_profile_id) do update
 set
   response_status = excluded.response_status,
@@ -652,10 +652,10 @@ insert into public.notifications (
   sent_at
 )
 values
-  ('eeeeeeee-eeee-4eee-8eee-000000000e01', (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000101', 'in_app', 'cover_request_created', 'Demo cover request created', 'DEMO cover request created for browser testing.', 1, 'queued', 'cover_requests', '99999999-9999-4999-8999-000000000901', '11111111-1111-4111-8111-000000000105', null, null),
-  ('eeeeeeee-eeee-4eee-8eee-000000000e02', (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000105', 'in_app', 'cover_request_created', 'Demo general cover request', 'DEMO general cover request created for browser testing.', 1, 'queued', 'cover_requests', '99999999-9999-4999-8999-000000000902', '11111111-1111-4111-8111-000000000105', null, null),
-  ('eeeeeeee-eeee-4eee-8eee-000000000e03', (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000102', 'in_app', 'cover_request_accepted', 'Demo cover request accepted', 'DEMO accepted cover request created for browser testing.', 2, 'queued', 'cover_requests', '99999999-9999-4999-8999-000000000903', '11111111-1111-4111-8111-000000000105', null, null),
-  ('eeeeeeee-eeee-4eee-8eee-000000000e04', (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000106', 'in_app', 'cover_request_cancelled', 'Demo cover request cancelled', 'DEMO cancelled/past cover request created for browser testing.', 0, 'queued', 'cover_requests', '99999999-9999-4999-8999-000000000904', '11111111-1111-4111-8111-000000000105', null, null)
+  ('eeeeeeee-eeee-4eee-8eee-000000000e01'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000101'::uuid, 'in_app', 'cover_request_created', 'Demo cover request created', 'DEMO cover request created for browser testing.', 1, 'queued', 'cover_requests', '99999999-9999-4999-8999-000000000901'::uuid, '11111111-1111-4111-8111-000000000105'::uuid, null, null),
+  ('eeeeeeee-eeee-4eee-8eee-000000000e02'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000105'::uuid, 'in_app', 'cover_request_created', 'Demo general cover request', 'DEMO general cover request created for browser testing.', 1, 'queued', 'cover_requests', '99999999-9999-4999-8999-000000000902'::uuid, '11111111-1111-4111-8111-000000000105'::uuid, null, null),
+  ('eeeeeeee-eeee-4eee-8eee-000000000e03'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000102'::uuid, 'in_app', 'cover_request_accepted', 'Demo cover request accepted', 'DEMO accepted cover request created for browser testing.', 2, 'queued', 'cover_requests', '99999999-9999-4999-8999-000000000903'::uuid, '11111111-1111-4111-8111-000000000105'::uuid, null, null),
+  ('eeeeeeee-eeee-4eee-8eee-000000000e04'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000106'::uuid, 'in_app', 'cover_request_cancelled', 'Demo cover request cancelled', 'DEMO cancelled/past cover request created for browser testing.', 0, 'queued', 'cover_requests', '99999999-9999-4999-8999-000000000904'::uuid, '11111111-1111-4111-8111-000000000105'::uuid, null, null)
 on conflict (id) do update
 set
   organisation_id = excluded.organisation_id,
@@ -687,10 +687,10 @@ insert into public.audit_log (
   metadata
 )
 values
-  ('ffffffff-ffff-4fff-8fff-000000000f01', (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-00000000010b', 'demo_cover_request_created', 'cover_requests', '99999999-9999-4999-8999-000000000901', '{}'::jsonb, '{"demo": true}'::jsonb, '{"source": "supabase/demo-seed.sql"}'::jsonb),
-  ('ffffffff-ffff-4fff-8fff-000000000f02', (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000105', 'demo_cover_request_general_created', 'cover_requests', '99999999-9999-4999-8999-000000000902', '{}'::jsonb, '{"demo": true}'::jsonb, '{"source": "supabase/demo-seed.sql"}'::jsonb),
-  ('ffffffff-ffff-4fff-8fff-000000000f03', (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000102', 'demo_cover_request_accepted', 'cover_requests', '99999999-9999-4999-8999-000000000903', '{}'::jsonb, '{"demo": true}'::jsonb, '{"source": "supabase/demo-seed.sql"}'::jsonb),
-  ('ffffffff-ffff-4fff-8fff-000000000f04', (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000106', 'demo_cover_request_cancelled', 'cover_requests', '99999999-9999-4999-8999-000000000904', '{}'::jsonb, '{"demo": true}'::jsonb, '{"source": "supabase/demo-seed.sql"}'::jsonb)
+  ('ffffffff-ffff-4fff-8fff-000000000f01'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-00000000010b'::uuid, 'demo_cover_request_created', 'cover_requests', '99999999-9999-4999-8999-000000000901'::uuid, '{}'::jsonb, '{"demo": true}'::jsonb, '{"source": "supabase/demo-seed.sql"}'::jsonb),
+  ('ffffffff-ffff-4fff-8fff-000000000f02'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000105'::uuid, 'demo_cover_request_general_created', 'cover_requests', '99999999-9999-4999-8999-000000000902'::uuid, '{}'::jsonb, '{"demo": true}'::jsonb, '{"source": "supabase/demo-seed.sql"}'::jsonb),
+  ('ffffffff-ffff-4fff-8fff-000000000f03'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000102'::uuid, 'demo_cover_request_accepted', 'cover_requests', '99999999-9999-4999-8999-000000000903'::uuid, '{}'::jsonb, '{"demo": true}'::jsonb, '{"source": "supabase/demo-seed.sql"}'::jsonb),
+  ('ffffffff-ffff-4fff-8fff-000000000f04'::uuid, (select id from public.organisations where slug = 'launch-ready-demo'), (select id from public.stations where slug = 'southend-lifeboat-station'), '11111111-1111-4111-8111-000000000106'::uuid, 'demo_cover_request_cancelled', 'cover_requests', '99999999-9999-4999-8999-000000000904'::uuid, '{}'::jsonb, '{"demo": true}'::jsonb, '{"source": "supabase/demo-seed.sql"}'::jsonb)
 on conflict (id) do update
 set
   organisation_id = excluded.organisation_id,

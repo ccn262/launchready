@@ -293,3 +293,14 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed after the cast fix.
 - Next recommended step: rerun `supabase/demo-seed.sql` in Supabase SQL Editor and verify the Southend demo rows.
+
+## 2026-05-10 18:34 BST Demo Seed UUID Source Cast Expansion
+
+- Branch: `feature/dla-launch-initiation`
+- Date/time: `2026-05-10 18:34 BST`
+- Files changed: `supabase/demo-seed.sql`, `FIX_LOG.md`, and this run log.
+- Error: Supabase SQL Editor reported `column "profile_id" is of type uuid but expression is of type text` on the `membership_rows` CTE-backed insert.
+- Fixes attempted: cast the remaining CTE-backed UUID source columns explicitly in every demo-seed insert path, plus the fixed UUID literals used by notification and audit placeholder rows.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the wider cast fix.
+- Next recommended step: rerun `supabase/demo-seed.sql` in Supabase SQL Editor and verify the Southend demo rows.

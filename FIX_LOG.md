@@ -176,3 +176,12 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed after the cast fix.
 - Next recommended step: rerun `supabase/demo-seed.sql` in Supabase SQL Editor and verify the Southend demo rows.
+
+## 2026-05-10 Demo Seed UUID Source Cast Expansion
+
+- Branch: `feature/dla-launch-initiation`
+- Scope: expanded the demo seed so every UUID source column in the CTE-backed inserts is explicitly cast before insertion.
+- Fixes: cast `profile_id`, `station_id`, `station_location_id`, `asset_id`, `asset_type_id`, `crew_type_id`, `operational_role_id`, `qualification_type_id`, `requester_profile_id`, `original_duty_period_id`, `accepted_by_profile_id`, and the fixed UUID literals used by the placeholder rows in notifications and audit logging.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the wider cast fix.
+- Next recommended step: rerun the demo seed in Supabase SQL Editor and confirm the Southend demo rows load cleanly.
