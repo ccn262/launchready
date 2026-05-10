@@ -96,3 +96,13 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Incidents now support launch drafts, selected station locations and assets, readiness previews, readiness snapshots, and crew response tracking.
 - Launch initiation remains advisory only and does not authorise a launch.
 - Notification rows and audit events are used as placeholders for operational visibility only until real messaging is intentionally enabled.
+
+## Demo Seed
+
+- `supabase/demo-seed.sql` provides safe Southend demo data for browser testing.
+- The demo seed creates `public.profiles` rows only; it does not create Supabase Auth users.
+- To sign in as a demo profile later, matching Auth users must be created separately or via a future invite/signup flow.
+- The demo seed is idempotent and uses fixed UUIDs plus fake `example.test` addresses only.
+- Use the demo seed after the base Supabase schema/data seed so the Southend station, assets, roles, and readiness rules already exist.
+- In Supabase SQL Editor, run `supabase/demo-seed.sql` after the main seed and then verify the demo crew with the SQL listed in `CODEX_RUN_LOG.md`.
+- For browser testing, the existing Test Admin account can be used immediately; the demo profiles become login-capable only after matching Supabase Auth users are created.

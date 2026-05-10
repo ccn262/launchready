@@ -168,3 +168,9 @@
 
 - Added the Phase 9 DLA launch initiation foundation with launch drafts, readiness previews, readiness snapshots, crew response tracking, and placeholder incident notifications.
 - Kept launch initiation advisory only and preserved incident audit logging for operational visibility rather than authorisation.
+
+## 0.8.1 - 2026-05-10
+
+- Added `supabase/demo-seed.sql` as a safe Southend development/demo dataset for browser testing Phase 9 workflows.
+- Seeded fake crew profiles, memberships, qualifications, availability, duty periods, cover requests, notification placeholders, and audit entries using fixed UUIDs and `example.test` addresses only.
+- Documented that demo profiles do not create Supabase Auth users and must be paired with matching login accounts separately if browser sign-in is required.

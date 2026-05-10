@@ -66,6 +66,13 @@
 - `incident_responses` remains crew-facing and is constrained by a unique `(incident_id, profile_id)` response boundary so one crew member can update their own response for an active incident.
 - The application maps `incidents.status = open` to draft and `incidents.status = active` to initiated for UI purposes, while `stood_down`, `closed`, and `cancelled` remain explicit operational states.
 
+## Development Demo Seed
+
+- `supabase/demo-seed.sql` is a development-only seed file for Southend browser testing.
+- It seeds `public.profiles` directly and does not create Supabase Auth users, so matching login accounts must be created separately if browser sign-in is required.
+- The demo seed uses fixed UUIDs and fake `example.test` addresses so it can be rerun safely without real personal data.
+- The demo dataset is intended to exercise readiness, cover requests, availability, rota, and launch-initiation workflows without changing the production schema.
+
 ## Initial Relationships
 
 - One organisation has many stations.

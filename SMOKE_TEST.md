@@ -124,3 +124,12 @@
 - Readiness snapshots are stored at initiation time and can be reviewed later.
 - Crew responses are station-scoped and only apply to the logged-in profile.
 - Notification rows are placeholders only and no external messages are sent yet.
+
+## Demo Seed Test Notes
+
+- Run `supabase/demo-seed.sql` in Supabase SQL Editor after the base schema and seed have already been applied.
+- Use the demo seed only for development and browser testing; it is not production data.
+- The demo seed creates `public.profiles` rows only, so login testing still requires matching Supabase Auth users to be created separately.
+- If you want the SQL Editor steps: open Supabase, choose the project, paste `supabase/demo-seed.sql` into a new SQL query, run it, and then execute the verification SQL from `CODEX_RUN_LOG.md`.
+- Verify the Southend demo rows with the SQL listed in `CODEX_RUN_LOG.md` before browser-testing the Phase 9 workflow.
+- Browser test the demo data on `/dla/launch`, `/dla/incidents`, `/crew/incidents`, `/crew/cover`, `/admin/cover`, and the readiness views.

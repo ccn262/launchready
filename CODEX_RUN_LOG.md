@@ -264,3 +264,21 @@
 - Fixes attempted: narrowed incident records before mutation, aligned incident status handling to the current enum, and removed stale helper imports and variables.
 - Tests run: `npm run lint`, `npm run build`.
 - Next recommended step: browser smoke-test `/dla/launch`, `/dla/incidents`, `/crew/incidents`, and the incident summary sections before merge.
+
+## 2026-05-10 18:18 BST Demo Seed Dataset
+
+- Branch: `feature/dla-launch-initiation`
+- Date/time: `2026-05-10 18:18 BST`
+- Files changed: `supabase/demo-seed.sql`, `PROJECT_HANDOFF.md`, `DATABASE_SCHEMA.md`, `SMOKE_TEST.md`, `CHANGELOG.md`, `FIX_LOG.md`, and this run log.
+- Errors: the first draft of the demo seed needed the Southend asset-role coverage expanded and simplified so the rows are useful for readiness, cover, availability, and launch browser testing.
+- Fixes attempted: rewrote the seed into deterministic inserts, added extra Southend role/currency coverage, and documented the demo/Auth caveat.
+- Verification SQL:
+  - `select count(*) from public.profiles where email like '%.demo@example.test';`
+  - `select p.display_name, sm.membership_role, ct.name as crew_type from public.profiles p join public.station_memberships sm on sm.profile_id = p.id join public.crew_types ct on ct.id = sm.crew_type_id where p.email like '%.demo@example.test' order by p.display_name;`
+  - `select p.display_name, qt.name as qualification, cq.currency_state, a.name as asset_name, sl.name as location_name from public.crew_qualifications cq join public.profiles p on p.id = cq.profile_id join public.qualification_types qt on qt.id = cq.qualification_type_id left join public.assets a on a.id = cq.asset_id left join public.station_locations sl on sl.id = a.station_location_id where p.email like '%.demo@example.test' order by p.display_name, qt.name;`
+  - `select p.display_name, av.slot_kind, av.starts_at, av.ends_at, av.notes from public.availability_slots av join public.profiles p on p.id = av.profile_id where p.email like '%.demo@example.test' order by av.starts_at;`
+  - `select p.display_name, dp.period_kind, dp.starts_at, dp.ends_at, dp.notes from public.duty_periods dp join public.profiles p on p.id = dp.profile_id where p.email like '%.demo@example.test' order by dp.starts_at;`
+  - `select cr.status, cr.urgency, cr.cover_type, cr.starts_at, cr.ends_at, cr.reason, p.display_name as requester from public.cover_requests cr join public.profiles p on p.id = cr.requester_profile_id where p.email like '%.demo@example.test' order by cr.starts_at;`
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed.
+- Next recommended step: apply `supabase/demo-seed.sql` in Supabase SQL Editor and browser-test the Phase 9 demo data.

@@ -158,3 +158,12 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed after the Phase 9 implementation.
 - Next recommended step: browser smoke-test `/dla/launch`, `/dla/incidents`, `/crew/incidents`, and the incident summary on `/`.
+
+## 2026-05-10 Demo Seed Dataset
+
+- Branch: `feature/dla-launch-initiation`
+- Scope: added `supabase/demo-seed.sql` with Southend-only fake profiles, memberships, qualifications, availability, duty periods, cover requests, notification placeholders, and audit rows for browser testing.
+- Fixes: rewrote the seed into deterministic idempotent inserts and added the missing Southend role/currency coverage needed for Phase 9 browser testing.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed.
+- Next recommended step: run the demo seed in Supabase SQL Editor and verify the Southend demo rows.
