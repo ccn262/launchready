@@ -177,3 +177,4 @@
 - Fixed the demo seed so CTE-backed inserts cast row IDs to UUID before inserting into UUID primary-key columns.
 - Expanded the demo seed to cast all CTE-backed UUID source columns explicitly before insertion.
 - Expanded the demo seed again so direct UUID literals in placeholder notification and audit rows are also explicit UUID values.
+- Cleaned up the demo seed source tuples so all UUID-like values in the CTE `VALUES` blocks are cast at source before insertion, preventing SQL Editor type inference issues.

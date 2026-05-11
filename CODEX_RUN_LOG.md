@@ -304,3 +304,14 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed after the wider cast fix.
 - Next recommended step: rerun `supabase/demo-seed.sql` in Supabase SQL Editor and verify the Southend demo rows.
+
+## 2026-05-11 18:XX BST Demo Seed Source-Level UUID Cast Cleanup
+
+- Branch: `feature/dla-launch-initiation`
+- Date/time: `2026-05-11 18:XX BST`
+- Files changed: `supabase/demo-seed.sql`, `FIX_LOG.md`, `CODEX_RUN_LOG.md`, and `CHANGELOG.md`.
+- Error: the demo seed still mixed plain text UUID strings and `uuid` values inside CTE `VALUES` blocks, causing the SQL Editor to infer `text` for source columns.
+- Fixes attempted: cast UUID literals at source in the `membership_rows`, `qualification_rows`, `availability_rows`, `duty_rows`, and `cover_rows` CTEs; verified notifications and audit placeholder UUIDs remain explicit `::uuid` values.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the source-level cast cleanup.
+- Next recommended step: rerun `supabase/demo-seed.sql` in Supabase SQL Editor and confirm the Southend demo rows load cleanly.

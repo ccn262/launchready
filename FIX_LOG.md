@@ -185,3 +185,12 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed after the wider cast fix.
 - Next recommended step: rerun the demo seed in Supabase SQL Editor and confirm the Southend demo rows load cleanly.
+
+## 2026-05-11 Demo Seed Source-Level UUID Cast Cleanup
+
+- Branch: `feature/dla-launch-initiation`
+- Scope: moved the remaining UUID casts into the CTE `VALUES` tuples themselves for `membership_rows`, `qualification_rows`, `availability_rows`, `duty_rows`, and `cover_rows`.
+- Fixes: cast `row_id`, `profile_id`, `created_by_profile_id`, `requester_profile_id`, `original_duty_period_id`, and `accepted_by_profile_id` at source so the SQL Editor no longer infers text in the CTEs.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the source-level cast cleanup.
+- Next recommended step: rerun `supabase/demo-seed.sql` in Supabase SQL Editor and confirm all Southend demo rows load cleanly.
