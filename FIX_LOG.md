@@ -194,3 +194,11 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed after the source-level cast cleanup.
 - Next recommended step: rerun `supabase/demo-seed.sql` in Supabase SQL Editor and confirm all Southend demo rows load cleanly.
+
+## 2026-05-11 Demo Seed Enum Alignment Fix
+
+- Branch: `feature/dla-launch-initiation`
+- Scope: corrected a demo availability row to use a valid `public.availability_slot_kind` value.
+- Fixes: replaced the invalid `day_cover` availability kind with `full_day` for the DLA day availability demo row; kept `day_cover` only where it belongs in `public.duty_period_kind`.
+- Tests run: pending rerun after the enum fix.
+- Next recommended step: rerun `npm run lint`, `npm run build`, and the demo seed in Supabase SQL Editor.
