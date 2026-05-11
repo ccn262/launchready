@@ -118,6 +118,18 @@
 - `/` shows active incident awareness without implying launch authorisation.
 - Cross-station incident access remains blocked by RLS and route helpers.
 
+## UI Readability Smoke Test
+
+- `/` loads as a compact operational dashboard with status, current job, cover, and action cards visible near the top.
+- `/admin/readiness` shows compact asset tiles first, with detailed readiness information expandable per asset.
+- `/dla` shows a prominent launch/create-incident action near the top, followed by concise station status and current job panels.
+- `/dla/launch` reads as a step-by-step operational flow with selection, readiness review, and initiation steps separated clearly.
+- `/dla/incidents` shows current job and crew response information in short grouped sections rather than a long flat list.
+- `/crew/incidents` shows response options and grouped crew responses clearly.
+- `/admin/cover` and `/crew/cover` remain usable and still surface open and historical requests.
+- `/admin/availability` and `/admin/duty-rota` keep their forms usable while collapsing long record lists into expandable rows.
+- No backend functionality, schema, or RLS changes are expected in this pass.
+
 ## Phase 9 Pass Criteria
 
 - Launch initiation remains advisory only and never authorises a launch.

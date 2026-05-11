@@ -325,3 +325,14 @@
 - Fixes attempted: changed the DLA day availability demo row to `full_day` while preserving `day_cover` only in `public.duty_period_kind`.
 - Tests run: pending rerun after the enum fix.
 - Next recommended step: rerun `npm run lint`, `npm run build`, and `supabase/demo-seed.sql` in Supabase SQL Editor.
+
+## 2026-05-11 UI Readability Pass
+
+- Branch: `feature/ui-dashboard-readability-pass`
+- Date/time: `2026-05-11`
+- Files changed: `src/app/page.tsx`, `src/app/admin/readiness/page.tsx`, `src/app/dla/page.tsx`, `src/app/dla/launch/page.tsx`, `src/app/dla/incidents/page.tsx`, `src/app/crew/incidents/page.tsx`, `src/app/admin/cover/page.tsx`, `src/app/crew/cover/page.tsx`, `src/app/admin/availability/page.tsx`, `src/app/admin/duty-rota/page.tsx`, `src/components/readiness-board.tsx`, `src/components/incident-response-groups.tsx`, `src/lib/incidents.ts`, plus the run-log docs.
+- Issue: the operational pages were too long and report-like for quick station use.
+- Fixes attempted: added a compact top-level operational snapshot, converted readiness asset rows into expandable tiles, step-labeled the launch flow, grouped incident responses with capability badges, and collapsed long availability/rota rows into details elements.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the UI-only refactor.
+- Next recommended step: browser-smoke the compact dashboard pages and confirm there was no backend behavior change.

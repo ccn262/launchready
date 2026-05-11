@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { PageHero } from "@/components/page-hero";
+import { IncidentResponseGroups } from "@/components/incident-response-groups";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
 import { buildRedirectUrl } from "@/lib/admin-crud";
@@ -153,6 +154,12 @@ export default async function CrewIncidentsPage({
                           {incident.selectedAssetNames.length ? incident.selectedAssetNames.join(", ") : "None selected"}
                         </p>
                       </div>
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                        <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Casualty care</p>
+                        <p className="mt-2 text-sm text-card-foreground">
+                          {incident.responses.some((response) => response.hasCasualtyCare) ? "Available" : "Not confirmed"}
+                        </p>
+                      </div>
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
@@ -217,6 +224,13 @@ export default async function CrewIncidentsPage({
                           <StatusPill tone="grey">No response recorded yet</StatusPill>
                         )}
                         {myResponse?.responded_at ? <span>{myResponse.responded_at}</span> : null}
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Crew responses</p>
+                      <div className="mt-2">
+                        <IncidentResponseGroups responses={incident.responses} />
                       </div>
                     </div>
                   </article>

@@ -3,6 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
+import { IncidentResponseGroups } from "@/components/incident-response-groups";
 import { buildRedirectUrl } from "@/lib/admin-crud";
 import { updateIncidentStatusAction } from "@/app/incident-actions";
 import { loadIncidentBoardData } from "@/lib/incidents";
@@ -121,35 +122,41 @@ export default async function DlaIncidentsPage({
           description="Active incidents stay visible for response tracking and state changes."
         >
           <div className="space-y-4">
-            {board.activeIncidents.length ? (
-              board.activeIncidents.map((incident) => (
-                <article key={incident.incident.id} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
+              {board.activeIncidents.length ? (
+                board.activeIncidents.map((incident) => (
+                  <article key={incident.incident.id} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
                       <p className="text-base font-semibold text-card-foreground">{incident.incident.title}</p>
                       <p className="mt-1 text-sm text-muted-foreground">
                         {incident.incident.operation_type.replace(/_/g, " ")} · {incident.stationLocationName ?? "No location selected"}
-                      </p>
+                        </p>
+                      </div>
+                      <StatusPill tone={toneForIncidentStatus(incident.incident.status)}>{incident.statusLabel}</StatusPill>
                     </div>
-                    <StatusPill tone={toneForIncidentStatus(incident.incident.status)}>{incident.statusLabel}</StatusPill>
-                  </div>
 
-                  <div className="mt-4 grid gap-3 md:grid-cols-3">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                      <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Reported by</p>
-                      <p className="mt-2 text-sm text-card-foreground">{incident.reporterName}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div className="mt-4 grid gap-3 md:grid-cols-4">
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                        <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Reported by</p>
+                        <p className="mt-2 text-sm text-card-foreground">{incident.reporterName}</p>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                       <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Launch authority</p>
                       <p className="mt-2 text-sm text-card-foreground">{incident.launchAuthorityName ?? "Unassigned"}</p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                      <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Selected assets</p>
-                      <p className="mt-2 text-sm text-card-foreground">
-                        {incident.selectedAssetNames.length ? incident.selectedAssetNames.join(", ") : "None selected"}
-                      </p>
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                        <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Selected assets</p>
+                        <p className="mt-2 text-sm text-card-foreground">
+                          {incident.selectedAssetNames.length ? incident.selectedAssetNames.join(", ") : "None selected"}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                        <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Casualty care</p>
+                        <p className="mt-2 text-sm text-card-foreground">
+                          {incident.responses.some((response) => response.hasCasualtyCare) ? "Available" : "Not confirmed"}
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
                   <div className="mt-4 grid gap-3 md:grid-cols-4">
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-card-foreground">
@@ -191,18 +198,10 @@ export default async function DlaIncidentsPage({
                     </form>
                   </div>
 
-                  <div className="mt-4 space-y-2">
+                  <div className="mt-4">
                     <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Crew responses</p>
-                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                      {incident.responses.length ? (
-                        incident.responses.map((response) => (
-                          <span key={response.id} className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
-                            {response.responder?.display_name ?? response.responder?.email ?? response.profile_id} · {response.response_status}
-                          </span>
-                        ))
-                      ) : (
-                        <span>No crew responses yet.</span>
-                      )}
+                    <div className="mt-2">
+                      <IncidentResponseGroups responses={incident.responses} />
                     </div>
                   </div>
                 </article>

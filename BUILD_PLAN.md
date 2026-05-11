@@ -127,3 +127,10 @@
 - Treat readiness as advisory only and keep launch initiation as a decision-support workflow rather than an authorisation mechanism.
 - Preserve incident state, audit logging, and notification placeholders for operational visibility only.
 - Keep real external messaging out of scope until the notification pipelines are intentionally enabled.
+
+## UI Readability Pass
+
+- Review the operational dashboard pages for readability without changing backend behavior.
+- Focus on `/`, `/admin/readiness`, `/dla`, `/dla/launch`, `/dla/incidents`, `/crew/incidents`, `/admin/cover`, `/crew/cover`, `/admin/availability`, and `/admin/duty-rota`.
+- Keep the UI as a fast operational dashboard: compact summary cards, shorter status-first layouts, expandable detail rows, and clear call-to-action buttons.
+- Do not change schema, RLS, readiness calculations, incident logic, cover logic, auth, or notification logic in this pass.

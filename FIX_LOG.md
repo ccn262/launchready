@@ -202,3 +202,12 @@
 - Fixes: replaced the invalid `day_cover` availability kind with `full_day` for the DLA day availability demo row; kept `day_cover` only where it belongs in `public.duty_period_kind`.
 - Tests run: pending rerun after the enum fix.
 - Next recommended step: rerun `npm run lint`, `npm run build`, and the demo seed in Supabase SQL Editor.
+
+## 2026-05-11 UI Readability Pass
+
+- Branch: `feature/ui-dashboard-readability-pass`
+- Scope: compacted the operational dashboard, readiness, incident, launch, cover, availability, and rota pages for faster scanning.
+- Fixes: switched readiness assets to expandable tiles, added top-level status and action cards, and grouped incident responses by status with capability badges.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the UI-only refactor.
+- Next recommended step: run browser smoke tests against the compact dashboard layouts and confirm no functionality regression.

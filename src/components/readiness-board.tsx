@@ -58,6 +58,10 @@ function summaryTone(value: ReadinessStatus) {
   return statusToneMap[value];
 }
 
+function getStatusLabel(status: ReadinessStatus) {
+  return getStatusCopy(status);
+}
+
 function RequirementList({
   title,
   items,
@@ -191,171 +195,181 @@ function AssetReadinessCard({ asset }: Readonly<{ asset: ReadinessAssetSummary }
         : "amber";
 
   return (
-    <article className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-base font-semibold text-card-foreground">{asset.asset.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {asset.location?.name ?? "No location"} · {asset.assetType?.name ?? "Asset type unknown"}
-          </p>
-        </div>
-        <StatusPill tone={summaryTone(asset.status)}>{getStatusCopy(asset.status)}</StatusPill>
-      </div>
-
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Qualified crew</p>
-          <p className="mt-2 text-2xl font-semibold text-card-foreground">
-            {formatCount(asset.qualifiedCrewCount)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Current green qualifications relevant to this asset
-          </p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Available crew</p>
-          <p className="mt-2 text-2xl font-semibold text-card-foreground">
-            {formatCount(asset.availableCrewCount)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Minimum {formatCount(asset.minimumCrew)}
-            {asset.maximumCrew !== null ? ` · Max ${formatCount(asset.maximumCrew)}` : ""}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Suggested crew</p>
-          <p className="mt-2 text-2xl font-semibold text-card-foreground">
-            {formatCount(asset.allocatedCrewCount)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Advisory boat, launch/recovery, shore support, and Head Launcher allocation
-          </p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-3 xl:col-span-1 sm:col-span-2">
-          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Crew capability badges</p>
-          <div className="mt-2">
-            <CrewCapabilityBadges items={asset.capabilityBadges} emptyLabel="No current green capability badges" />
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 grid gap-4">
-        <RequirementList
-          title="Missing hard-stop roles"
-          items={asset.missingHardStopRoles}
-          emptyLabel="No missing hard-stop roles."
-        />
-        <RequirementList
-          title="Missing required roles"
-          items={asset.missingRequiredRoles}
-          emptyLabel="No missing required roles."
-        />
-        <RequirementList
-          title="Launch / recovery gaps"
-          items={asset.launchRecoveryGaps}
-          emptyLabel="No launch / recovery gaps."
-        />
-        <RequirementList
-          title="Preferred gaps"
-          items={asset.preferredGaps}
-          emptyLabel="No preferred gaps."
-        />
-      </div>
-
-      <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-4">
+    <details className="group rounded-3xl border border-white/10 bg-slate-950/55 shadow-[0_24px_80px_-40px_rgba(0,0,0,0.8)]">
+      <summary className="cursor-pointer list-none rounded-3xl px-4 py-4 outline-none transition hover:bg-white/5 sm:px-5">
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-card-foreground">Advisory allocation only</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              This section suggests a likely crew composition. It does not authorise a launch.
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-base font-semibold text-card-foreground">{asset.asset.name}</p>
+              <StatusPill tone={summaryTone(asset.status)}>{getStatusLabel(asset.status)}</StatusPill>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {asset.location?.name ?? "No location"} · {asset.assetType?.name ?? "Asset type unknown"}
             </p>
           </div>
-          <StatusPill tone="grey">Advisory</StatusPill>
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-muted-foreground">
+            Details
+          </span>
         </div>
 
-        <div className="mt-4 grid gap-4">
-          <CrewAllocationList
-            title="Likely boat crew"
-            items={asset.allocation.likelyBoatCrew}
-            emptyLabel="No likely boat crew allocation."
-          />
-          <CrewAllocationList
-            title="Likely launch / recovery crew"
-            items={asset.allocation.likelyLaunchRecoveryCrew}
-            emptyLabel="No likely launch / recovery crew allocation."
-          />
-          <CrewAllocationList
-            title="Likely shore support crew"
-            items={asset.allocation.likelyShoreSupportCrew}
-            emptyLabel="No likely shore support crew allocation."
-          />
-          <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Head Launcher</p>
-                <p className="text-sm font-medium text-card-foreground">{asset.headLauncher.label}</p>
-              </div>
-              <StatusPill tone={headLauncherTone}>{asset.headLauncher.status.replaceAll("_", " ")}</StatusPill>
-            </div>
-            {asset.headLauncher.notes.length ? (
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {asset.headLauncher.notes.join(" ")}
-              </p>
-            ) : null}
-          </div>
-          <StringList
-            title="Role conflicts"
-            items={asset.roleConflicts}
-            emptyLabel="No role conflicts detected."
-          />
-          <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
-              Crew who could restore readiness
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Crew</p>
+            <p className="mt-2 text-2xl font-semibold text-card-foreground">
+              {formatCount(asset.availableCrewCount)}
             </p>
-            {asset.crewWhoCouldRestoreReadiness.length ? (
-              <div className="flex flex-wrap gap-2">
-                {asset.crewWhoCouldRestoreReadiness.map((member) => (
-                  <span
-                    key={member.id}
-                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-card-foreground"
-                  >
-                    {member.display_name ?? member.email ?? member.id}
+            <p className="mt-1 text-xs text-muted-foreground">
+              Min {formatCount(asset.minimumCrew)}
+              {asset.maximumCrew !== null ? ` · Max ${formatCount(asset.maximumCrew)}` : ""}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Ready</p>
+            <p className="mt-2 text-2xl font-semibold text-card-foreground">
+              {formatCount(asset.qualifiedCrewCount)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Current green qualifications</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Suggested</p>
+            <p className="mt-2 text-2xl font-semibold text-card-foreground">
+              {formatCount(asset.allocatedCrewCount)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Advisory allocation</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Gaps</p>
+            <p className="mt-2 text-2xl font-semibold text-card-foreground">
+              {formatCount(asset.missingHardStopRoles.length + asset.launchRecoveryGaps.length)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Hard-stop and launch/recovery gaps</p>
+          </div>
+        </div>
+      </summary>
+
+      <div className="border-t border-white/10 p-4 sm:p-5">
+        <div className="grid gap-4">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Crew capability badges</p>
+            <div className="mt-2">
+              <CrewCapabilityBadges items={asset.capabilityBadges} emptyLabel="No current green capability badges" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-2">
+            <RequirementList
+              title="Missing hard-stop roles"
+              items={asset.missingHardStopRoles}
+              emptyLabel="No missing hard-stop roles."
+            />
+            <RequirementList
+              title="Launch / recovery gaps"
+              items={asset.launchRecoveryGaps}
+              emptyLabel="No launch / recovery gaps."
+            />
+          </div>
+          <div className="grid gap-4 xl:grid-cols-2">
+            <RequirementList
+              title="Missing required roles"
+              items={asset.missingRequiredRoles}
+              emptyLabel="No missing required roles."
+            />
+            <RequirementList
+              title="Preferred gaps"
+              items={asset.preferredGaps}
+              emptyLabel="No preferred gaps."
+            />
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-card-foreground">Advisory allocation only</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Likely crew composition, launch/recovery crew, and Head Launcher placement are shown here for operational support only.
+                </p>
+              </div>
+              <StatusPill tone="grey">Advisory</StatusPill>
+            </div>
+
+            <div className="mt-4 grid gap-4">
+              <CrewAllocationList
+                title="Likely boat crew"
+                items={asset.allocation.likelyBoatCrew}
+                emptyLabel="No likely boat crew allocation."
+              />
+              <CrewAllocationList
+                title="Likely launch / recovery crew"
+                items={asset.allocation.likelyLaunchRecoveryCrew}
+                emptyLabel="No likely launch / recovery crew allocation."
+              />
+              <CrewAllocationList
+                title="Likely shore support crew"
+                items={asset.allocation.likelyShoreSupportCrew}
+                emptyLabel="No likely shore support crew allocation."
+              />
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Head Launcher</p>
+                    <p className="text-sm font-medium text-card-foreground">{asset.headLauncher.label}</p>
+                  </div>
+                  <StatusPill tone={headLauncherTone}>{asset.headLauncher.status.replaceAll("_", " ")}</StatusPill>
+                </div>
+                {asset.headLauncher.notes.length ? (
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                    {asset.headLauncher.notes.join(" ")}
+                  </p>
+                ) : null}
+              </div>
+              <StringList
+                title="Role conflicts"
+                items={asset.roleConflicts}
+                emptyLabel="No role conflicts detected."
+              />
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+                  Crew who could restore readiness
+                </p>
+                {asset.crewWhoCouldRestoreReadiness.length ? (
+                  <div className="flex flex-wrap gap-2">
+                    {asset.crewWhoCouldRestoreReadiness.map((member) => (
+                      <span
+                        key={member.id}
+                        className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-card-foreground"
+                      >
+                        {member.display_name ?? member.email ?? member.id}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No obvious readiness restoration candidates.</p>
+                )}
+              </div>
+              {asset.allocation.headLauncher.status === "conflict_boat_crew" ? (
+                <p className="text-xs text-amber-200">Head Launcher conflict: also counted as boat crew.</p>
+              ) : null}
+              {asset.allocation.headLauncher.status === "conflict_launch_authority" ? (
+                <p className="text-xs text-amber-200">Head Launcher conflict: acting as Launch Authority / DLA.</p>
+              ) : null}
+            </div>
+          </div>
+
+          {asset.currentCrew.length ? (
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Current crew</p>
+              <div className="mt-3 flex flex-wrap gap-2 text-sm text-card-foreground">
+                {asset.currentCrew.map((member) => (
+                  <span key={member.profile.id} className="rounded-full border border-white/10 bg-slate-950/70 px-3 py-1">
+                    {member.profile.display_name ?? member.profile.email ?? member.profile.id}
                   </span>
                 ))}
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No obvious readiness restoration candidates.</p>
-            )}
-          </div>
-          {asset.allocation.headLauncher.status === "conflict_boat_crew" ? (
-            <p className="text-xs text-amber-200">
-              Head Launcher conflict: also counted as boat crew.
-            </p>
-          ) : null}
-          {asset.allocation.headLauncher.status === "conflict_launch_authority" ? (
-            <p className="text-xs text-amber-200">
-              Head Launcher conflict: acting as Launch Authority / DLA.
-            </p>
+            </div>
           ) : null}
         </div>
       </div>
-
-      {asset.currentCrew.length ? (
-        <div className="mt-4 space-y-2">
-          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Current crew</p>
-          <div className="flex flex-wrap gap-2 text-sm text-card-foreground">
-            {asset.currentCrew.map((member) => (
-              <span
-                key={member.profile.id}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1"
-              >
-                {member.profile.display_name ?? member.profile.email ?? member.profile.id}
-              </span>
-            ))}
-          </div>
-        </div>
-      ) : null}
-    </article>
+    </details>
   );
 }
 
@@ -460,6 +474,11 @@ export function ReadinessBoard({
             </p>
           </div>
         </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <StatusPill tone="grey">Advisory only</StatusPill>
+          <StatusPill tone={summaryTone(stationSummary.status)}>{stationSummary.assetCount} assets assessed</StatusPill>
+          <StatusPill tone="blue">{stationSummary.locationCount} locations</StatusPill>
+        </div>
       </SectionShell>
 
       <SectionShell title="Station coverage" description="Location-level readiness highlights operational gaps without authorising launches.">
@@ -473,7 +492,7 @@ export function ReadinessBoard({
                 </div>
                 <StatusPill tone={summaryTone(location.status)}>{getStatusCopy(location.status)}</StatusPill>
               </div>
-              <div className="mt-4 space-y-4">
+              <div className="mt-4 grid gap-3">
                 {location.assets.map((asset) => (
                   <AssetReadinessCard key={asset.asset.id} asset={asset} />
                 ))}

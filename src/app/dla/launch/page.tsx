@@ -62,6 +62,7 @@ export default async function DlaLaunchPage({
     stationId: snapshot.selectedStationId,
     operationType: requestedOperationType,
   });
+  const launchReady = snapshot.stationSummary?.status === "launch_ready";
 
   return (
     <AppShell>
@@ -69,7 +70,7 @@ export default async function DlaLaunchPage({
         <PageHero
           eyebrow="DLA / Launch"
           title="Launch initiation and incident control"
-          summary="The launch screen shows advisory readiness, open cover requests, and incident tracking. It never authorises a launch."
+          summary="A step-by-step operational flow for advisory launch records, readiness preview, and incident tracking."
         />
 
         {success ? (
@@ -84,7 +85,33 @@ export default async function DlaLaunchPage({
         ) : null}
 
         <SectionShell
-          title="Station and operation"
+          title="Launch flow"
+          description="Review the station, preview readiness, then create an advisory launch record."
+        >
+          <div className="grid gap-3 md:grid-cols-3">
+            {[
+              ["1. Select station", "Choose the station, location, and assets to review."],
+              ["2. Review readiness", "Check blocking gaps, Head Launcher status, and cover."],
+              ["3. Confirm record", "Create the advisory launch draft only when ready."],
+            ].map(([title, text]) => (
+              <div key={title} className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+                <p className="text-sm font-semibold text-card-foreground">{title}</p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <StatusPill tone={launchReady ? "green" : "amber"}>
+              {launchReady ? "Ready to initiate advisory launch record" : "Blocking gaps or warnings present"}
+            </StatusPill>
+            <span className="text-sm text-muted-foreground">
+              Readiness remains advisory and the Launch Authority/DLA is still responsible for decisions.
+            </span>
+          </div>
+        </SectionShell>
+
+        <SectionShell
+          title="Step 1. Station and operation"
           description="Select the station and operation type to preview readiness before creating a draft incident."
         >
           <form method="get" className="grid gap-4 md:grid-cols-3">
@@ -128,7 +155,9 @@ export default async function DlaLaunchPage({
           </form>
         </SectionShell>
 
-        <ReadinessBoard snapshot={snapshot} />
+        <SectionShell title="Step 2. Review readiness" description="Compact asset tiles show the status first. Expand any asset for the full detail.">
+          <ReadinessBoard snapshot={snapshot} />
+        </SectionShell>
 
         <SectionShell
           title="Open cover requests affecting readiness"
@@ -170,7 +199,7 @@ export default async function DlaLaunchPage({
         </SectionShell>
 
         <SectionShell
-          title="Create launch draft"
+          title="Step 3. Create launch draft"
           description="Select assets, capture the launch context, and save a draft before initiation."
         >
           <form action={saveIncidentDraftAction} className="space-y-5 rounded-3xl border border-white/10 bg-slate-950/50 p-4">
@@ -272,7 +301,7 @@ export default async function DlaLaunchPage({
         </SectionShell>
 
         <SectionShell
-          title="Launch drafts and incidents"
+          title="Step 4. Launch drafts and incidents"
           description="Drafts can be initiated from here; active incidents stay visible for tracking and response."
         >
           <div className="grid gap-4 xl:grid-cols-2">

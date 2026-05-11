@@ -1,6 +1,7 @@
 import "server-only";
 
 import { unstable_noStore as noStore } from "next/cache";
+import { buildCapabilityBadges } from "@/lib/capability-badges";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildStationOptionsFromContext } from "@/lib/phase6";
 import { requireRouteAccess, type CurrentUserContext } from "@/lib/auth";
@@ -67,7 +68,45 @@ export type IncidentResponseRecord = {
   created_at: string;
   updated_at: string;
   responder: CrewProfileRecord | null;
+  capabilityBadges: ReturnType<typeof buildCapabilityBadges>;
+  hasCasualtyCare: boolean;
 };
+
+type IncidentQualificationRecord = Readonly<{
+  id: string;
+  profile_id: string;
+  currency_state: "green" | "amber" | "red" | null;
+  is_active: boolean;
+  expires_on: string | null;
+  asset_type:
+    | { code: string | null; name: string | null }
+    | { code: string | null; name: string | null }[]
+    | null;
+  asset:
+    | {
+        asset_type_id: string | null;
+        asset_type:
+          | { code: string | null; name: string | null }
+          | { code: string | null; name: string | null }[]
+          | null;
+      }
+    | {
+        asset_type_id: string | null;
+        asset_type:
+          | { code: string | null; name: string | null }
+          | { code: string | null; name: string | null }[]
+          | null;
+      }[]
+    | null;
+  operational_role:
+    | { code: string | null; name: string | null }
+    | { code: string | null; name: string | null }[]
+    | null;
+  qualification_type:
+    | { code: string | null; name: string | null }
+    | { code: string | null; name: string | null }[]
+    | null;
+}>;
 
 export type IncidentAssetSummary = {
   id: string;
@@ -125,6 +164,19 @@ function getLabel(profile: CrewProfileRecord | null) {
   return profile?.display_name ?? profile?.email ?? profile?.id ?? "Unknown crew member";
 }
 
+function isCurrentQualification(qualification: IncidentQualificationRecord) {
+  if (!qualification.is_active || qualification.currency_state !== "green") {
+    return false;
+  }
+
+  if (!qualification.expires_on) {
+    return true;
+  }
+
+  const expiry = new Date(`${qualification.expires_on}T23:59:59`);
+  return !Number.isNaN(expiry.getTime()) && expiry >= new Date();
+}
+
 function getIncidentStatusLabel(status: IncidentDbStatus) {
   switch (status) {
     case "open":
@@ -163,10 +215,11 @@ async function loadIncidentRows(stationId: string | null) {
       incidents: [] as IncidentRecord[],
       incidentAssets: [] as IncidentAssetRecord[],
       incidentResponses: [] as IncidentResponseRecord[],
+      incidentQualifications: [] as IncidentQualificationRecord[],
     };
   }
 
-  const [incidentResult, assetResult, responseResult] = await Promise.all([
+  const [incidentResult, assetResult, responseResult, qualificationResult] = await Promise.all([
     supabase
       .from("incidents")
       .select(
@@ -229,6 +282,37 @@ async function loadIncidentRows(stationId: string | null) {
         `,
       )
       .order("created_at", { ascending: true }),
+    supabase
+      .from("crew_qualifications")
+      .select(
+        `
+          id,
+          profile_id,
+          currency_state,
+          is_active,
+          expires_on,
+          asset_type:asset_types (
+            code,
+            name
+          ),
+          asset:assets (
+            asset_type_id,
+            asset_type:asset_types (
+              code,
+              name
+            )
+          ),
+          operational_role:operational_roles (
+            code,
+            name
+          ),
+          qualification_type:qualification_types (
+            code,
+            name
+          )
+        `,
+      )
+      .order("created_at", { ascending: false }),
   ]);
 
   return {
@@ -280,6 +364,7 @@ async function loadIncidentRows(stationId: string | null) {
       updated_at: String(response.updated_at),
       responder: null,
     })) as IncidentResponseRecord[],
+    incidentQualifications: (qualificationResult.data ?? []) as IncidentQualificationRecord[],
   };
 }
 
@@ -346,7 +431,7 @@ export async function loadIncidentBoardData(pathname: string, requestedStationId
       ? requestedStationId
       : null) ?? stationOptions[0]?.id ?? null;
   const selectedStation = stationOptions.find((station) => station.id === selectedStationId) ?? null;
-  const { incidents, incidentAssets, incidentResponses } = await loadIncidentRows(selectedStationId);
+  const { incidents, incidentAssets, incidentResponses, incidentQualifications } = await loadIncidentRows(selectedStationId);
 
   const profileIds = Array.from(
     new Set([
@@ -417,14 +502,33 @@ export async function loadIncidentBoardData(pathname: string, requestedStationId
   }
 
   const responseMap = new Map<string, IncidentResponseRecord[]>();
+  const qualificationMap = new Map<string, IncidentQualificationRecord[]>();
+  for (const qualification of incidentQualifications) {
+    const existing = qualificationMap.get(qualification.profile_id) ?? [];
+    qualificationMap.set(qualification.profile_id, [...existing, qualification]);
+  }
   for (const response of incidentResponses) {
     const responder = profileMap.get(response.profile_id) ?? null;
+    const responderQualifications = qualificationMap.get(response.profile_id) ?? [];
+    const capabilityBadges = buildCapabilityBadges<IncidentQualificationRecord>(responderQualifications);
+    const hasCasualtyCare = responderQualifications.some((qualification) => {
+      if (!isCurrentQualification(qualification)) {
+        return false;
+      }
+
+      const qualificationType = Array.isArray(qualification.qualification_type)
+        ? qualification.qualification_type[0] ?? null
+        : qualification.qualification_type;
+      return qualificationType?.code === "casualty_care";
+    });
     const existing = responseMap.get(response.incident_id) ?? [];
     responseMap.set(response.incident_id, [
       ...existing,
       {
         ...response,
         responder,
+        capabilityBadges,
+        hasCasualtyCare,
       },
     ]);
   }

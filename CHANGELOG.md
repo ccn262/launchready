@@ -179,3 +179,4 @@
 - Expanded the demo seed again so direct UUID literals in placeholder notification and audit rows are also explicit UUID values.
 - Cleaned up the demo seed source tuples so all UUID-like values in the CTE `VALUES` blocks are cast at source before insertion, preventing SQL Editor type inference issues.
 - Aligned the demo seed with the actual `availability_slot_kind` enum by replacing an invalid `day_cover` availability value with `full_day`.
+- Added a UI readability pass that keeps the operational dashboards compact, status-first, and easier to scan without changing backend behavior.

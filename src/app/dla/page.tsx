@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { OperationalCard } from "@/components/operational-card";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
@@ -20,40 +19,70 @@ export default async function DlaPage() {
   });
   const coverOverview = await loadCoverRequestOverview("/dla", snapshot.selectedStationId);
   const incidentBoard = await loadIncidentBoardData("/dla", snapshot.selectedStationId);
+  const assets = snapshot.stationSummary?.locations.flatMap((location) => location.assets) ?? [];
+  const readyCount = assets.filter((asset) => asset.status === "launch_ready").length;
+  const offServiceCount = assets.filter((asset) => asset.status === "off_service" || asset.status === "not_launch_ready").length;
+  const activeIncidentCount = incidentBoard.activeCount;
+  const urgentCoverCount = coverOverview.urgentCount;
 
   return (
     <AppShell>
       <div className="space-y-6">
         <PageHero
           eyebrow="DLA section"
-          title="Station readiness and duty cover control"
-          summary="DLA users can view station readiness, missing roles, and duty context for their own station without touching launch authorisation."
+          title="Station readiness and current operational work"
+          summary="DLA users can scan readiness, incidents, and cover at a glance without touching launch authorisation."
         />
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <OperationalCard
-            title="Readiness visibility"
-            tone="green"
-            metric="Station scope"
-            summary="The readiness engine highlights missing hard-stop roles, qualified crew counts, and launch/recovery dependencies."
-            details={[
-              "Readiness is calculated per asset and then rolled up to the station.",
-              "Crew availability and duty periods are part of the calculation.",
-              "The output is advisory, not a launch authority.",
-            ]}
-          />
-          <OperationalCard
-            title="Operational boundaries"
-            tone="amber"
-            metric="Decision support only"
-            summary="If a hard-stop role is missing, the asset will not be shown as launch-ready."
-            details={[
-              "Dynamic risk assessment may be recorded later.",
-              "WhatsApp and SMS remain out of scope here.",
-              "Launch initiation is not part of this phase.",
-            ]}
-          />
-        </div>
+        <SectionShell
+          title="Operational snapshot"
+          description="Station status, current work, and urgent cover are kept together for fast scanning."
+        >
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Station</p>
+              <p className="mt-2 text-2xl font-semibold text-card-foreground">
+                {snapshot.stationSummary?.stationName ?? "No station selected"}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">{snapshot.stationSummary?.statusLabel ?? "No readiness data"}</p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Assets ready</p>
+              <p className="mt-2 text-3xl font-semibold text-emerald-200">{readyCount}</p>
+              <p className="mt-2 text-sm text-muted-foreground">On service</p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Off service</p>
+              <p className="mt-2 text-3xl font-semibold text-rose-200">{offServiceCount}</p>
+              <p className="mt-2 text-sm text-muted-foreground">Not launch ready</p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Current work</p>
+              <p className="mt-2 text-3xl font-semibold text-amber-200">{activeIncidentCount}</p>
+              <p className="mt-2 text-sm text-muted-foreground">Active incidents · Urgent cover {urgentCoverCount}</p>
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/dla/launch"
+              className="inline-flex h-11 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
+            >
+              Launch / create incident
+            </Link>
+            <Link
+              href="/dla/incidents"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              View incidents
+            </Link>
+            <Link
+              href="/admin/readiness"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              View readiness
+            </Link>
+          </div>
+        </SectionShell>
 
         <ReadinessBoard snapshot={snapshot} />
 
@@ -135,40 +164,42 @@ export default async function DlaPage() {
           </div>
           <div className="mt-4 space-y-4">
             {incidentBoard.activeIncidents.slice(0, 3).map((incident) => (
-              <div key={incident.incident.id} className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-card-foreground">{incident.incident.title}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {incident.incident.operation_type.replace(/_/g, " ")} · {incident.selectedAssetNames.join(", ") || "No assets selected"}
-                    </p>
+              <details key={incident.incident.id} className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                <summary className="cursor-pointer list-none outline-none">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-card-foreground">{incident.incident.title}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {incident.incident.operation_type.replace(/_/g, " ")} · {incident.selectedAssetNames.join(", ") || "No assets selected"}
+                      </p>
+                    </div>
+                    <StatusPill tone={incident.statusTone}>{incident.statusLabel}</StatusPill>
                   </div>
-                  <StatusPill tone={incident.statusTone}>{incident.statusLabel}</StatusPill>
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    Responses attending {incident.attendingCount} · delayed {incident.delayedCount} · fallback {incident.fallbackAvailableCount}
+                  </p>
+                </summary>
+                <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Response snapshot</p>
+                  <div className="mt-3 grid gap-3 md:grid-cols-3">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-card-foreground">
+                      Attending {incident.attendingCount}
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-card-foreground">
+                      Delayed {incident.delayedCount}
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-card-foreground">
+                      Fallback {incident.fallbackAvailableCount}
+                    </div>
+                  </div>
                 </div>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  Responses attending {incident.attendingCount} · delayed {incident.delayedCount} · fallback {incident.fallbackAvailableCount}
-                </p>
-              </div>
+              </details>
             ))}
             {!incidentBoard.activeIncidents.length ? (
               <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
                 No active incidents are open for the selected station.
               </div>
             ) : null}
-          </div>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              href="/dla/launch"
-              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
-            >
-              Open launch draft screen
-            </Link>
-            <Link
-              href="/dla/incidents"
-              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
-            >
-              Open incident board
-            </Link>
           </div>
         </SectionShell>
       </div>

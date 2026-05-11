@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
@@ -18,15 +19,83 @@ export default async function DashboardPage() {
   });
   const coverOverview = await loadCoverRequestOverview("/", snapshot.selectedStationId);
   const incidentBoard = await loadIncidentBoardData("/", snapshot.selectedStationId);
+  const assets = snapshot.stationSummary?.locations.flatMap((location) => location.assets) ?? [];
+  const readyCount = assets.filter((asset) => asset.status === "launch_ready").length;
+  const degradedCount = assets.filter((asset) => asset.status === "degraded" || asset.status === "delayed_launch_possible").length;
+  const offServiceCount = assets.filter((asset) => asset.status === "off_service" || asset.status === "not_launch_ready").length;
+  const unknownCount = assets.filter((asset) => asset.status === "unknown" || asset.status === "non_sar_capable_exercise_only").length;
 
   return (
     <AppShell>
       <div className="space-y-6">
         <PageHero
           eyebrow="Operational dashboard"
-          title="Readiness, crew cover, and launch support in one view"
-          summary="The dashboard now surfaces the first readiness engine calculation. It stays station-scoped, asset-aware, and non-authorising."
+          title="Readiness, cover, and current incidents"
+          summary="A compact operational dashboard for quick scanning. Status, current jobs, cover, and launch support stay in one place."
         />
+
+        <SectionShell
+          title="Operational snapshot"
+          description="The dashboard stays station-scoped, advisory only, and focused on what needs action next."
+        >
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            <div className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Station</p>
+              <p className="mt-2 text-2xl font-semibold text-card-foreground">
+                {snapshot.stationSummary?.stationName ?? "No station selected"}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {snapshot.stationSummary?.statusLabel ?? "No readiness data"}
+              </p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Assets ready</p>
+              <p className="mt-2 text-3xl font-semibold text-emerald-200">{readyCount}</p>
+              <p className="mt-2 text-sm text-muted-foreground">Launch-ready assets</p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">At risk</p>
+              <p className="mt-2 text-3xl font-semibold text-amber-200">{degradedCount}</p>
+              <p className="mt-2 text-sm text-muted-foreground">Degraded or delayed-launch possible</p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Off service</p>
+              <p className="mt-2 text-3xl font-semibold text-rose-200">{offServiceCount}</p>
+              <p className="mt-2 text-sm text-muted-foreground">Not launch ready</p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Unknown</p>
+              <p className="mt-2 text-3xl font-semibold text-muted-foreground">{unknownCount}</p>
+              <p className="mt-2 text-sm text-muted-foreground">No rule configured</p>
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/dla/launch"
+              className="inline-flex h-11 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
+            >
+              Launch / create incident
+            </Link>
+            <Link
+              href="/admin/readiness"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              View readiness
+            </Link>
+            <Link
+              href="/dla/incidents"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              View incidents
+            </Link>
+            <Link
+              href="/crew/cover"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              Cover requests
+            </Link>
+          </div>
+        </SectionShell>
 
         <ReadinessBoard snapshot={snapshot} />
 

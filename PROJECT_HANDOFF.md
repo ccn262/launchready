@@ -107,3 +107,10 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - In Supabase SQL Editor, run `supabase/demo-seed.sql` after the main seed and then verify the demo crew with the SQL listed in `CODEX_RUN_LOG.md`.
 - For browser testing, the existing Test Admin account can be used immediately; the demo profiles become login-capable only after matching Supabase Auth users are created.
 - If Supabase SQL Editor reports a UUID type mismatch, rerun the updated `supabase/demo-seed.sql`; the CTE-backed inserts now cast their row IDs explicitly to `uuid`.
+
+## UI Readability Pass
+
+- Pages reviewed: `/`, `/admin/readiness`, `/dla`, `/dla/launch`, `/dla/incidents`, `/crew/incidents`, `/admin/cover`, `/crew/cover`, `/admin/availability`, `/admin/duty-rota`.
+- Main usability issue: the operational screens had become long report-style pages that were hard to scan quickly during live use.
+- Layout changes: the dashboard and readiness views now prefer compact summary cards, status-first tiles, step labels, and expandable detail rows for asset, availability, and rota records.
+- Scope boundary: this pass was UI-only. No schema, RLS, readiness, incident, cover, auth, or notification logic changed.

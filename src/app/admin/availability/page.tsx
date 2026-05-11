@@ -340,32 +340,34 @@ export default async function AdminAvailabilityPage({
                     const role = slot.operational_role && !Array.isArray(slot.operational_role) ? slot.operational_role : null;
 
                     return (
-                      <div key={slot.id} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-base font-semibold text-card-foreground">
-                              {profile?.display_name ?? profile?.email ?? "Crew member"} · {slot.slot_kind.replace(/_/g, " ")}
-                            </p>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {formatDateTime(slot.starts_at)} to {formatDateTime(slot.ends_at)}
-                            </p>
+                      <details key={slot.id} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
+                        <summary className="cursor-pointer list-none outline-none">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-base font-semibold text-card-foreground">
+                                {profile?.display_name ?? profile?.email ?? "Crew member"} · {slot.slot_kind.replace(/_/g, " ")}
+                              </p>
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                {formatDateTime(slot.starts_at)} to {formatDateTime(slot.ends_at)}
+                              </p>
+                            </div>
+                            <StatusPill tone={getSlotTone(slot)}>{slot.is_active ? "Active" : "Inactive"}</StatusPill>
                           </div>
-                          <StatusPill tone={getSlotTone(slot)}>{slot.is_active ? "Active" : "Inactive"}</StatusPill>
-                        </div>
 
-                        <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                          {location ? <span className="rounded-full border border-white/10 px-3 py-1">{location.name}</span> : null}
-                          {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
-                          {assetType ? <span className="rounded-full border border-white/10 px-3 py-1">{assetType.name}</span> : null}
-                          {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
-                        </div>
+                          <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                            {location ? <span className="rounded-full border border-white/10 px-3 py-1">{location.name}</span> : null}
+                            {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
+                            {assetType ? <span className="rounded-full border border-white/10 px-3 py-1">{assetType.name}</span> : null}
+                            {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
+                          </div>
+                        </summary>
 
                         {slot.notes ? (
                           <p className="mt-4 text-sm leading-6 text-muted-foreground">
                             {slot.notes}
                           </p>
                         ) : null}
-                      </div>
+                      </details>
                     );
                   })}
                 </div>

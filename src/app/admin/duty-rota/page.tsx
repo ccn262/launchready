@@ -350,32 +350,34 @@ export default async function AdminDutyRotaPage({
                     const role = period.operational_role && !Array.isArray(period.operational_role) ? period.operational_role : null;
 
                     return (
-                      <div key={period.id} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-base font-semibold text-card-foreground">
-                              {profile?.display_name ?? profile?.email ?? "Crew member"} · {period.period_kind.replace(/_/g, " ")}
-                            </p>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {formatDateTime(period.starts_at)} to {formatDateTime(period.ends_at)}
-                            </p>
+                      <details key={period.id} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
+                        <summary className="cursor-pointer list-none outline-none">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-base font-semibold text-card-foreground">
+                                {profile?.display_name ?? profile?.email ?? "Crew member"} · {period.period_kind.replace(/_/g, " ")}
+                              </p>
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                {formatDateTime(period.starts_at)} to {formatDateTime(period.ends_at)}
+                              </p>
+                            </div>
+                            <StatusPill tone={getPeriodTone(period)}>{period.is_active ? "Active" : "Inactive"}</StatusPill>
                           </div>
-                          <StatusPill tone={getPeriodTone(period)}>{period.is_active ? "Active" : "Inactive"}</StatusPill>
-                        </div>
 
-                        <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                          {location ? <span className="rounded-full border border-white/10 px-3 py-1">{location.name}</span> : null}
-                          {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
-                          {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
-                          <span className="rounded-full border border-white/10 px-3 py-1">{period.source}</span>
-                        </div>
+                          <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                            {location ? <span className="rounded-full border border-white/10 px-3 py-1">{location.name}</span> : null}
+                            {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
+                            {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
+                            <span className="rounded-full border border-white/10 px-3 py-1">{period.source}</span>
+                          </div>
+                        </summary>
 
                         {period.notes ? (
                           <p className="mt-4 text-sm leading-6 text-muted-foreground">
                             {period.notes}
                           </p>
                         ) : null}
-                      </div>
+                      </details>
                     );
                   })}
                 </div>
