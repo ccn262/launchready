@@ -134,3 +134,4 @@
 - Focus on `/`, `/admin/readiness`, `/dla`, `/dla/launch`, `/dla/incidents`, `/crew/incidents`, `/admin/cover`, `/crew/cover`, `/admin/availability`, and `/admin/duty-rota`.
 - Keep the UI as a fast operational dashboard: compact summary cards, shorter status-first layouts, expandable detail rows, and clear call-to-action buttons.
 - Do not change schema, RLS, readiness calculations, incident logic, cover logic, auth, or notification logic in this pass.
+- Follow up with a second UI-only refinement for cover and rota surfaces if those pages still feel too long after the first readability pass.

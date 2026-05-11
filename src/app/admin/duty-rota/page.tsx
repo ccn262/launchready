@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/app-shell";
 import { CrewCapabilityBadges } from "@/components/crew-capability-badges";
-import { OperationalCard } from "@/components/operational-card";
+import { DashboardSummaryTile } from "@/components/dashboard-summary-tile";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
@@ -53,6 +53,43 @@ function getPeriodTone(period: DutyPeriodRecord) {
   }
 }
 
+function getDutyGroupLabel(periodKind: DutyPeriodRecord["period_kind"]) {
+  switch (periodKind) {
+    case "day_cover":
+      return "Day";
+    case "night_cover":
+      return "Night";
+    case "weekend_cover":
+      return "Weekend";
+    case "dla_day":
+    case "dla_night":
+      return "DLA";
+    case "launch_alert":
+      return "Launch";
+    case "incident_cover":
+      return "Incident";
+    case "training":
+      return "Training";
+    default:
+      return "Other";
+  }
+}
+
+function getDutyGroupTone(periodKind: DutyPeriodRecord["period_kind"]) {
+  switch (periodKind) {
+    case "day_cover":
+    case "dla_day":
+      return "green" as const;
+    case "night_cover":
+    case "dla_night":
+      return "blue" as const;
+    case "weekend_cover":
+      return "amber" as const;
+    default:
+      return "grey" as const;
+  }
+}
+
 export default async function AdminDutyRotaPage({
   searchParams,
 }: Readonly<{
@@ -71,6 +108,40 @@ export default async function AdminDutyRotaPage({
   const defaultEndDate = new Date(defaultStartDate.getTime() + 8 * 60 * 60 * 1000);
   const defaultStart = toDateTimeLocalValue(defaultStartDate);
   const defaultEnd = toDateTimeLocalValue(defaultEndDate);
+  const dayCoverCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "day_cover").length;
+  const nightCoverCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "night_cover").length;
+  const weekendCoverCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "weekend_cover").length;
+  const dlaDayCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "dla_day").length;
+  const dlaNightCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "dla_night").length;
+  const unassignedCount = data.dutyPeriods.filter((period) => period.is_active && !period.profile_id).length;
+  const groupedLocations = [
+    ...data.locations.map((location) => {
+      const periods = data.dutyPeriods.filter((period) => period.station_location_id === location.id);
+      const profileIds = new Set(periods.map((period) => period.profile_id).filter((value): value is string => Boolean(value)));
+      const locationQualifications = data.crewQualifications.filter((qualification) => profileIds.has(qualification.profile_id));
+
+      return {
+        key: location.id,
+        title: location.name,
+        periods,
+        capabilityBadges: buildCapabilityBadges(locationQualifications),
+        dayCount: periods.filter((period) => period.period_kind === "day_cover").length,
+        nightCount: periods.filter((period) => period.period_kind === "night_cover").length,
+        weekendCount: periods.filter((period) => period.period_kind === "weekend_cover").length,
+        dlaCount: periods.filter((period) => period.period_kind === "dla_day" || period.period_kind === "dla_night").length,
+      };
+    }),
+    {
+      key: "station-wide",
+      title: "Station-wide",
+      periods: data.dutyPeriods.filter((period) => !period.station_location_id),
+      capabilityBadges: [],
+      dayCount: data.dutyPeriods.filter((period) => !period.station_location_id && period.period_kind === "day_cover").length,
+      nightCount: data.dutyPeriods.filter((period) => !period.station_location_id && period.period_kind === "night_cover").length,
+      weekendCount: data.dutyPeriods.filter((period) => !period.station_location_id && period.period_kind === "weekend_cover").length,
+      dlaCount: data.dutyPeriods.filter((period) => !period.station_location_id && (period.period_kind === "dla_day" || period.period_kind === "dla_night")).length,
+    },
+  ];
 
   return (
     <AppShell>
@@ -92,30 +163,33 @@ export default async function AdminDutyRotaPage({
           </div>
         ) : null}
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <OperationalCard
-            title="Manual rota foundation"
-            tone="green"
-            metric="No auto-generation"
-            summary="This page allows manual rota assignment only. It is intentionally lightweight so it can later feed readiness and launch workflows."
-            details={[
-              "Weekend duty runs Friday 19:00 to Monday 07:00.",
-              "Weeknight cover runs Monday to Thursday 19:00 to 07:00.",
-              "Auto-rota generation and cover swaps remain backlog items.",
-            ]}
-          />
-          <OperationalCard
-            title="DLA coverage"
-            tone="amber"
-            metric="Day and night periods"
-            summary="DLA duty periods can be assigned and reviewed here, while keeping the operational data station-scoped."
-            details={[
-              "DLA access to this page stays station-scoped.",
-              "Future incident and alerting work will build on the same records.",
-              "Audit logging remains in the database layer.",
-            ]}
-          />
-        </div>
+        <SectionShell
+          title="Duty rota summary"
+          description="Duty rota shows assigned cover periods such as day cover, night cover, DLA duty and weekend cover."
+        >
+          <div className="grid gap-4 md:grid-cols-6">
+            <DashboardSummaryTile label="Day cover" value={dayCoverCount} tone="green" />
+            <DashboardSummaryTile label="Night cover" value={nightCoverCount} tone="blue" />
+            <DashboardSummaryTile label="Weekend cover" value={weekendCoverCount} tone="amber" />
+            <DashboardSummaryTile label="DLA day" value={dlaDayCount} tone="green" />
+            <DashboardSummaryTile label="DLA night" value={dlaNightCount} tone="blue" />
+            <DashboardSummaryTile label="Gaps / unassigned" value={unassignedCount} tone={unassignedCount > 0 ? "red" : "grey"} />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/admin/availability"
+              className="inline-flex h-11 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
+            >
+              View availability
+            </Link>
+            <Link
+              href="/admin/readiness"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              View readiness
+            </Link>
+          </div>
+        </SectionShell>
 
         <SectionShell
           title="Readiness console"
@@ -338,48 +412,103 @@ export default async function AdminDutyRotaPage({
             </SectionShell>
 
             <SectionShell
-              title="Duty period list"
-              description="Current duty, weekend, and DLA periods for the selected station."
+              title="Duty period dashboard"
+              description="Station locations appear first, then duty periods are grouped by type so the rota is easy to scan."
             >
               {data.dutyPeriods.length ? (
                 <div className="space-y-4">
-                  {data.dutyPeriods.map((period) => {
-                    const profile = period.profile && !Array.isArray(period.profile) ? period.profile : null;
-                    const location = period.station_location && !Array.isArray(period.station_location) ? period.station_location : null;
-                    const asset = period.asset && !Array.isArray(period.asset) ? period.asset : null;
-                    const role = period.operational_role && !Array.isArray(period.operational_role) ? period.operational_role : null;
+                  {groupedLocations.map((group) => (
+                    <details key={group.key} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
+                      <summary className="cursor-pointer list-none outline-none">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-base font-semibold text-card-foreground">{group.title}</p>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {group.dayCount} day · {group.nightCount} night · {group.weekendCount} weekend · {group.dlaCount} DLA
+                            </p>
+                          </div>
+                          <StatusPill tone={group.periods.some((period) => period.is_active) ? "green" : "grey"}>
+                            {group.periods.some((period) => period.is_active) ? "Active" : "No active periods"}
+                          </StatusPill>
+                        </div>
+                      </summary>
 
-                    return (
-                      <details key={period.id} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
-                        <summary className="cursor-pointer list-none outline-none">
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="text-base font-semibold text-card-foreground">
-                                {profile?.display_name ?? profile?.email ?? "Crew member"} · {period.period_kind.replace(/_/g, " ")}
-                              </p>
-                              <p className="mt-1 text-sm text-muted-foreground">
-                                {formatDateTime(period.starts_at)} to {formatDateTime(period.ends_at)}
-                              </p>
+                      <div className="mt-4 space-y-4">
+                        {group.capabilityBadges.length ? (
+                          <div>
+                            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Capability badges</p>
+                            <div className="mt-2">
+                              <CrewCapabilityBadges items={group.capabilityBadges} />
                             </div>
-                            <StatusPill tone={getPeriodTone(period)}>{period.is_active ? "Active" : "Inactive"}</StatusPill>
                           </div>
-
-                          <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                            {location ? <span className="rounded-full border border-white/10 px-3 py-1">{location.name}</span> : null}
-                            {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
-                            {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
-                            <span className="rounded-full border border-white/10 px-3 py-1">{period.source}</span>
-                          </div>
-                        </summary>
-
-                        {period.notes ? (
-                          <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                            {period.notes}
-                          </p>
                         ) : null}
-                      </details>
-                    );
-                  })}
+
+                        {[
+                          "day_cover",
+                          "night_cover",
+                          "weekend_cover",
+                          "dla_day",
+                          "dla_night",
+                          "launch_alert",
+                          "incident_cover",
+                          "training",
+                        ].map((periodKind) => {
+                          const periods = group.periods.filter((period) => period.period_kind === periodKind);
+
+                          if (!periods.length) {
+                            return null;
+                          }
+
+                          return (
+                            <div key={periodKind} className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                              <div className="flex items-center justify-between gap-3">
+                                <div>
+                                  <p className="text-sm font-medium text-card-foreground">{getDutyGroupLabel(periodKind as DutyPeriodRecord["period_kind"])}</p>
+                                  <p className="mt-1 text-xs text-muted-foreground">{periods.length} assigned periods</p>
+                                </div>
+                                <StatusPill tone={getDutyGroupTone(periodKind as DutyPeriodRecord["period_kind"])}>{periods.length}</StatusPill>
+                              </div>
+                              <div className="mt-3 space-y-2">
+                                {periods.map((period) => {
+                                  const profile = period.profile && !Array.isArray(period.profile) ? period.profile : null;
+                                  const asset = period.asset && !Array.isArray(period.asset) ? period.asset : null;
+                                  const role = period.operational_role && !Array.isArray(period.operational_role) ? period.operational_role : null;
+                                  const location = period.station_location && !Array.isArray(period.station_location) ? period.station_location : null;
+
+                                  return (
+                                    <details key={period.id} className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
+                                      <summary className="cursor-pointer list-none outline-none">
+                                        <div className="flex items-start justify-between gap-3">
+                                          <div>
+                                            <p className="text-sm font-medium text-card-foreground">
+                                              {profile?.display_name ?? profile?.email ?? "Crew member"}
+                                            </p>
+                                            <p className="mt-1 text-xs text-muted-foreground">
+                                              {formatDateTime(period.starts_at)} to {formatDateTime(period.ends_at)}
+                                            </p>
+                                          </div>
+                                          <StatusPill tone={getPeriodTone(period)}>{period.is_active ? "Active" : "Inactive"}</StatusPill>
+                                        </div>
+                                        <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                          {location ? <span className="rounded-full border border-white/10 px-3 py-1">{location.name}</span> : null}
+                                          {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
+                                          {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
+                                          <span className="rounded-full border border-white/10 px-3 py-1">{period.source}</span>
+                                        </div>
+                                      </summary>
+                                      {period.notes ? (
+                                        <p className="mt-3 text-sm leading-6 text-muted-foreground">{period.notes}</p>
+                                      ) : null}
+                                    </details>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </details>
+                  ))}
                 </div>
               ) : (
                 <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">

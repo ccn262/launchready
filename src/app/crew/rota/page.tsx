@@ -1,11 +1,12 @@
 import { AppShell } from "@/components/app-shell";
 import { CrewCapabilityBadges } from "@/components/crew-capability-badges";
-import { OperationalCard } from "@/components/operational-card";
+import { DashboardSummaryTile } from "@/components/dashboard-summary-tile";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
+import Link from "next/link";
 import { buildCapabilityBadges } from "@/lib/capability-badges";
-import { getNextWeekendWindow, loadCrewAvailabilityContext } from "@/lib/phase6";
+import { loadCrewAvailabilityContext } from "@/lib/phase6";
 
 function getQueryValue(value: string | string[] | undefined, fallback = "") {
   if (Array.isArray(value)) {
@@ -45,6 +46,38 @@ function getPeriodTone(periodKind: string) {
   }
 }
 
+function getRotaGroupTone(periodKind: string) {
+  switch (periodKind) {
+    case "night_cover":
+    case "dla_night":
+      return "blue" as const;
+    case "weekend_cover":
+      return "amber" as const;
+    case "day_cover":
+    case "dla_day":
+      return "green" as const;
+    default:
+      return "grey" as const;
+  }
+}
+
+function getRotaGroupLabel(periodKind: string) {
+  switch (periodKind) {
+    case "day_cover":
+      return "Day cover";
+    case "night_cover":
+      return "Night cover";
+    case "weekend_cover":
+      return "Weekend cover";
+    case "dla_day":
+      return "DLA day";
+    case "dla_night":
+      return "DLA night";
+    default:
+      return periodKind.replace(/_/g, " ");
+  }
+}
+
 export default async function CrewRotaPage({
   searchParams,
 }: Readonly<{
@@ -55,10 +88,15 @@ export default async function CrewRotaPage({
   const error = getQueryValue(params.error);
   const requestedStationId = getQueryValue(params.stationId) || null;
   const data = await loadCrewAvailabilityContext("/crew/rota", requestedStationId);
-  const weekendWindow = getNextWeekendWindow();
   const badges = buildCapabilityBadges(
     data.crewQualifications.filter((qualification) => qualification.asset_id && qualification.operational_role_id),
   );
+  const dayCoverCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "day_cover").length;
+  const nightCoverCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "night_cover").length;
+  const weekendCoverCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "weekend_cover").length;
+  const dlaDayCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "dla_day").length;
+  const dlaNightCount = data.dutyPeriods.filter((period) => period.is_active && period.period_kind === "dla_night").length;
+  const unassignedCount = data.dutyPeriods.filter((period) => period.is_active && !period.profile_id).length;
 
   return (
     <AppShell>
@@ -80,30 +118,33 @@ export default async function CrewRotaPage({
           </div>
         ) : null}
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <OperationalCard
-            title="Crew view"
-            tone="green"
-            metric="Own rota assignments"
-            summary="This page is intentionally read-only. Crew can see the periods they have been assigned against station operations."
-            details={[
-              "Availability remains editable on the availability page.",
-              "Admin and LOM staff can assign rota periods from the station view.",
-              "DLA visibility follows the existing security model.",
-            ]}
-          />
-          <OperationalCard
-            title="Weekend duty window"
-            tone="amber"
-            metric="Fri 19:00 to Mon 07:00"
-            summary={`Weekend rota planning runs from ${weekendWindow.startDateTimeLocal.replace("T", " ")} to ${weekendWindow.endDateTimeLocal.replace("T", " ")}.`}
-            details={[
-              "Crew can mark themselves unavailable for the weekend window.",
-              "Manual rota assignment is supported in the admin page.",
-              "Auto-generation and cover requests are backlog items.",
-            ]}
-          />
-        </div>
+        <SectionShell
+          title="Rota summary"
+          description="Duty rota shows assigned cover periods such as day cover, night cover, DLA duty and weekend cover."
+        >
+          <div className="grid gap-4 md:grid-cols-6">
+            <DashboardSummaryTile label="Day cover" value={dayCoverCount} tone="green" />
+            <DashboardSummaryTile label="Night cover" value={nightCoverCount} tone="blue" />
+            <DashboardSummaryTile label="Weekend cover" value={weekendCoverCount} tone="amber" />
+            <DashboardSummaryTile label="DLA day" value={dlaDayCount} tone="green" />
+            <DashboardSummaryTile label="DLA night" value={dlaNightCount} tone="blue" />
+            <DashboardSummaryTile label="Gaps / unassigned" value={unassignedCount} tone={unassignedCount > 0 ? "red" : "grey"} />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/crew/cover"
+              className="inline-flex h-11 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
+            >
+              Request cover
+            </Link>
+            <Link
+              href="/crew/availability"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              View availability
+            </Link>
+          </div>
+        </SectionShell>
 
         <SectionShell
           title="Station context"
@@ -151,49 +192,75 @@ export default async function CrewRotaPage({
 
             <SectionShell
               title="Rota assignments"
-              description="Assigned duty periods for the current station and crew member."
+              description="Assigned duty periods grouped by duty type so the next duty is easy to spot."
             >
               {data.dutyPeriods.length ? (
                 <div className="space-y-4">
-                  {data.dutyPeriods.map((period) => {
-                    const location = period.station_location && !Array.isArray(period.station_location) ? period.station_location : null;
-                    const asset = period.asset && !Array.isArray(period.asset) ? period.asset : null;
-                    const role = period.operational_role && !Array.isArray(period.operational_role) ? period.operational_role : null;
+                  {["day_cover", "night_cover", "weekend_cover", "dla_day", "dla_night", "launch_alert", "incident_cover", "training"].map(
+                    (periodKind) => {
+                      const periods = data.dutyPeriods.filter((period) => period.period_kind === periodKind);
 
-                    return (
-                      <div
-                        key={period.id}
-                        className="rounded-3xl border border-white/10 bg-slate-950/50 p-4"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-base font-semibold text-card-foreground">
-                              {period.period_kind.replace(/_/g, " ")}
-                            </p>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {formatDateTime(period.starts_at)} to {formatDateTime(period.ends_at)}
-                            </p>
+                      if (!periods.length) {
+                        return null;
+                      }
+
+                      return (
+                        <details key={periodKind} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
+                          <summary className="cursor-pointer list-none outline-none">
+                            <div className="flex items-center justify-between gap-3">
+                              <div>
+                                <p className="text-base font-semibold text-card-foreground">{getRotaGroupLabel(periodKind)}</p>
+                                <p className="mt-1 text-sm text-muted-foreground">{periods.length} assigned periods</p>
+                              </div>
+                              <StatusPill tone={getRotaGroupTone(periodKind)}>
+                                {periods.some((period) => period.is_active) ? "Shown" : "Inactive"}
+                              </StatusPill>
+                            </div>
+                          </summary>
+
+                          <div className="mt-4 space-y-3">
+                            {periods.map((period) => {
+                              const location = period.station_location && !Array.isArray(period.station_location) ? period.station_location : null;
+                              const asset = period.asset && !Array.isArray(period.asset) ? period.asset : null;
+                              const role = period.operational_role && !Array.isArray(period.operational_role) ? period.operational_role : null;
+
+                              return (
+                                <details key={period.id} className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                                  <summary className="cursor-pointer list-none outline-none">
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div>
+                                        <p className="text-sm font-medium text-card-foreground">
+                                          {formatDateTime(period.starts_at)} to {formatDateTime(period.ends_at)}
+                                        </p>
+                                        <p className="mt-1 text-xs text-muted-foreground">
+                                          {period.profile && !Array.isArray(period.profile)
+                                            ? period.profile.display_name ?? period.profile.email ?? "Crew member"
+                                            : "Crew member"}
+                                        </p>
+                                      </div>
+                                      <StatusPill tone={getPeriodTone(period.period_kind)}>
+                                        {period.is_active ? "Active" : "Inactive"}
+                                      </StatusPill>
+                                    </div>
+                                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                      {location ? <span className="rounded-full border border-white/10 px-3 py-1">{location.name}</span> : null}
+                                      {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
+                                      {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
+                                      <span className="rounded-full border border-white/10 px-3 py-1">{period.source}</span>
+                                    </div>
+                                  </summary>
+
+                                  {period.notes ? (
+                                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{period.notes}</p>
+                                  ) : null}
+                                </details>
+                              );
+                            })}
                           </div>
-                          <StatusPill tone={getPeriodTone(period.period_kind)}>
-                            {period.is_active ? "Active" : "Inactive"}
-                          </StatusPill>
-                        </div>
-
-                        <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                          {location ? <span className="rounded-full border border-white/10 px-3 py-1">{location.name}</span> : null}
-                          {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
-                          {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
-                          <span className="rounded-full border border-white/10 px-3 py-1">{period.source}</span>
-                        </div>
-
-                        {period.notes ? (
-                          <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                            {period.notes}
-                          </p>
-                        ) : null}
-                      </div>
-                    );
-                  })}
+                        </details>
+                      );
+                    },
+                  )}
                 </div>
               ) : (
                 <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">

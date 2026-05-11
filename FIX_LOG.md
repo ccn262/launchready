@@ -211,3 +211,12 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed after the UI-only refactor.
 - Next recommended step: run browser smoke tests against the compact dashboard layouts and confirm no functionality regression.
+
+## 2026-05-11 UI Readability Pass 2
+
+- Branch: `feature/ui-dashboard-readability-pass`
+- Scope: further compressed the cover and rota pages into dashboard-style summaries with grouped, expandable records.
+- Fixes: added reusable summary tiles, turned cover pages into section-filtered dashboards, and grouped availability/rota records by station location so the lists scan faster.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the second UI-only refinement.
+- Next recommended step: browser smoke test the cover and rota pages with station data and confirm the new grouping reads clearly.

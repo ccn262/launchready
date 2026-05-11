@@ -1,4 +1,7 @@
+import Link from "next/link";
+
 import { AppShell } from "@/components/app-shell";
+import { DashboardSummaryTile } from "@/components/dashboard-summary-tile";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
@@ -11,6 +14,8 @@ import { buildRedirectUrl } from "@/lib/admin-crud";
 import { loadAdminCoverPageData } from "@/lib/cover-requests";
 
 export const dynamic = "force-dynamic";
+
+type CoverSection = "open" | "urgent" | "accepted" | "cancelled" | "recent";
 
 function getQueryValue(value: string | string[] | undefined, fallback = "") {
   if (Array.isArray(value)) {
@@ -42,7 +47,7 @@ function toneForStatus(status: string) {
       return "green" as const;
     case "cancelled":
     case "expired":
-      return "red" as const;
+      return "grey" as const;
     case "open":
       return "amber" as const;
     default:
@@ -63,6 +68,48 @@ function toneForEligibility(status: string | null | undefined) {
   }
 }
 
+function getSection(value: string | undefined): CoverSection {
+  switch (value) {
+    case "urgent":
+    case "accepted":
+    case "cancelled":
+    case "recent":
+      return value;
+    default:
+      return "open";
+  }
+}
+
+function getSectionTitle(section: CoverSection) {
+  switch (section) {
+    case "urgent":
+      return "Urgent requests";
+    case "accepted":
+      return "Accepted cover";
+    case "cancelled":
+      return "Cancelled cover";
+    case "recent":
+      return "Recent and past";
+    default:
+      return "Open requests";
+  }
+}
+
+function getSectionDescription(section: CoverSection) {
+  switch (section) {
+    case "urgent":
+      return "Urgent cover requests that need quick attention.";
+    case "accepted":
+      return "Accepted requests remain visible for operational awareness.";
+    case "cancelled":
+      return "Cancelled requests stay visible for audit traceability.";
+    case "recent":
+      return "Accepted, cancelled, and expired requests remain visible as history.";
+    default:
+      return "Open station requests that may need crew cover.";
+  }
+}
+
 function RequestCard({
   item,
 }: Readonly<{
@@ -75,119 +122,25 @@ function RequestCard({
     <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-base font-semibold text-card-foreground">
-            {item.requesterName}
-          </p>
+          <p className="text-base font-semibold text-card-foreground">{item.requesterName}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {item.requestLabel} · {formatDateTime(request.starts_at)} to {formatDateTime(request.ends_at)}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <StatusPill tone={toneForStatus(request.status)}>{request.status.replace(/_/g, " ")}</StatusPill>
-          <StatusPill tone={request.urgency === "urgent" ? "red" : "amber"}>
-            {request.urgency}
-          </StatusPill>
+          <StatusPill tone={request.urgency === "urgent" ? "red" : "amber"}>{request.urgency}</StatusPill>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-        <span className="rounded-full border border-white/10 px-3 py-1">
-          {request.cover_type.replace(/_/g, " ")}
-        </span>
+        <span className="rounded-full border border-white/10 px-3 py-1">{request.cover_type.replace(/_/g, " ")}</span>
         {item.assetName ? <span className="rounded-full border border-white/10 px-3 py-1">{item.assetName}</span> : null}
         {item.roleName ? <span className="rounded-full border border-white/10 px-3 py-1">{item.roleName}</span> : null}
         {item.crewTypeName ? <span className="rounded-full border border-white/10 px-3 py-1">{item.crewTypeName}</span> : null}
       </div>
 
-      <p className="mt-4 text-sm leading-6 text-muted-foreground">
-        {request.reason}
-      </p>
-
-      {request.notes ? (
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          {request.notes}
-        </p>
-      ) : null}
-
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Eligible crew</p>
-          <p className="mt-2 text-2xl font-semibold text-card-foreground">
-            {item.eligibleCrewCount ?? 0}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-3 md:col-span-2">
-          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Eligible names</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {item.eligibleCrewNames.length ? (
-              item.eligibleCrewNames.map((name) => (
-                <span
-                  key={name}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-card-foreground"
-                >
-                  {name}
-                </span>
-              ))
-            ) : (
-              <span className="text-sm text-muted-foreground">No eligible crew identified yet.</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 space-y-2">
-        <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Responses</p>
-        {item.responses.length ? (
-          <div className="space-y-2">
-            {item.responses.map((response) => {
-              const responder = response.responder && !Array.isArray(response.responder) ? response.responder : null;
-              const canConfirm = request.status === "open" && response.response_status !== "accepted";
-
-              return (
-                <div key={response.id} className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-medium text-card-foreground">
-                        {responder?.display_name ?? responder?.email ?? response.responder_profile_id}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {response.response_status} · {response.eligibility_status.replace(/_/g, " ")}
-                      </p>
-                    </div>
-                    <StatusPill tone={toneForEligibility(response.eligibility_status)}>
-                      {response.eligibility_status.replace(/_/g, " ")}
-                    </StatusPill>
-                  </div>
-                  {response.eligibility_notes ? (
-                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                      {response.eligibility_notes}
-                    </p>
-                  ) : null}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {canConfirm ? (
-                      <form action={saveCoverResponseAction}>
-                        <input type="hidden" name="mode" value="confirm" />
-                        <input type="hidden" name="response_id" value={response.id} />
-                        <input type="hidden" name="cover_request_id" value={request.id} />
-                        <input type="hidden" name="response_status" value="accepted" />
-                        <input type="hidden" name="return_path" value="/admin/cover" />
-                        <button
-                          type="submit"
-                          className="inline-flex h-9 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
-                        >
-                          Confirm accepted
-                        </button>
-                      </form>
-                    ) : null}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">No responses recorded yet.</p>
-        )}
-      </div>
+      <p className="mt-4 line-clamp-2 text-sm leading-6 text-muted-foreground">{request.reason}</p>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {request.status === "open" ? (
@@ -205,10 +158,97 @@ function RequestCard({
 
         {openResponse ? (
           <StatusPill tone={toneForEligibility(openResponse.eligibility_status)}>
-            {openResponse.response_status}
+            {openResponse.response_status.replace(/_/g, " ")}
           </StatusPill>
         ) : null}
       </div>
+
+      <details className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-3">
+        <summary className="cursor-pointer list-none text-sm font-medium text-card-foreground outline-none">
+          Details, eligibility, and responses
+        </summary>
+
+        <div className="mt-3 space-y-4">
+          {request.notes ? (
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Notes</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{request.notes}</p>
+            </div>
+          ) : null}
+
+          <div>
+            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Eligible crew</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {item.eligibleCrewNames.length ? (
+                item.eligibleCrewNames.map((name) => (
+                  <span
+                    key={name}
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-card-foreground"
+                  >
+                    {name}
+                  </span>
+                ))
+              ) : (
+                <span className="text-sm text-muted-foreground">No eligible crew identified yet.</span>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Responses</p>
+            {item.responses.length ? (
+              <div className="mt-2 space-y-2">
+                {item.responses.map((response) => {
+                  const responder = response.responder && !Array.isArray(response.responder) ? response.responder : null;
+                  const canConfirm = request.status === "open" && response.response_status !== "accepted";
+
+                  return (
+                    <div key={response.id} className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-medium text-card-foreground">
+                            {responder?.display_name ?? responder?.email ?? response.responder_profile_id}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {response.response_status.replace(/_/g, " ")} · {response.eligibility_status.replace(/_/g, " ")}
+                          </p>
+                        </div>
+                        <StatusPill tone={toneForEligibility(response.eligibility_status)}>
+                          {response.eligibility_status.replace(/_/g, " ")}
+                        </StatusPill>
+                      </div>
+                      {response.eligibility_notes ? (
+                        <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                          {response.eligibility_notes}
+                        </p>
+                      ) : null}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {canConfirm ? (
+                          <form action={saveCoverResponseAction}>
+                            <input type="hidden" name="mode" value="confirm" />
+                            <input type="hidden" name="response_id" value={response.id} />
+                            <input type="hidden" name="cover_request_id" value={request.id} />
+                            <input type="hidden" name="response_status" value="accepted" />
+                            <input type="hidden" name="return_path" value="/admin/cover" />
+                            <button
+                              type="submit"
+                              className="inline-flex h-9 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
+                            >
+                              Confirm accepted
+                            </button>
+                          </form>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">No responses recorded yet.</p>
+            )}
+          </div>
+        </div>
+      </details>
     </article>
   );
 }
@@ -222,11 +262,30 @@ export default async function AdminCoverPage({
   const success = getQueryValue(params.success);
   const error = getQueryValue(params.error);
   const requestedStationId = getQueryValue(params.stationId) || null;
+  const selectedSection = getSection(getQueryValue(params.section));
   const data = await loadAdminCoverPageData("/admin/cover", requestedStationId);
-  const stationActionPath = buildRedirectUrl("/admin/cover", { stationId: data.selectedStationId });
+  const stationActionPath = buildRedirectUrl("/admin/cover", {
+    stationId: data.selectedStationId,
+    section: selectedSection,
+  });
+
   const openRequests = data.coverRequests.filter((item) => item.request.status === "open");
+  const urgentRequests = openRequests.filter((item) => item.request.urgency === "urgent");
   const acceptedRequests = data.coverRequests.filter((item) => item.request.status === "accepted");
   const cancelledRequests = data.coverRequests.filter((item) => item.request.status === "cancelled");
+  const recentRequests = data.coverRequests.filter((item) => item.request.status !== "open");
+
+  const sectionRequests =
+    selectedSection === "urgent"
+      ? urgentRequests
+      : selectedSection === "accepted"
+        ? acceptedRequests
+        : selectedSection === "cancelled"
+          ? cancelledRequests
+          : selectedSection === "recent"
+            ? recentRequests
+            : openRequests;
+
   const defaultStart = new Date();
   const defaultEnd = new Date(defaultStart.getTime() + 8 * 60 * 60 * 1000);
 
@@ -235,8 +294,8 @@ export default async function AdminCoverPage({
       <div className="space-y-6">
         <PageHero
           eyebrow="Admin / Cover"
-          title="Station cover requests"
-          summary="Station admins and LOMs can review open, urgent, accepted, and cancelled cover requests, see eligible crew counts, and confirm acceptance."
+          title="Cover requests"
+          summary="Review open, urgent, accepted, cancelled, and recent cover requests from a dashboard-first station view."
         />
 
         {success ? (
@@ -276,9 +335,7 @@ export default async function AdminCoverPage({
           description="Choose the station whose cover requests you want to manage."
         >
           <div className="flex flex-wrap items-center gap-3">
-            <StatusPill tone="blue">
-              {data.selectedStation?.name ?? "No station selected"}
-            </StatusPill>
+            <StatusPill tone="blue">{data.selectedStation?.name ?? "No station selected"}</StatusPill>
             <span className="text-sm text-muted-foreground">
               {data.selectedStation?.organisation_name ?? "Station scoped"}
             </span>
@@ -299,6 +356,7 @@ export default async function AdminCoverPage({
                 ))}
               </select>
             </label>
+            <input type="hidden" name="section" value={selectedSection} />
             <button
               type="submit"
               className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
@@ -310,11 +368,85 @@ export default async function AdminCoverPage({
 
         {data.selectedStationId ? (
           <>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href={buildRedirectUrl("/admin/cover", { stationId: data.selectedStationId, section: "open" })}
+                className="inline-flex h-11 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
+              >
+                Review cover requests
+              </Link>
+              <Link
+                href="#create-request"
+                className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+              >
+                Create cover request
+              </Link>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-5">
+              <DashboardSummaryTile
+                label="Open Requests"
+                value={openRequests.length}
+                tone="amber"
+                href={buildRedirectUrl("/admin/cover", { stationId: data.selectedStationId, section: "open" })}
+                description="Open station requests"
+              />
+              <DashboardSummaryTile
+                label="Urgent"
+                value={urgentRequests.length}
+                tone="red"
+                href={buildRedirectUrl("/admin/cover", { stationId: data.selectedStationId, section: "urgent" })}
+                description="Needs quick attention"
+              />
+              <DashboardSummaryTile
+                label="Accepted"
+                value={acceptedRequests.length}
+                tone="green"
+                href={buildRedirectUrl("/admin/cover", { stationId: data.selectedStationId, section: "accepted" })}
+                description="Already covered"
+              />
+              <DashboardSummaryTile
+                label="Cancelled"
+                value={cancelledRequests.length}
+                tone="grey"
+                href={buildRedirectUrl("/admin/cover", { stationId: data.selectedStationId, section: "cancelled" })}
+                description="Closed requests"
+              />
+              <DashboardSummaryTile
+                label="Recent / Past"
+                value={recentRequests.length}
+                tone="grey"
+                href={buildRedirectUrl("/admin/cover", { stationId: data.selectedStationId, section: "recent" })}
+                description="Operational history"
+              />
+            </div>
+
+            <SectionShell
+              title={getSectionTitle(selectedSection)}
+              description={getSectionDescription(selectedSection)}
+            >
+              {sectionRequests.length ? (
+                <div className="space-y-4">
+                  {sectionRequests.map((item) => (
+                    <RequestCard key={item.request.id} item={item} />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
+                  No {selectedSection === "recent" ? "historical" : selectedSection} cover requests are currently visible.
+                </div>
+              )}
+            </SectionShell>
+
             <SectionShell
               title="Create cover request"
               description="Admins can create a request on behalf of the station to keep manual cover tracking consistent."
             >
-              <form action={saveCoverRequestAction} className="grid gap-4 rounded-3xl border border-white/10 bg-slate-950/50 p-4 md:grid-cols-2">
+              <form
+                id="create-request"
+                action={saveCoverRequestAction}
+                className="grid gap-4 rounded-3xl border border-white/10 bg-slate-950/50 p-4 md:grid-cols-2"
+              >
                 <input type="hidden" name="station_id" value={data.selectedStationId} />
                 <input type="hidden" name="return_path" value={stationActionPath} />
                 <label className="space-y-2">
@@ -453,73 +585,6 @@ export default async function AdminCoverPage({
                   </button>
                 </div>
               </form>
-            </SectionShell>
-
-            <div className="grid gap-4 md:grid-cols-4">
-              {[
-                ["Open", openRequests.length],
-                ["Urgent", data.urgentCount],
-                ["Accepted", acceptedRequests.length],
-                ["Cancelled", cancelledRequests.length],
-              ].map(([label, value]) => (
-                <div key={label} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">{label}</p>
-                  <p className="mt-2 text-3xl font-semibold text-card-foreground">{value as number}</p>
-                </div>
-              ))}
-            </div>
-
-            <SectionShell
-              title="Open requests"
-              description="Station requests that are still open and may need crew cover."
-            >
-              {openRequests.length ? (
-                <div className="space-y-4">
-                  {openRequests.map((item) => (
-                    <RequestCard key={item.request.id} item={item} />
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
-                  No open cover requests are currently active.
-                </div>
-              )}
-            </SectionShell>
-
-            <SectionShell
-              title="Accepted and cancelled"
-              description="Recent resolved cover requests remain visible for operational awareness and audit traceability."
-            >
-              {acceptedRequests.length || cancelledRequests.length ? (
-                <div className="space-y-4">
-                  {[...acceptedRequests, ...cancelledRequests].map((item) => (
-                    <RequestCard key={item.request.id} item={item} />
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
-                  No accepted or cancelled requests yet.
-                </div>
-              )}
-            </SectionShell>
-
-            <SectionShell
-              title="Recent / past cover requests"
-              description="All non-open station requests remain visible so historical requests do not disappear."
-            >
-              {data.coverRequests.filter((item) => item.request.status !== "open").length ? (
-                <div className="space-y-4">
-                  {data.coverRequests
-                    .filter((item) => item.request.status !== "open")
-                    .map((item) => (
-                      <RequestCard key={item.request.id} item={item} />
-                    ))}
-                </div>
-              ) : (
-                <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
-                  No historical cover requests yet.
-                </div>
-              )}
             </SectionShell>
           </>
         ) : (

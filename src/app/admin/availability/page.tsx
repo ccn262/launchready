@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/app-shell";
 import { CrewCapabilityBadges } from "@/components/crew-capability-badges";
-import { OperationalCard } from "@/components/operational-card";
+import { DashboardSummaryTile } from "@/components/dashboard-summary-tile";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
@@ -52,6 +52,37 @@ function getSlotTone(slot: AvailabilitySlotRecord) {
   }
 }
 
+function getAvailabilityStatusTone(availableCount: number, unavailableCount: number) {
+  if (availableCount === 0 && unavailableCount === 0) {
+    return "grey" as const;
+  }
+
+  if (availableCount > 0 && unavailableCount === 0) {
+    return "green" as const;
+  }
+
+  if (availableCount > 0 && unavailableCount > 0) {
+    return "amber" as const;
+  }
+
+  return "red" as const;
+}
+
+function getAvailabilitySummary(slotKind: AvailabilitySlotRecord["slot_kind"]) {
+  switch (slotKind) {
+    case "full_day":
+      return "Full day";
+    case "partial_day":
+      return "Partial day";
+    case "night_cover":
+      return "Night cover";
+    case "weekend_unavailable":
+      return "Weekend unavailable";
+    default:
+      return "Unavailable";
+  }
+}
+
 export default async function AdminAvailabilityPage({
   searchParams,
 }: Readonly<{
@@ -70,6 +101,81 @@ export default async function AdminAvailabilityPage({
   const defaultEndDate = new Date(defaultStartDate.getTime() + 8 * 60 * 60 * 1000);
   const defaultStart = toDateTimeLocalValue(defaultStartDate);
   const defaultEnd = toDateTimeLocalValue(defaultEndDate);
+  const nowLabel = new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date());
+  const groupedLocations = [
+    ...data.locations.map((location) => {
+      const slots = data.availabilitySlots.filter((slot) => slot.station_location_id === location.id);
+      const profileIds = new Set(slots.map((slot) => slot.profile_id));
+      const availableProfiles = new Set(
+        slots.filter((slot) => slot.slot_kind === "full_day" || slot.slot_kind === "partial_day" || slot.slot_kind === "night_cover")
+          .map((slot) => slot.profile_id),
+      );
+      const unavailableProfiles = new Set(
+        slots.filter((slot) => slot.slot_kind === "unavailable" || slot.slot_kind === "weekend_unavailable")
+          .map((slot) => slot.profile_id),
+      );
+      const nightCoverCount = slots.filter((slot) => slot.slot_kind === "night_cover").length;
+      const weekendUnavailableCount = slots.filter((slot) => slot.slot_kind === "weekend_unavailable").length;
+      const locationQualifications = data.crewQualifications.filter((qualification) => profileIds.has(qualification.profile_id));
+
+      return {
+        key: location.id,
+        title: location.name,
+        slots,
+        tone: getAvailabilityStatusTone(availableProfiles.size, unavailableProfiles.size),
+        availableCount: availableProfiles.size,
+        unavailableCount: unavailableProfiles.size,
+        nightCoverCount,
+        weekendUnavailableCount,
+        capabilityBadges: buildCapabilityBadges(locationQualifications),
+      };
+    }),
+    {
+      key: "station-wide",
+      title: "Station-wide",
+      slots: data.availabilitySlots.filter((slot) => !slot.station_location_id),
+      tone: getAvailabilityStatusTone(
+        new Set(
+          data.availabilitySlots
+            .filter((slot) => !slot.station_location_id && (slot.slot_kind === "full_day" || slot.slot_kind === "partial_day" || slot.slot_kind === "night_cover"))
+            .map((slot) => slot.profile_id),
+        ).size,
+        new Set(
+          data.availabilitySlots
+            .filter((slot) => !slot.station_location_id && (slot.slot_kind === "unavailable" || slot.slot_kind === "weekend_unavailable"))
+            .map((slot) => slot.profile_id),
+        ).size,
+      ),
+      availableCount: new Set(
+        data.availabilitySlots
+          .filter((slot) => !slot.station_location_id && (slot.slot_kind === "full_day" || slot.slot_kind === "partial_day" || slot.slot_kind === "night_cover"))
+          .map((slot) => slot.profile_id),
+      ).size,
+      unavailableCount: new Set(
+        data.availabilitySlots
+          .filter((slot) => !slot.station_location_id && (slot.slot_kind === "unavailable" || slot.slot_kind === "weekend_unavailable"))
+          .map((slot) => slot.profile_id),
+      ).size,
+      nightCoverCount: data.availabilitySlots.filter((slot) => !slot.station_location_id && slot.slot_kind === "night_cover").length,
+      weekendUnavailableCount: data.availabilitySlots.filter((slot) => !slot.station_location_id && slot.slot_kind === "weekend_unavailable").length,
+      capabilityBadges: [],
+    },
+  ];
+  const availableCount = new Set(
+    data.availabilitySlots
+      .filter((slot) => slot.slot_kind === "full_day" || slot.slot_kind === "partial_day" || slot.slot_kind === "night_cover")
+      .map((slot) => slot.profile_id),
+  ).size;
+  const unavailableCount = new Set(
+    data.availabilitySlots
+      .filter((slot) => slot.slot_kind === "unavailable" || slot.slot_kind === "weekend_unavailable")
+      .map((slot) => slot.profile_id),
+  ).size;
+  const nightCoverCount = data.availabilitySlots.filter((slot) => slot.slot_kind === "night_cover").length;
+  const weekendUnavailableCount = data.availabilitySlots.filter((slot) => slot.slot_kind === "weekend_unavailable").length;
 
   return (
     <AppShell>
@@ -91,41 +197,51 @@ export default async function AdminAvailabilityPage({
           </div>
         ) : null}
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <OperationalCard
-            title="Station-wide view"
-            tone="green"
-            metric="Scoped to the selected station"
-            summary="This page surfaces station availability in one place so admins can see who is covering what."
-            details={[
-              "Crew still own their personal availability entries.",
-              "Station admins and LOMs can view and manage station-scoped records.",
-              "The rota engine will use these windows later, but not yet.",
-            ]}
-          />
-          <OperationalCard
-            title="Weeknight cover"
-            tone="amber"
-            metric="Mon to Thu 19:00–07:00"
-            summary="Night cover is visible here as a foundation for future rota summaries and alerting."
-            details={[
-              "Use the station selector to switch context.",
-              "Weekend unavailability is supported as a separate slot type.",
-              "Auto-rotas and cover requests remain out of scope.",
-            ]}
-          />
-        </div>
-
         <SectionShell
-          title="Readiness console"
-          description="Use the readiness console to see the calculated station, location, and asset status built from these availability records."
+          title="Availability summary"
+          description="Availability shows who has declared they are available or unavailable. It does not itself mean the asset is on service; readiness combines availability, roles, qualifications, and safe-crewing rules."
         >
-          <Link
-            href="/admin/readiness"
-            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
-          >
-            Open readiness console
-          </Link>
+          <div className="grid gap-4 md:grid-cols-4">
+            <DashboardSummaryTile
+              label="Available crew"
+              value={availableCount}
+              tone="green"
+              description="Active available windows"
+            />
+            <DashboardSummaryTile
+              label="Unavailable crew"
+              value={unavailableCount}
+              tone={unavailableCount > 0 ? "amber" : "grey"}
+              description="Active unavailable windows"
+            />
+            <DashboardSummaryTile
+              label="Night cover"
+              value={nightCoverCount}
+              tone="blue"
+              description="Mon to Thu 19:00–07:00"
+            />
+            <DashboardSummaryTile
+              label="Weekend unavailable"
+              value={weekendUnavailableCount}
+              tone={weekendUnavailableCount > 0 ? "red" : "grey"}
+              description="Fri 19:00 to Mon 07:00"
+            />
+          </div>
+          <p className="mt-4 text-sm text-muted-foreground">Current assessment time: {nowLabel}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/admin/readiness"
+              className="inline-flex h-11 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
+            >
+              View readiness
+            </Link>
+            <Link
+              href="/admin/duty-rota"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              View duty rota
+            </Link>
+          </div>
         </SectionShell>
 
         <SectionShell title="Station context" description="Pick the station you want to manage.">
@@ -327,49 +443,81 @@ export default async function AdminAvailabilityPage({
             </SectionShell>
 
             <SectionShell
-              title="Station availability list"
-              description="Review current station-wide windows, including weekend unavailability."
+              title="Location dashboard"
+              description="Station locations appear first so you can expand the place you need and keep the raw rows collapsed by default."
             >
-              {data.availabilitySlots.length ? (
+              {groupedLocations.length ? (
                 <div className="space-y-4">
-                  {data.availabilitySlots.map((slot) => {
-                    const profile = slot.profile && !Array.isArray(slot.profile) ? slot.profile : null;
-                    const location = slot.station_location && !Array.isArray(slot.station_location) ? slot.station_location : null;
-                    const asset = slot.asset && !Array.isArray(slot.asset) ? slot.asset : null;
-                    const assetType = slot.asset_type && !Array.isArray(slot.asset_type) ? slot.asset_type : null;
-                    const role = slot.operational_role && !Array.isArray(slot.operational_role) ? slot.operational_role : null;
+                  {groupedLocations.map((group) => (
+                    <details key={group.key} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
+                      <summary className="cursor-pointer list-none outline-none">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-base font-semibold text-card-foreground">{group.title}</p>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {group.availableCount} available · {group.unavailableCount} unavailable · {group.nightCoverCount} night cover · {group.weekendUnavailableCount} weekend unavailable
+                            </p>
+                          </div>
+                          <StatusPill tone={group.tone}>
+                            {group.availableCount > 0 ? "Ready" : group.unavailableCount > 0 ? "At risk" : "Unknown"}
+                          </StatusPill>
+                        </div>
+                      </summary>
 
-                    return (
-                      <details key={slot.id} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
-                        <summary className="cursor-pointer list-none outline-none">
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="text-base font-semibold text-card-foreground">
-                                {profile?.display_name ?? profile?.email ?? "Crew member"} · {slot.slot_kind.replace(/_/g, " ")}
-                              </p>
-                              <p className="mt-1 text-sm text-muted-foreground">
-                                {formatDateTime(slot.starts_at)} to {formatDateTime(slot.ends_at)}
-                              </p>
+                      <div className="mt-4 space-y-4">
+                        {group.capabilityBadges.length ? (
+                          <div>
+                            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Capability badges</p>
+                            <div className="mt-2">
+                              <CrewCapabilityBadges items={group.capabilityBadges} />
                             </div>
-                            <StatusPill tone={getSlotTone(slot)}>{slot.is_active ? "Active" : "Inactive"}</StatusPill>
                           </div>
-
-                          <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                            {location ? <span className="rounded-full border border-white/10 px-3 py-1">{location.name}</span> : null}
-                            {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
-                            {assetType ? <span className="rounded-full border border-white/10 px-3 py-1">{assetType.name}</span> : null}
-                            {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
-                          </div>
-                        </summary>
-
-                        {slot.notes ? (
-                          <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                            {slot.notes}
-                          </p>
                         ) : null}
-                      </details>
-                    );
-                  })}
+
+                        {group.slots.length ? (
+                          <div className="space-y-3">
+                            {group.slots.map((slot) => {
+                              const profile = slot.profile && !Array.isArray(slot.profile) ? slot.profile : null;
+                              const asset = slot.asset && !Array.isArray(slot.asset) ? slot.asset : null;
+                              const assetType = slot.asset_type && !Array.isArray(slot.asset_type) ? slot.asset_type : null;
+                              const role = slot.operational_role && !Array.isArray(slot.operational_role) ? slot.operational_role : null;
+
+                              return (
+                                <details key={slot.id} className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                                  <summary className="cursor-pointer list-none outline-none">
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div>
+                                        <p className="text-sm font-medium text-card-foreground">
+                                          {profile?.display_name ?? profile?.email ?? "Crew member"} · {getAvailabilitySummary(slot.slot_kind).toLowerCase()}
+                                        </p>
+                                        <p className="mt-1 text-xs text-muted-foreground">
+                                          {formatDateTime(slot.starts_at)} to {formatDateTime(slot.ends_at)}
+                                        </p>
+                                      </div>
+                                      <StatusPill tone={getSlotTone(slot)}>{slot.is_active ? "Active" : "Inactive"}</StatusPill>
+                                    </div>
+                                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                      {asset ? <span className="rounded-full border border-white/10 px-3 py-1">{asset.name}</span> : null}
+                                      {assetType ? <span className="rounded-full border border-white/10 px-3 py-1">{assetType.name}</span> : null}
+                                      {role ? <span className="rounded-full border border-white/10 px-3 py-1">{role.name}</span> : null}
+                                    </div>
+                                  </summary>
+
+                                  {slot.notes ? (
+                                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{slot.notes}</p>
+                                  ) : null}
+                                </details>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-sm text-muted-foreground">
+                            No availability windows exist for this location yet.
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  ))}
                 </div>
               ) : (
                 <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">

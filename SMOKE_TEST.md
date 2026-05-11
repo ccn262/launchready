@@ -130,6 +130,16 @@
 - `/admin/availability` and `/admin/duty-rota` keep their forms usable while collapsing long record lists into expandable rows.
 - No backend functionality, schema, or RLS changes are expected in this pass.
 
+## UI Readability Pass 2
+
+- `/admin/cover` opens with status cards, a clear primary action, and a single default section rather than every list at once.
+- `/crew/cover` opens with `Create cover request` plus summary cards for my requests, open requests, accepted, and recent cover.
+- `/admin/availability` explains the difference between availability, duty rota, and readiness, then shows station locations as expandable dashboard tiles.
+- `/admin/duty-rota` explains what the page does, then shows summary cards and location-grouped duty sections first.
+- `/crew/availability` is action-led with `Add availability` near the top and grouped availability sections.
+- `/crew/rota` is compact and grouped by duty type, with a link back to cover requests where relevant.
+- No schema, RLS, or business-logic changes are expected.
+
 ## Phase 9 Pass Criteria
 
 - Launch initiation remains advisory only and never authorises a launch.

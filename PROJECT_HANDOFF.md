@@ -114,3 +114,4 @@ Launch Ready now has the initial Next.js App Router foundation, strict TypeScrip
 - Main usability issue: the operational screens had become long report-style pages that were hard to scan quickly during live use.
 - Layout changes: the dashboard and readiness views now prefer compact summary cards, status-first tiles, step labels, and expandable detail rows for asset, availability, and rota records.
 - Scope boundary: this pass was UI-only. No schema, RLS, readiness, incident, cover, auth, or notification logic changed.
+- Follow-up UI refinement: the cover and rota pages were further compressed into dashboard-first layouts with status tiles, grouped sections, and expandable detail cards while keeping existing actions intact.

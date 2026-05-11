@@ -1,9 +1,10 @@
 import { AppShell } from "@/components/app-shell";
 import { CrewCapabilityBadges } from "@/components/crew-capability-badges";
-import { OperationalCard } from "@/components/operational-card";
+import { DashboardSummaryTile } from "@/components/dashboard-summary-tile";
 import { PageHero } from "@/components/page-hero";
 import { SectionShell } from "@/components/section-shell";
 import { StatusPill } from "@/components/status-pill";
+import Link from "next/link";
 import { saveCrewAvailabilityAction } from "@/app/phase6-actions";
 import { buildRedirectUrl, type AssetRecord, type AssetTypeRecord, type StationLocationRecord } from "@/lib/admin-crud";
 import { buildCapabilityBadges } from "@/lib/capability-badges";
@@ -54,6 +55,14 @@ function getSlotTone(slot: AvailabilitySlotRecord) {
     default:
       return "green" as const;
   }
+}
+
+function isAvailableSlot(slot: AvailabilitySlotRecord) {
+  return slot.slot_kind === "full_day" || slot.slot_kind === "partial_day" || slot.slot_kind === "night_cover";
+}
+
+function isUnavailableSlot(slot: AvailabilitySlotRecord) {
+  return slot.slot_kind === "unavailable" || slot.slot_kind === "weekend_unavailable";
 }
 
 function SlotCard({
@@ -269,8 +278,22 @@ export default async function CrewAvailabilityPage({
   );
   const defaultStartDate = new Date();
   const defaultEndDate = new Date(defaultStartDate.getTime() + 8 * 60 * 60 * 1000);
+  const assessmentTime = new Date();
+  const assessmentTimeMs = assessmentTime.getTime();
   const defaultStart = toDateTimeLocalValue(defaultStartDate);
   const defaultEnd = toDateTimeLocalValue(defaultEndDate);
+  const availableNowCount = data.availabilitySlots.filter((slot) => slot.is_active && isAvailableSlot(slot)).length;
+  const upcomingAvailabilityCount = data.availabilitySlots.filter(
+    (slot) => slot.is_active && isAvailableSlot(slot) && slot.starts_at && new Date(slot.starts_at).getTime() > assessmentTimeMs,
+  ).length;
+  const unavailableCount = data.availabilitySlots.filter((slot) => slot.is_active && isUnavailableSlot(slot)).length;
+  const weekendUnavailableCount = data.availabilitySlots.filter(
+    (slot) => slot.is_active && slot.slot_kind === "weekend_unavailable",
+  ).length;
+  const availableSlots = data.availabilitySlots.filter((slot) => slot.is_active && isAvailableSlot(slot));
+  const upcomingSlots = availableSlots.filter((slot) => slot.starts_at && new Date(slot.starts_at).getTime() > assessmentTimeMs);
+  const unavailableSlots = data.availabilitySlots.filter((slot) => slot.is_active && slot.slot_kind === "unavailable");
+  const weekendUnavailableSlots = data.availabilitySlots.filter((slot) => slot.is_active && slot.slot_kind === "weekend_unavailable");
 
   return (
     <AppShell>
@@ -292,30 +315,31 @@ export default async function CrewAvailabilityPage({
           </div>
         ) : null}
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <OperationalCard
-            title="Weeknight cover"
-            tone="green"
-            metric="Mon to Thu 19:00–07:00"
-            summary="Use this page to declare availability windows that support weeknight cover for boat crew, shore crew, and DLA where applicable."
-            details={[
-              "The next step is using these windows in the rota summary.",
-              "Availability remains crew-owned by default.",
-              "Station admins can view the station-wide picture on the admin page.",
-            ]}
-          />
-          <OperationalCard
-            title="Weekend duty window"
-            tone="amber"
-            metric="Fri 19:00 to Mon 07:00"
-            summary="Crew can mark themselves unavailable for the weekend duty window, which admins can then review and assign manually."
-            details={[
-              "Auto-rota generation is not built yet.",
-              "Cover and swap requests remain backlog items.",
-              "The foundation is designed for future rota management.",
-            ]}
-          />
-        </div>
+        <SectionShell
+          title="Availability summary"
+          description="Tell the station when you can or cannot cover. Availability does not itself mean the asset is on service; readiness combines availability, roles, qualifications, and safe-crewing rules."
+        >
+          <div className="grid gap-4 md:grid-cols-4">
+            <DashboardSummaryTile label="Available now" value={availableNowCount} tone="green" />
+            <DashboardSummaryTile label="Upcoming availability" value={upcomingAvailabilityCount} tone="blue" />
+            <DashboardSummaryTile label="Unavailable periods" value={unavailableCount} tone="amber" />
+            <DashboardSummaryTile label="Weekend unavailable" value={weekendUnavailableCount} tone="red" />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="#add-availability"
+              className="inline-flex h-11 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-sm font-medium text-emerald-950 transition hover:bg-emerald-400"
+            >
+              Add availability
+            </Link>
+            <Link
+              href="/crew/rota"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-foreground transition hover:bg-white/10"
+            >
+              View rota
+            </Link>
+          </div>
+        </SectionShell>
 
         <SectionShell
           title="Station context"
@@ -353,6 +377,7 @@ export default async function CrewAvailabilityPage({
               description="Use a datetime window, then tag it with location, asset, and role context where helpful."
             >
               <form
+                id="add-availability"
                 action={saveCrewAvailabilityAction}
                 className="grid gap-4 rounded-3xl border border-white/10 bg-slate-950/50 p-4 md:grid-cols-2"
               >
@@ -485,28 +510,50 @@ export default async function CrewAvailabilityPage({
             </SectionShell>
 
             <SectionShell
-              title="Availability list"
-              description="Current availability windows for the selected station."
+              title="Availability breakdown"
+              description="Grouped by how crew have declared their availability so the station can scan the current picture quickly."
             >
-              {data.availabilitySlots.length ? (
-                <div className="space-y-4">
-                  {data.availabilitySlots.map((slot) => (
-                    <SlotCard
-                      key={slot.id}
-                      slot={slot}
-                      locations={data.locations}
-                      assets={data.assets}
-                      assetTypes={data.assetTypes}
-                      operationalRoles={data.operationalRoles}
-                      returnPath={returnPath}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-muted-foreground">
-                  No availability windows exist for this station yet.
-                </div>
-              )}
+              <div className="space-y-4">
+                {[
+                  ["Available now", availableSlots],
+                  ["Upcoming availability", upcomingSlots],
+                  ["Unavailable periods", unavailableSlots],
+                  ["Weekend unavailable", weekendUnavailableSlots],
+                ].map(([label, slots]) => (
+                  <details key={label as string} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
+                    <summary className="cursor-pointer list-none outline-none">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-base font-semibold text-card-foreground">{label as string}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">{(slots as AvailabilitySlotRecord[]).length} records</p>
+                        </div>
+                        <StatusPill tone={(slots as AvailabilitySlotRecord[]).length ? (label === "Weekend unavailable" ? "red" : label === "Unavailable periods" ? "amber" : label === "Upcoming availability" ? "blue" : "green") : "grey"}>
+                          { (slots as AvailabilitySlotRecord[]).length ? "Shown" : "None" }
+                        </StatusPill>
+                      </div>
+                    </summary>
+                    <div className="mt-4 space-y-4">
+                      {(slots as AvailabilitySlotRecord[]).length ? (
+                        (slots as AvailabilitySlotRecord[]).map((slot) => (
+                          <SlotCard
+                            key={slot.id}
+                            slot={slot}
+                            locations={data.locations}
+                            assets={data.assets}
+                            assetTypes={data.assetTypes}
+                            operationalRoles={data.operationalRoles}
+                            returnPath={returnPath}
+                          />
+                        ))
+                      ) : (
+                        <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-sm text-muted-foreground">
+                          No records in this section.
+                        </div>
+                      )}
+                    </div>
+                  </details>
+                ))}
+              </div>
             </SectionShell>
 
             <SectionShell

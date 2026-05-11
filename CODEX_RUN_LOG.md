@@ -336,3 +336,12 @@
 - Tests run: `npm run lint`, `npm run build`.
 - Result: both passed after the UI-only refactor.
 - Next recommended step: browser-smoke the compact dashboard pages and confirm there was no backend behavior change.
+
+## 2026-05-11 UI Readability Pass 2
+
+- Branch: `feature/ui-dashboard-readability-pass`
+- Scope: refined `/admin/cover`, `/crew/cover`, `/admin/availability`, `/admin/duty-rota`, `/crew/availability`, and `/crew/rota` to read like dashboard screens instead of long record lists.
+- Fixes: added reusable status summary tiles, grouped cover requests into section-based dashboard views, and collapsed availability/rota records into location-first expandable panels.
+- Tests run: `npm run lint`, `npm run build`.
+- Result: both passed after the second UI-only refinement.
+- Next recommended step: browser-test the cover and rota screens to confirm the dashboard-first flow is easy to scan.
